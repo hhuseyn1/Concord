@@ -3,16 +3,14 @@ using Concord.Application.Models;
 using Concord.Domain.Entities;
 using Concord.Domain.Exceptions;
 using Concord.Infrastructure.Context;
-using Microsoft.AspNetCore.Hosting;
+using Concord.Infrastructure.Services.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Concord.Infrastructure.Services;
 
-public class FilesService(IWebHostEnvironment environment, ApplicationDbContext context)
+public class FilesService(IFileStorage fileStorage, ApplicationDbContext context)
 {
-    private const string UploadsUrlPrefix = "/uploads/";
-
     private const string AvatarPurpose = "avatars";
     private const string ServerIconPurpose = "server-icons";
     private const string AttachmentPurpose = "attachments";
@@ -76,7 +74,7 @@ public class FilesService(IWebHostEnvironment environment, ApplicationDbContext 
     private static bool StartsWith(byte[] bytes, byte[] signature) =>
         bytes.Length >= signature.Length && bytes.AsSpan(0, signature.Length).SequenceEqual(signature);
 
-    private readonly IWebHostEnvironment _environment = environment;
+    private readonly IFileStorage _fileStorage = fileStorage;
     private readonly ApplicationDbContext _context = context;
 
     public async Task<FileUploadResponse> UploadAvatarAsync(Guid uploaderUserId, IFormFile file)
@@ -100,8 +98,7 @@ public class FilesService(IWebHostEnvironment environment, ApplicationDbContext 
         return new FileUploadResponse { Url = url };
     }
 
-    public static bool IsOwnUploadUrl(string? url) =>
-        !string.IsNullOrWhiteSpace(url) && url.StartsWith(UploadsUrlPrefix, StringComparison.Ordinal);
+    public bool IsOwnUploadUrl(string? url) => _fileStorage.OwnsUrl(url);
 
     /// <summary>
     /// The message-attachment-specific half of the ownership check: <see cref="IsOwnUploadUrl"/>
@@ -123,22 +120,12 @@ public class FilesService(IWebHostEnvironment environment, ApplicationDbContext 
             file.Url == url && file.UploaderUserId == userId && file.Purpose == UploadPurpose.Attachment);
     }
 
-    public void DeleteFile(string? url)
+    public async Task DeleteFileAsync(string? url)
     {
         if (string.IsNullOrWhiteSpace(url))
             return;
 
-        try
-        {
-            var relativePath = url.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
-            var fullPath = Path.Combine(_environment.WebRootPath, relativePath);
-
-            if (File.Exists(fullPath))
-                File.Delete(fullPath);
-        }
-        catch
-        {
-        }
+        await _fileStorage.DeleteAsync(url);
     }
 
     private async Task<string> SaveFileAsync(Guid uploaderUserId, IFormFile file, UploadPurpose purpose, string purposeSegment, string[] allowedContentTypes, long maxSizeBytes)
@@ -175,19 +162,14 @@ public class FilesService(IWebHostEnvironment environment, ApplicationDbContext 
         }
 
         var extension = allowedExtensions[0];
-
-        var directoryPath = Path.Combine(_environment.WebRootPath, "uploads", purposeSegment);
-        Directory.CreateDirectory(directoryPath);
-
         var fileName = $"{Guid.NewGuid()}{extension}";
-        var fullPath = Path.Combine(directoryPath, fileName);
 
-        await using (var stream = new FileStream(fullPath, FileMode.Create))
+        string url;
+
+        await using (var stream = file.OpenReadStream())
         {
-            await file.CopyToAsync(stream);
+            url = await _fileStorage.SaveAsync(stream, purposeSegment, fileName, file.ContentType);
         }
-
-        var url = $"/uploads/{purposeSegment}/{fileName}";
 
         _context.UploadedFiles.Add(new UploadedFile
         {

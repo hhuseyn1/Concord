@@ -234,7 +234,7 @@ public class MessagesService(
             await _context.SaveChangesAsync();
 
             if (!string.IsNullOrWhiteSpace(attachmentUrl))
-                _filesService.DeleteFile(attachmentUrl);
+                await _filesService.DeleteFileAsync(attachmentUrl);
 
             await _realtimeNotifier.MessageDeletedAsync(channelId, messageId);
 

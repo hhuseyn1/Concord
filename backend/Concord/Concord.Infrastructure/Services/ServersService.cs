@@ -29,7 +29,7 @@ public class ServersService(
         if (string.IsNullOrWhiteSpace(request.Name))
             throw new ParameterValidationException(nameof(request.Name));
 
-        if (!string.IsNullOrWhiteSpace(request.IconUrl) && !FilesService.IsOwnUploadUrl(request.IconUrl))
+        if (!string.IsNullOrWhiteSpace(request.IconUrl) && !_filesService.IsOwnUploadUrl(request.IconUrl))
             throw new ParameterValidationException(nameof(request.IconUrl));
 
         var server = new Server
@@ -64,7 +64,7 @@ public class ServersService(
         if (string.IsNullOrWhiteSpace(request.Name))
             throw new ParameterValidationException(nameof(request.Name));
 
-        if (!string.IsNullOrWhiteSpace(request.IconUrl) && !FilesService.IsOwnUploadUrl(request.IconUrl))
+        if (!string.IsNullOrWhiteSpace(request.IconUrl) && !_filesService.IsOwnUploadUrl(request.IconUrl))
             throw new ParameterValidationException(nameof(request.IconUrl));
 
         var oldIconUrl = server.IconUrl;
@@ -75,7 +75,7 @@ public class ServersService(
         await _context.SaveChangesAsync();
 
         if (!string.IsNullOrWhiteSpace(oldIconUrl) && oldIconUrl != request.IconUrl)
-            _filesService.DeleteFile(oldIconUrl);
+            await _filesService.DeleteFileAsync(oldIconUrl);
 
         var result = server.MapToResponse();
 

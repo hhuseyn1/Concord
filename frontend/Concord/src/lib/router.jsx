@@ -11,10 +11,12 @@ import { RegisterScreen } from '../features/auth/RegisterScreen'
 import { ResetPasswordScreen } from '../features/auth/ResetPasswordScreen'
 import { DirectMessageView } from '../features/directMessages/DirectMessageView'
 import { FriendsScreen } from '../features/friends/FriendsScreen'
+import { LandingScreen } from '../features/landing/LandingScreen'
 import { ChannelView } from '../features/messages/ChannelView'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 
 export const router = createBrowserRouter([
+  { path: '/welcome', element: <LandingScreen /> },
   { path: '/login', element: <LoginScreen /> },
   { path: '/register', element: <RegisterScreen /> },
   { path: '/forgot-password', element: <ForgotPasswordScreen /> },

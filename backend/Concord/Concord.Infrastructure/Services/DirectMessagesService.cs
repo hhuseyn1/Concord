@@ -425,7 +425,7 @@ public class DirectMessagesService(
             await _context.SaveChangesAsync();
 
             if (!string.IsNullOrWhiteSpace(attachmentUrl))
-                _filesService.DeleteFile(attachmentUrl);
+                await _filesService.DeleteFileAsync(attachmentUrl);
 
             await _realtimeNotifier.MessageDeletedAsync(conversation.UserAId, conversation.UserBId, conversationId, messageId);
 
