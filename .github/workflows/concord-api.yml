@@ -1,0 +1,69 @@
+name: Deploy Concord API to Azure
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      # Yollar backend/Concord daxilinə yönləndirildi
+      - 'backend/Concord/Concord.API/**'
+      - 'backend/Concord/Concord.Application/**'
+      - 'backend/Concord/Concord.Infrastructure/**'
+      - 'backend/Concord/Concord.Domain/**'
+      - '.github/workflows/master_concord.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-concord-api-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Azure JWT token üçün mütləqdir
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+
+      - name: Publish API
+        run: |
+          # csproj faylının dəqiq yolu qeyd edildi
+          dotnet publish backend/Concord/Concord.API/Concord.API.csproj \
+            --configuration Release \
+            --output ./publish \
+            --nologo
+
+      - name: Verify publish output
+        run: |
+          [ -f "./publish/Concord.API.dll" ] || { echo "::error::Concord.API.dll missing"; exit 1; }
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C88A83A8A32241AE8A21D08635E0595B }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3D5E1A63D014FB2929C936EE6C03284 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_EAF4D4C438864F7DB498FAD9C25E3B07 }}
+            
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'concord'
+          package: ./publish
+
+      - name: Azure Logout
+        if: always()
+        run: az logout
