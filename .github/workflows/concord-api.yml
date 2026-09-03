@@ -5,6 +5,7 @@ on:
     branches:
       - master
     paths:
+      # Yollar backend/Concord daxilinə yönləndirildi
       - 'backend/Concord/Concord.API/**'
       - 'backend/Concord/Concord.Application/**'
       - 'backend/Concord/Concord.Infrastructure/**'
@@ -40,7 +41,8 @@ jobs:
 
       - name: Publish API
         run: |
-          dotnet publish Concord.API/Concord.API.csproj \
+          # csproj faylının dəqiq yolu qeyd edildi
+          dotnet publish backend/Concord/Concord.API/Concord.API.csproj \
             --configuration Release \
             --output ./publish \
             --nologo
@@ -52,7 +54,6 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          # Concord layihəsinə aid olan secretlər:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C88A83A8A32241AE8A21D08635E0595B }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D3D5E1A63D014FB2929C936EE6C03284 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_EAF4D4C438864F7DB498FAD9C25E3B07 }}
