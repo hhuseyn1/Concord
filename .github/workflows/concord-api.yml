@@ -5,10 +5,10 @@ on:
     branches:
       - master
     paths:
-      - 'Concord.API/**'
-      - 'Concord.Application/**'
-      - 'Concord.Infrastructure/**'
-      - 'Concord.Domain/**'
+      - 'backend/Concord/Concord.API/**'
+      - 'backend/Concord/Concord.Application/**'
+      - 'backend/Concord/Concord.Infrastructure/**'
+      - 'backend/Concord/Concord.Domain/**'
       - '.github/workflows/master_concord.yml'
   workflow_dispatch:
 
