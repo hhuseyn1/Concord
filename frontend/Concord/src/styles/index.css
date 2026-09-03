@@ -1,0 +1,73 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/*
+ * Base styles / reset. Tailwind's Preflight already normalizes most
+ * browser defaults — this only covers the app-wide baseline that sits on
+ * top of the design tokens above.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark light;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  color: var(--color-fg-default);
+  background: var(--color-surface-base);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-fg-heading);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--color-fg-link);
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--color-brand-bg);
+  color: var(--color-fg-default);
+}
+
+/* Slim, Discord-style scrollbars for anything not using the ScrollArea
+ * primitive (e.g. native overflow containers). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-default) transparent;
+}

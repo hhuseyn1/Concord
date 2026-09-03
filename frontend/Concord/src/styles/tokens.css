@@ -1,0 +1,273 @@
+/*
+ * Concord design tokens — Tailwind v4 CSS-first theme.
+ *
+ * This app is dark-first (Discord-inspired). Every color/shadow token below is
+ * defined once inside `@theme` using its DARK value as the default, and a
+ * `@media (prefers-color-scheme: light)` block further down overrides the
+ * subset of tokens that actually change in light mode (type scale, spacing,
+ * radii and motion are theme-invariant, so they're only declared once).
+ *
+ * Anything declared under `--color-*`, `--text-*`, `--font-*`, `--spacing`,
+ * `--radius-*`, `--shadow-*` and `--ease-*` is a recognized Tailwind v4 theme
+ * namespace, so it automatically generates matching utility classes
+ * (e.g. `--color-brand` -> `bg-brand`, `text-brand`, `border-brand`, ...).
+ */
+
+@theme {
+  /* ---------------------------------------------------------------------
+   * Surfaces (elevation) — rail is darkest, sidebar one step lighter,
+   * base (message area) lighter still, floating (modal/popover/tooltip)
+   * distinct again — paired with `--shadow-*` to "pop" off the page.
+   * --------------------------------------------------------------------- */
+  --color-surface-rail: #17131f;
+  --color-surface-sidebar: #1e1929;
+  --color-surface-base: #262032;
+  --color-surface-floating: #120e19;
+
+  /* Borders */
+  --color-border-default: #33303e;
+  --color-border-subtle: #262330;
+
+  /* ---------------------------------------------------------------------
+   * Foreground / text
+   * --------------------------------------------------------------------- */
+  --color-fg-default: #dcdbe3;
+  --color-fg-muted: #948f9e;
+  --color-fg-link: #c084fc;
+  --color-fg-heading: #f5f3f9;
+  --color-fg-on-brand: #1a1625;
+  --color-fg-on-danger: #ffffff;
+
+  /* ---------------------------------------------------------------------
+   * Brand / accent — a violet identity distinct from Discord's blurple,
+   * built on the seeded `#aa3bff` (light) / `#c084fc` (dark) accents.
+   * --------------------------------------------------------------------- */
+  --color-brand: #c084fc;
+  --color-brand-hover: #d1a3fd;
+  --color-brand-pressed: #a855f7;
+  --color-brand-bg: rgb(192 132 252 / 15%);
+
+  /* ---------------------------------------------------------------------
+   * Semantic colors — text/icon tone + background tint (for badges,
+   * banners) per status, matching the old `--accent-bg` tint pattern.
+   * `-solid` variants are theme-invariant, high-contrast fills for solid
+   * buttons (e.g. the Button `danger` variant).
+   * --------------------------------------------------------------------- */
+  --color-danger: #f87171;
+  --color-danger-bg: rgb(248 113 113 / 15%);
+  --color-danger-solid: #dc2626;
+  --color-danger-solid-hover: #b91c1c;
+  --color-danger-solid-pressed: #991b1b;
+
+  --color-success: #4ade80;
+  --color-success-bg: rgb(74 222 128 / 15%);
+
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgb(251 191 36 / 15%);
+
+  --color-info: #60a5fa;
+  --color-info-bg: rgb(96 165 250 / 15%);
+
+  /* ---------------------------------------------------------------------
+   * Presence status — matches the backend `PresenceStatus` enum: Online /
+   * Idle / DoNotDisturb / Invisible / Offline. Invisible has no dot color of
+   * its own — it renders identically to Offline everywhere except the
+   * status *picker* itself (the whole point is looking offline to others).
+   * Theme-invariant so a status dot reads the same regardless of light/dark.
+   * --------------------------------------------------------------------- */
+  --color-presence-online: #3ba55d;
+  --color-presence-idle: #f0b232;
+  --color-presence-dnd: #ed4245;
+  --color-presence-offline: #80848e;
+
+  /* ---------------------------------------------------------------------
+   * Typography
+   * --------------------------------------------------------------------- */
+  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+
+  /* 2xs is an extra step below the requested xs–2xl range, used for
+   * timestamps/metadata that need to read even smaller than `xs`. */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-2xs--line-height: 0.875rem;
+  --text-xs: 0.75rem; /* 12px — timestamps / metadata */
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem; /* 13px — UI labels, secondary text */
+  --text-sm--line-height: 1.125rem;
+  --text-base: 0.9375rem; /* 15px — message body text */
+  --text-base--line-height: 1.375rem;
+  --text-lg: 1.0625rem; /* 17px */
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.25rem; /* 20px — section headings */
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem; /* 24px — page/modal headings */
+  --text-2xl--line-height: 2rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ---------------------------------------------------------------------
+   * Spacing — explicit 4px base (this matches Tailwind v4's own default,
+   * declared here so the intent is documented and locked in).
+   * --------------------------------------------------------------------- */
+  --spacing: 0.25rem;
+
+  /* ---------------------------------------------------------------------
+   * Radii
+   * --------------------------------------------------------------------- */
+  --radius-sm: 0.25rem; /* subtle rounding, e.g. inline code */
+  --radius-md: 0.5rem; /* buttons, inputs, cards */
+  --radius-lg: 1rem; /* modals */
+  --radius-full: 9999px; /* avatars, chips, pills */
+
+  /* ---------------------------------------------------------------------
+   * Shadows — elevation scale for popovers/modals/tooltips.
+   * --------------------------------------------------------------------- */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 40%);
+  --shadow-md:
+    0 4px 6px -2px rgb(0 0 0 / 35%), 0 10px 15px -3px rgb(0 0 0 / 45%);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 50%), 0 20px 25px -5px rgb(0 0 0 / 55%);
+
+  /* ---------------------------------------------------------------------
+   * Motion — subtle, not decorative. `--duration-*` aren't a Tailwind
+   * theme namespace (transition-duration utilities use Tailwind's built-in
+   * numeric scale, e.g. `duration-150`/`duration-200`) so these exist as
+   * the documented source of truth; components use the matching numeric
+   * utility directly.
+   * --------------------------------------------------------------------- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms; /* hover/press */
+  --duration-base: 200ms; /* panel open/close, overlays */
+
+  /* Overlay enter/exit animations, keyed to the durations above — every
+   * Radix overlay (Modal, Popover, DropdownMenu, ContextMenu, Tooltip,
+   * Toast) drives its entrance/exit off `data-[state=open|closed]`, which
+   * Radix's Presence primitive detects via computed `animation-name` and
+   * waits for `animationend` before unmounting, so these stay in sync with
+   * each component's real mount lifecycle for free. Content animations
+   * animate the standalone `scale`/`translate` CSS properties (CSS
+   * Transforms Level 2), not the `transform` shorthand, so they never fight
+   * Radix Popper's own inline `transform` positioning style or Tailwind's
+   * `translate-x/y` utilities (which also compile to the standalone
+   * `translate` property in this Tailwind version) used elsewhere (e.g.
+   * `Modal`'s centering transform). */
+  --animate-overlay-in: overlay-in var(--duration-base) var(--ease-standard);
+  --animate-overlay-out: overlay-out var(--duration-fast) var(--ease-standard);
+  --animate-content-in: content-in var(--duration-base) var(--ease-emphasized);
+  --animate-content-out: content-out var(--duration-fast) var(--ease-standard);
+  --animate-toast-in: toast-in var(--duration-base) var(--ease-emphasized);
+  --animate-toast-out: toast-out var(--duration-fast) var(--ease-standard);
+  --animate-drawer-in: drawer-in var(--duration-base) var(--ease-emphasized);
+  --animate-drawer-out: drawer-out var(--duration-fast) var(--ease-standard);
+  /* Mic/deafen/camera/screen-share toggle "pop" — re-triggered per click via a `key` change on the
+   * icon (see `VoiceCallControls.jsx`), not a `data-[state]` attribute like the overlays above, since
+   * this fires on every toggle rather than once per mount. */
+  --animate-icon-toggle: icon-toggle var(--duration-fast) var(--ease-emphasized);
+  /* X-04: applied unconditionally (plain mount animation, not `data-[state]`-driven like the overlays
+   * above) to a message row / sidebar list row's outer element. React only mounts a fresh DOM node for
+   * a genuinely new `key` — an already-rendered row stays the same node across re-renders and never
+   * replays this — so in practice this only plays for messages/rows actually being inserted, live or
+   * on initial load alike. */
+  --animate-row-in: row-in var(--duration-base) var(--ease-emphasized);
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes overlay-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes content-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+@keyframes content-out {
+  to {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    translate: 16px 0;
+  }
+}
+@keyframes toast-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes drawer-in {
+  from {
+    translate: -100% 0;
+  }
+}
+@keyframes drawer-out {
+  to {
+    translate: -100% 0;
+  }
+}
+@keyframes icon-toggle {
+  from {
+    scale: 0.7;
+  }
+}
+@keyframes row-in {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-surface-rail: #e3ddec;
+    --color-surface-sidebar: #eee9f5;
+    --color-surface-base: #ffffff;
+    --color-surface-floating: #fbfaff;
+
+    --color-border-default: #e5e4e7;
+    --color-border-subtle: #efeef2;
+
+    --color-fg-default: #4a4453;
+    --color-fg-muted: #6b6375;
+    --color-fg-link: #aa3bff;
+    --color-fg-heading: #08060d;
+    --color-fg-on-brand: #ffffff;
+    --color-fg-on-danger: #ffffff;
+
+    --color-brand: #aa3bff;
+    --color-brand-hover: #9526e8;
+    --color-brand-pressed: #7f1fc7;
+    --color-brand-bg: rgb(170 59 255 / 10%);
+
+    --color-danger: #dc2626;
+    --color-danger-bg: rgb(220 38 38 / 10%);
+
+    --color-success: #16a34a;
+    --color-success-bg: rgb(22 163 74 / 10%);
+
+    --color-warning: #b45309;
+    --color-warning-bg: rgb(180 83 9 / 10%);
+
+    --color-info: #2563eb;
+    --color-info-bg: rgb(37 99 235 / 10%);
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 6%);
+    --shadow-md:
+      0 4px 6px -2px rgb(0 0 0 / 5%), 0 10px 15px -3px rgb(0 0 0 / 10%);
+    --shadow-lg:
+      0 10px 15px -3px rgb(0 0 0 / 10%), 0 20px 25px -5px rgb(0 0 0 / 12%);
+  }
+}

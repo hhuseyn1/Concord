@@ -1,0 +1,133 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../providers/auth_controller.dart';
+import '../../theme/theme.dart';
+import '../../widgets/widgets.dart';
+import 'active_sessions_section.dart';
+import 'change_password_section.dart';
+import 'custom_status_sheet.dart';
+import 'edit_profile_sheet.dart';
+import 'link_device_screen.dart';
+import 'preferences_section.dart';
+import 'privacy_tab.dart';
+import 'two_factor_section.dart';
+import 'voice_settings_tab.dart';
+
+class SettingsScreen extends ConsumerWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = Theme.of(context).extension<ConcordColors>()!;
+    final textTheme = Theme.of(context).textTheme;
+    final profile = ref.watch(authControllerProvider).profile;
+
+    final displayName = profile == null
+        ? null
+        : (profile.username?.isNotEmpty == true
+              ? profile.username!
+              : [profile.name, profile.surname].where((part) => part != null && part.isNotEmpty).join(' '));
+
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Settings'),
+          bottom: const TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            tabs: [
+              Tab(text: 'My Account'),
+              Tab(text: 'Privacy'),
+              Tab(text: 'Voice'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            ListView(
+              padding: const EdgeInsets.all(ConcordSpacing.lg),
+              children: [
+                Row(
+                  children: [
+                    ConcordAvatar(imageUrl: profile?.avatarUrl, name: displayName, size: ConcordAvatarSize.lg),
+                    const SizedBox(width: ConcordSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            displayName?.isNotEmpty == true ? displayName! : 'Loading…',
+                            style: textTheme.titleMedium,
+                          ),
+                          if (profile?.email != null)
+                            Text(profile!.email!, style: textTheme.bodySmall?.copyWith(color: colors.fgMuted)),
+                          if (profile?.customStatusText?.isNotEmpty == true)
+                            Text(
+                              '${profile?.customStatusEmoji ?? ''} ${profile?.customStatusText}'.trim(),
+                              style: textTheme.bodySmall?.copyWith(color: colors.fgMuted),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ConcordButton(
+                          label: 'Edit Profile',
+                          variant: ConcordButtonVariant.secondary,
+                          size: ConcordButtonSize.sm,
+                          onPressed: profile == null ? null : () => showEditProfileSheet(context, ref),
+                        ),
+                        const SizedBox(height: ConcordSpacing.sm),
+                        ConcordButton(
+                          label: 'Status',
+                          variant: ConcordButtonVariant.secondary,
+                          size: ConcordButtonSize.sm,
+                          onPressed: profile == null ? null : () => showCustomStatusSheet(context, ref),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: ConcordSpacing.xxl),
+                const ChangePasswordSection(),
+                const SizedBox(height: ConcordSpacing.xxl),
+                const Divider(),
+                const SizedBox(height: ConcordSpacing.lg),
+                const TwoFactorSection(),
+                const SizedBox(height: ConcordSpacing.xxl),
+                const Divider(),
+                const SizedBox(height: ConcordSpacing.lg),
+                const PreferencesSection(),
+                const SizedBox(height: ConcordSpacing.xxl),
+                const Divider(),
+                const SizedBox(height: ConcordSpacing.lg),
+                const ActiveSessionsSection(),
+                const SizedBox(height: ConcordSpacing.md),
+                ConcordButton(
+                  label: 'Link a Device',
+                  variant: ConcordButtonVariant.secondary,
+                  size: ConcordButtonSize.sm,
+                  onPressed: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute(builder: (context) => const LinkDeviceScreen()),
+                  ),
+                ),
+                const SizedBox(height: ConcordSpacing.xxl),
+                ConcordButton(
+                  label: 'Log Out',
+                  variant: ConcordButtonVariant.danger,
+                  expand: true,
+                  onPressed: () => ref.read(authControllerProvider.notifier).logout(),
+                ),
+              ],
+            ),
+            const PrivacyTab(),
+            const VoiceSettingsTab(),
+          ],
+        ),
+      ),
+    );
+  }
+}
