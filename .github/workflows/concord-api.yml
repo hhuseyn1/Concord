@@ -5,7 +5,6 @@ on:
     branches:
       - master
     paths:
-      # Yollar backend/Concord daxilinə yönləndirildi
       - 'backend/Concord/Concord.API/**'
       - 'backend/Concord/Concord.Application/**'
       - 'backend/Concord/Concord.Infrastructure/**'
@@ -21,7 +20,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # Azure JWT token üçün mütləqdir
+      id-token: write
       contents: read
 
     steps:
