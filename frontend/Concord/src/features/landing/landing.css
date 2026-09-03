@@ -1,0 +1,39 @@
+/*
+ * Decorative motion scoped to the landing page only - kept out of the shared
+ * styles/tokens.css so it can't affect anything else in the app.
+ */
+
+@keyframes landing-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -18px;
+  }
+}
+
+@keyframes landing-float-slow {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 14px;
+  }
+}
+
+.landing-orb {
+  animation: landing-float 9s ease-in-out infinite;
+}
+
+.landing-orb-slow {
+  animation: landing-float-slow 12s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-orb,
+  .landing-orb-slow {
+    animation: none;
+  }
+}

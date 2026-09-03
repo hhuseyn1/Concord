@@ -51,7 +51,7 @@ public class UsersService(ApplicationDbContext context, FilesService filesServic
         if (!UsernameRegex().IsMatch(request.Username))
             throw new ParameterValidationException(nameof(request.Username));
 
-        if (!string.IsNullOrWhiteSpace(request.AvatarUrl) && !FilesService.IsOwnUploadUrl(request.AvatarUrl))
+        if (!string.IsNullOrWhiteSpace(request.AvatarUrl) && !_filesService.IsOwnUploadUrl(request.AvatarUrl))
             throw new ParameterValidationException(nameof(request.AvatarUrl));
 
         await ValidateUsernameUniqueAsync(currentUserId, request.Username);
@@ -66,7 +66,7 @@ public class UsersService(ApplicationDbContext context, FilesService filesServic
         await _context.SaveChangesAsync();
 
         if (!string.IsNullOrWhiteSpace(oldAvatarUrl) && oldAvatarUrl != request.AvatarUrl)
-            _filesService.DeleteFile(oldAvatarUrl);
+            await _filesService.DeleteFileAsync(oldAvatarUrl);
 
         return await GetMyProfileAsync(currentUserId);
     }

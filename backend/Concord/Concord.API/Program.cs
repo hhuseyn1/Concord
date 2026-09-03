@@ -21,6 +21,7 @@ builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSect
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection(nameof(ApiSettings)));
 builder.Services.Configure<LiveKitSettings>(builder.Configuration.GetSection(nameof(LiveKitSettings)));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
+builder.Services.Configure<AzureBlobStorageSettings>(builder.Configuration.GetSection(nameof(AzureBlobStorageSettings)));
 
 var authSettings = builder.Configuration.GetSection(nameof(AuthenticationSettings)).Get<AuthenticationSettings>();
 
@@ -58,6 +59,7 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddSignalRWithRedisBackplane(builder.Configuration);
 builder.Services.AddPresenceRedis(builder.Configuration);
 builder.Services.AddLiveKit(builder.Configuration);
+builder.Services.AddFileStorage(builder.Configuration, builder.Environment.IsProduction());
 
 builder.Services.SetupAuth(authSettings);
 builder.Services.SetupCorsPolicy(builder.Configuration, builder.Environment.IsDevelopment());
@@ -190,7 +192,8 @@ if (builder.Environment.IsDevelopment())
 
 var app = builder.Build();
 
-Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "uploads"));
+if (!app.Environment.IsProduction())
+    Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "uploads"));
 
 if (!app.Environment.IsDevelopment())
 {
