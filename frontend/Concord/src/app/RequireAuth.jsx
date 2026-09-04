@@ -13,12 +13,7 @@ export function RequireAuth() {
   }, [])
 
   if (!isAuthenticated) {
-    // The root path is the app's authenticated home (see ServerRail/ChannelSidebar's `to="/"`
-    // links) - a signed-out visitor landing there sees the marketing page instead of being
-    // dropped straight into a login form. Every other protected route still bounces to /login
-    // as before, including the post-login redirect back to where they were headed.
-    const redirectTo = location.pathname === '/' ? '/welcome' : '/login'
-    return <Navigate to={redirectTo} replace state={{ from: location }} />
+    return <Navigate to="/login" replace state={{ from: location }} />
   }
 
   return <Outlet />
