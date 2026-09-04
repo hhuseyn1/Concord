@@ -36,7 +36,7 @@ export function AppShell() {
     query.addEventListener('change', handleChange)
     return () => query.removeEventListener('change', handleChange)
   }, [])
-  const isDmRoute = useMatch('/dm/:conversationId')
+  const isDmRoute = useMatch('/cabinet/dm/:conversationId')
   const [prevPathname, setPrevPathname] = useState(location.pathname)
   if (location.pathname !== prevPathname) {
     setPrevPathname(location.pathname)

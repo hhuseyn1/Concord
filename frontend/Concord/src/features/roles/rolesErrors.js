@@ -15,7 +15,7 @@ function mapForbidden(error) {
     return "You can't change a role ranked at or above your own highest role."
   }
   if (message.includes('default role')) {
-    return "The @everyone role can't be renamed, deleted, or assigned — only its permissions can change."
+    return "The @everyone role can't be renamed, deleted, or assigned - only its permissions can change."
   }
   if (message.includes('lack the')) {
     return error.message

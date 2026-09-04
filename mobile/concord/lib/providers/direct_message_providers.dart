@@ -28,9 +28,6 @@ class DirectMessagesState {
   final Set<String> typingUserIds;
   final int page;
 
-  /// The other participant's last-read timestamp for this conversation, driven by
-  /// `DirectMessagesHub.onConversationRead`. Used to render a "Seen" marker under this client's
-  /// own most recent message once it's read (mirrors the web app's `readReceiptsByConversation`).
   final DateTime? otherReadAt;
 
   DirectMessagesState copyWith({

@@ -59,12 +59,12 @@ export function NotificationRow({ notification, onNavigate }) {
     if (!notification.IsRead) markReadSafely()
     if (isFriendRequestType) {
       onNavigate?.()
-      navigate('/', { state: { tab: 'pending' } })
+      navigate('/cabinet', { state: { tab: 'pending' } })
     } else if (notification.Type === 'Mention' && notification.ContextMessageId) {
       onNavigate?.()
       const path = notification.ContextChannelId
-        ? `/servers/${notification.ContextServerId}/channels/${notification.ContextChannelId}`
-        : `/dm/${notification.ContextConversationId}`
+        ? `/cabinet/servers/${notification.ContextServerId}/channels/${notification.ContextChannelId}`
+        : `/cabinet/dm/${notification.ContextConversationId}`
       navigate(path)
       setTimeout(() => jumpToMessage(notification.ContextMessageId), JUMP_AFTER_NAVIGATE_DELAY_MS)
     }

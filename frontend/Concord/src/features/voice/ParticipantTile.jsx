@@ -258,8 +258,8 @@ export function ParticipantTile({ participant, isLocal = false, spotlight = fals
         <p className="rounded bg-black/60 px-1.5 py-0.5 text-xs font-medium text-white">
           {displayName}
           {isLocal ? ' (you)' : ''}
-          {isScreenShare ? ' — sharing screen' : ''}
-          {isConnectionLost ? ' — connection lost' : ''}
+          {isScreenShare ? ' - sharing screen' : ''}
+          {isConnectionLost ? ' - connection lost' : ''}
         </p>
         <ConnectionQualityIcon quality={connectionQuality} />
         {micBadge}

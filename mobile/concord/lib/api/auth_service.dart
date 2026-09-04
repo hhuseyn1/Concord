@@ -67,10 +67,6 @@ class AuthService {
     await _client.post('/$userId:Reset-password', body: {'NewPassword': newPassword});
   }
 
-  /// Confirms a password reset using the token from an emailed reset link
-  /// (`concord://reset-password?token=...` on mobile, `/reset-password?token=...` on web) — the
-  /// public, unauthenticated counterpart to the admin-facing [resetPassword] above. Matches the
-  /// backend's `POST /Reset-password`, which revokes every existing session on success.
   Future<void> confirmPasswordReset({required String token, required String newPassword}) async {
     await _client.post(
       '/Reset-password',
@@ -106,15 +102,11 @@ class AuthService {
     return TwoFactorStatusResponse.fromJson(data as Map<String, dynamic>);
   }
 
-  /// Begins enrolment: mints a secret and returns it as a QR (server-rendered SVG) plus a typeable
-  /// key. Two-factor is not yet active - the secret stays inert until confirmed via [enableTwoFactor].
   Future<TwoFactorSetupResponse> startTwoFactorSetup() async {
     final data = await _client.post('/Me/TwoFactor/Setup');
     return TwoFactorSetupResponse.fromJson(data as Map<String, dynamic>);
   }
 
-  /// Confirms enrolment with a code from the authenticator and returns the recovery codes. Those
-  /// codes are shown exactly once - only their hashes are kept server-side.
   Future<RecoveryCodesResponse> enableTwoFactor({required String code}) async {
     final data = await _client.post('/Me/TwoFactor/Enable', body: {'Code': code});
     return RecoveryCodesResponse.fromJson(data as Map<String, dynamic>);

@@ -20,7 +20,7 @@ export function ChannelRow({ channel, serverId, canManageChannels }) {
 
   const row = (
     <NavLink
-      to={`/servers/${serverId}/channels/${channel.Id}`}
+      to={`/cabinet/servers/${serverId}/channels/${channel.Id}`}
       className={({ isActive }) =>
         cn(
           'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-fg-muted motion-safe:animate-row-in',

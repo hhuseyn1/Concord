@@ -9,20 +9,6 @@ import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-/// Destination picker for forwarding a message — mirrors the web app's `ForwardMessageModal`'s
-/// two-section shape (channels, then DM conversations), but widened to every server the caller
-/// belongs to rather than just the message's source server, per this feature's mobile scope. Each
-/// server renders as a collapsed [ExpansionTile] so its channel list (via the cached
-/// [channelsProvider] family) is only fetched once a server is actually expanded — avoids fanning
-/// out a channel-list call per server up front, the same concern the web version's doc comment
-/// flags, just solved with lazy-expand instead of "only the source server" scoping.
-///
-/// The search field filters direct messages by the other participant's name immediately (that list
-/// is already loaded), and filters the server list by server name; a channel-name match inside an
-/// already-expanded server is filtered live against the same query. Searching for a channel name
-/// inside a server that hasn't been expanded yet — and whose own name doesn't match — won't surface
-/// it; a deliberate simplification for a rarely-used picker rather than pre-loading every server's
-/// channels to make search exhaustive.
 Future<void> showForwardMessageSheet(
   BuildContext context, {
   required MessageLike message,

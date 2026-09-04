@@ -28,13 +28,13 @@ const JUMP_AFTER_NAVIGATE_DELAY_MS = 400
 
 function navigationForType(event) {
   if (event.type === 'FriendRequestReceived' || event.type === 'FriendRequestAccepted') {
-    return () => navigateTo('/', { state: { tab: 'pending' } })
+    return () => navigateTo('/cabinet', { state: { tab: 'pending' } })
   }
   if (event.type === 'Mention' && event.contextMessageId) {
     return () => {
       const path = event.contextChannelId
-        ? `/servers/${event.contextServerId}/channels/${event.contextChannelId}`
-        : `/dm/${event.contextConversationId}`
+        ? `/cabinet/servers/${event.contextServerId}/channels/${event.contextChannelId}`
+        : `/cabinet/dm/${event.contextConversationId}`
       navigateTo(path)
       setTimeout(() => jumpToMessage(event.contextMessageId), JUMP_AFTER_NAVIGATE_DELAY_MS)
     }
@@ -80,7 +80,7 @@ export function NotificationsProvider({ children }) {
               ? () =>
                   directMessagesService
                     .createOrGetConversation(event.relatedUserId)
-                    .then((conversation) => navigateTo(`/dm/${conversation.Id}`))
+                    .then((conversation) => navigateTo(`/cabinet/dm/${conversation.Id}`))
                     .catch(() => {})
               : navigationForType(event)
 

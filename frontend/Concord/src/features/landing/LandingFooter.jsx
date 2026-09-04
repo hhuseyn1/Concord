@@ -18,7 +18,7 @@ export function LandingFooter() {
               <span className="text-base font-semibold text-fg-heading">Concord</span>
             </a>
             <p className="mt-3 text-sm text-fg-muted">
-              Real-time messaging, voice &amp; video, and communities — all in one place.
+              Real-time messaging, voice &amp; video, and communities - all in one place.
             </p>
           </div>
 
@@ -56,7 +56,7 @@ export function LandingFooter() {
             <ul className="mt-3 flex flex-col gap-2">
               <li>
                 <span className="text-sm text-fg-muted" title="The Android app isn't published yet.">
-                  Android app — coming soon
+                  Android app - coming soon
                 </span>
               </li>
             </ul>

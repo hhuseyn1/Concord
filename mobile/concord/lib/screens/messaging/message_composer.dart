@@ -19,15 +19,11 @@ const _warnThreshold = _maxContentLength - 200;
 
 const _maxMentionSuggestions = 5;
 
-/// Matches an in-progress `@token` right before the cursor — requires a word boundary (start of
-/// string or whitespace) before the `@` so an email-like "user@host" mid-word never triggers it.
-/// Mirrors the web app's `useMentionAutocomplete`'s `MENTION_TRIGGER_REGEX`.
 final _mentionTriggerRegex = RegExp(r'(?:^|\s)@([a-zA-Z0-9_]{0,32})$');
 
 class _MentionTrigger {
   const _MentionTrigger({required this.startIndex, required this.query});
 
-  /// Index of the `@` character itself within the full text.
   final int startIndex;
   final String query;
 }
@@ -80,10 +76,6 @@ class MessageComposer extends ConsumerStatefulWidget {
   final VoidCallback onSent;
   final String hintText;
 
-  /// The server this composer is attached to, used to source `@`-mention autocomplete candidates
-  /// from that server's member list. Null for DM composers — a DM only ever has one other
-  /// participant, so a full autocomplete affordance isn't worth building for it (inline highlighting
-  /// of an already-sent `@username`, in `MessageTile`, still works there regardless).
   final String? serverId;
 
   @override
@@ -138,9 +130,6 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
     setState(() {});
   }
 
-  /// Detects an in-progress `@word` right before the cursor, mirroring the web app's
-  /// `useMentionAutocomplete.handleChange`. Channel-only (see [MessageComposer.serverId]'s doc
-  /// comment) — a null `serverId` means this is a DM composer, where autocomplete never triggers.
   _MentionTrigger? _detectMentionTrigger() {
     if (widget.serverId == null) return null;
     final text = _controller.text;
@@ -155,8 +144,6 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
     return _MentionTrigger(startIndex: cursor - query.length - 1, query: query);
   }
 
-  /// Inserts `@{username} ` in place of the in-progress trigger token and moves the cursor past it —
-  /// mirrors `useMentionAutocomplete.handleSelect`.
   void _selectMention(ServerMemberSummary member) {
     final trigger = _mentionTrigger;
     final username = member.user.username;
@@ -375,7 +362,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                           ? Text(_sendError!, style: TextStyle(fontSize: 12, color: colors.danger))
                           : (overLimit
                               ? Text(
-                                  'Message is too long — trim it to $_maxContentLength characters or fewer to send.',
+                                  'Message is too long - trim it to $_maxContentLength characters or fewer to send.',
                                   style: TextStyle(fontSize: 12, color: colors.danger),
                                 )
                               : const SizedBox.shrink())),
@@ -494,10 +481,6 @@ class _AttachmentChip extends StatelessWidget {
   }
 }
 
-/// `@`-mention autocomplete dropdown, shown above the input row while an in-progress `@word` token
-/// matches at least one server member. Mirrors the web app's `MentionAutocomplete`, rendered inline
-/// (pushing the composer's other content up) rather than as an absolutely-positioned overlay, which
-/// plays more predictably with the on-screen keyboard on mobile.
 class _MentionSuggestionsList extends StatelessWidget {
   const _MentionSuggestionsList({required this.candidates, required this.onSelect});
 

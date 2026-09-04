@@ -8,7 +8,7 @@ export function MobileAppSection() {
         <Reveal className="order-2 lg:order-1">
           <h2 className="text-3xl font-bold text-fg-heading sm:text-4xl">Stay connected wherever you go.</h2>
           <p className="mt-4 max-w-md text-lg text-fg-muted">
-            The Concord mobile app brings your servers, DMs, and calls to Android — so you're never far from your
+            The Concord mobile app brings your servers, DMs, and calls to Android - so you're never far from your
             community.
           </p>
 
@@ -17,7 +17,7 @@ export function MobileAppSection() {
               type="button"
               disabled
               aria-disabled="true"
-              title="The Android app isn't published yet — check back soon."
+              title="The Android app isn't published yet - check back soon."
               className="inline-flex cursor-not-allowed items-center gap-3 rounded-md border border-border-default bg-surface-base px-5 py-3 text-left opacity-70"
             >
               <Smartphone className="size-6 shrink-0 text-fg-muted" aria-hidden="true" />

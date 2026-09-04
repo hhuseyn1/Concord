@@ -11,12 +11,9 @@ class TwoFactorSetupResponse {
     );
   }
 
-  /// Base32 secret, space-grouped for readable manual entry when a QR cannot be scanned.
   final String? secretKey;
 
-  /// Standard `otpauth://totp/...` URI - what the QR encodes.
   final String? otpAuthUri;
 
-  /// The same URI rendered as an SVG data URI (`data:image/svg+xml;base64,...`), ready to display directly.
   final String? qrCodeSvg;
 }

@@ -99,14 +99,14 @@ export function AddFriendTab() {
       </div>
 
       {trimmed.length > 0 && !enabled && (
-        <p className="text-sm text-fg-muted">Keep typing — at least {MIN_QUERY_LENGTH} characters.</p>
+        <p className="text-sm text-fg-muted">Keep typing - at least {MIN_QUERY_LENGTH} characters.</p>
       )}
 
       {trimmed.length === 0 && (
         <EmptyState
           icon={UserPlus}
           title="Find friends by username"
-          description="You, existing friends, and blocked users won't show up here — search results reflect your real relationship with each person."
+          description="You, existing friends, and blocked users won't show up here - search results reflect your real relationship with each person."
         />
       )}
 

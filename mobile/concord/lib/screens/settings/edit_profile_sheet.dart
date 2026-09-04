@@ -19,8 +19,6 @@ const _avatarExtensionToContentType = {
   'gif': 'image/gif',
 };
 
-/// Mirrors `usersService.updateMe`'s documented server-side rule (see the web
-/// `AccountSettingsForm`'s `USERNAME_PATTERN`).
 final _usernamePattern = RegExp(r'^[a-zA-Z0-9_]{1,32}$');
 
 Future<void> showEditProfileSheet(BuildContext context, WidgetRef ref) {
@@ -93,7 +91,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
       _usernameError = username.isEmpty
           ? 'Username is required.'
           : (!_usernamePattern.hasMatch(username)
-                ? 'Only letters, numbers, and underscores — up to 32 characters.'
+                ? 'Only letters, numbers, and underscores - up to 32 characters.'
                 : null);
       _formError = null;
     });

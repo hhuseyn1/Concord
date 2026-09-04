@@ -62,7 +62,7 @@ export function LinkDeviceScreen() {
     try {
       await qrLoginService.approveQrLogin(request.UserCode)
       toast({ variant: 'success', title: t('qrLogin.approved') })
-      navigate('/', { replace: true })
+      navigate('/cabinet', { replace: true })
     } catch (approveError) {
       setError(mapQrLoginApprovalError(approveError))
     } finally {
@@ -76,7 +76,7 @@ export function LinkDeviceScreen() {
     try {
       await qrLoginService.denyQrLogin(request.UserCode)
       toast({ variant: 'info', title: t('qrLogin.deniedConfirmation') })
-      navigate('/', { replace: true })
+      navigate('/cabinet', { replace: true })
     } catch (denyError) {
       setError(mapQrLoginApprovalError(denyError))
     } finally {

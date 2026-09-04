@@ -86,12 +86,6 @@ class MessagesService {
         .toList();
   }
 
-  /// Forwards a message sourced from this channel into another channel or DM conversation.
-  /// Exactly one of [targetChannelId]/[targetConversationId] must be set — mirrors the backend's
-  /// `ForwardMessageRequest`. The response shape depends on which target was chosen (a
-  /// `MessageResponse` or a `DirectMessageResponse`), which callers don't need: the newly created
-  /// message reaches its destination thread over that thread's own SignalR hub, same as any other
-  /// send, so this just needs to succeed or throw.
   Future<void> forwardMessage(
     String serverId,
     String channelId,

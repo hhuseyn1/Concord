@@ -73,7 +73,7 @@ function IncomingSection() {
 
   return (
     <section className="flex flex-col gap-2">
-      <SectionHeading icon={Inbox}>Incoming{data ? ` — ${data.length}` : ''}</SectionHeading>
+      <SectionHeading icon={Inbox}>Incoming{data ? ` - ${data.length}` : ''}</SectionHeading>
       {isLoading ? (
         <RowSkeletons />
       ) : isError ? (
@@ -136,7 +136,7 @@ function OutgoingSection() {
 
   return (
     <section className="flex flex-col gap-2">
-      <SectionHeading icon={Send}>Outgoing{data ? ` — ${data.length}` : ''}</SectionHeading>
+      <SectionHeading icon={Send}>Outgoing{data ? ` - ${data.length}` : ''}</SectionHeading>
       {isLoading ? (
         <RowSkeletons />
       ) : isError ? (

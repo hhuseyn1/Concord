@@ -1,7 +1,5 @@
 import 'json_utils.dart';
 
-/// Moderation state of one member — mirrors `ModerationController`'s
-/// `MemberModerationResponse` (mute/timeout, P1).
 class MemberModerationResponse {
   const MemberModerationResponse({
     required this.userId,

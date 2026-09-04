@@ -15,8 +15,6 @@ const _expiryOptions = <String, Duration?>{
   '7 days': Duration(days: 7),
 };
 
-/// Mirrors the web app's `InviteModal`: generates a new invite (optional expiry/max-uses) and lists
-/// every invite previously generated for this server, newest first.
 Future<void> showInviteSheet(BuildContext context, WidgetRef ref, {required String serverId}) {
   return showModalBottomSheet<void>(
     context: context,
@@ -260,7 +258,7 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
   String _describeUses(InviteResponse invite) {
     if (invite.maxUses == null) return '${invite.useCount} use${invite.useCount == 1 ? '' : 's'}';
     final exhausted = invite.useCount >= invite.maxUses!;
-    return '${invite.useCount} / ${invite.maxUses} uses${exhausted ? ' — exhausted' : ''}';
+    return '${invite.useCount} / ${invite.maxUses} uses${exhausted ? ' - exhausted' : ''}';
   }
 
   String _describeExpiry(InviteResponse invite, bool isExpired) {

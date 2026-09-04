@@ -7,8 +7,6 @@ import '../../providers/server_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-/// Mirrors the web app's `CreateChannelModal`: `defaultType` pre-selects Text/Voice depending on
-/// which group's "+" was tapped, but it's still changeable before submit.
 Future<void> showCreateChannelSheet(
   BuildContext context,
   WidgetRef ref, {

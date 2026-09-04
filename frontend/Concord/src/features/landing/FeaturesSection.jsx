@@ -14,7 +14,7 @@ const FEATURES = [
   {
     icon: MessageCircle,
     title: 'Real-time messaging',
-    description: 'Instant text chat in every channel and DM, powered by live SignalR connections — no refreshing, ever.',
+    description: 'Instant text chat in every channel and DM, powered by live SignalR connections - no refreshing, ever.',
   },
   {
     icon: Compass,
@@ -24,7 +24,7 @@ const FEATURES = [
   {
     icon: Video,
     title: 'Voice & video calls',
-    description: 'Jump into a voice channel or start a video call with a friend — talk face to face, no extra app needed.',
+    description: 'Jump into a voice channel or start a video call with a friend - talk face to face, no extra app needed.',
   },
   {
     icon: Radio,
@@ -60,7 +60,7 @@ export function FeaturesSection() {
         <Reveal className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold text-fg-heading sm:text-4xl">Everything your community needs</h2>
           <p className="mt-4 text-lg text-fg-muted">
-            Concord bundles the essentials — chat, voice, video, and moderation — into one focused app.
+            Concord bundles the essentials - chat, voice, video, and moderation - into one focused app.
           </p>
         </Reveal>
 

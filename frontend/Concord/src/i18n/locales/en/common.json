@@ -124,7 +124,7 @@
     "testMic": "Test Microphone",
     "testSpeaker": "Test Speaker",
     "cameraPreview": "Camera Preview",
-    "permissionDenied": "Permission denied — check your browser settings.",
+    "permissionDenied": "Permission denied - check your browser settings.",
     "deviceUnavailable": "No device found.",
     "noPermissionYet": "Grant microphone/camera access to see your devices.",
     "defaultDevice": "System Default",
@@ -181,7 +181,7 @@
   },
   "connection": {
     "reconnecting": "Reconnecting…",
-    "disconnected": "Connection lost — attempting to reconnect…"
+    "disconnected": "Connection lost - attempting to reconnect…"
   },
   "desktopNotifications": {
     "title": "Desktop Notifications",
@@ -217,7 +217,7 @@
     "defaultRoleHint": "Applies to every member. It cannot be renamed or deleted, but its permissions set the baseline for the whole server.",
     "readOnlyHint": "You need the Manage Roles permission to change roles on this server.",
     "outrankedHint": "This role ranks at or above your highest role, so you cannot change it.",
-    "reservedHint": "Reserved for an upcoming release — not enforced yet.",
+    "reservedHint": "Reserved for an upcoming release - not enforced yet.",
     "saved": "Role updated",
     "created": "Role created",
     "deleted": "Role deleted",
@@ -272,7 +272,7 @@
     "ban": "Ban from server",
     "unban": "Unban",
     "reason": "Reason",
-    "reasonOptional": "Optional — shown in the ban and timeout list.",
+    "reasonOptional": "Optional - shown in the ban and timeout list.",
     "duration": "Duration",
     "timeoutTitle": "Time out {{name}}",
     "timeoutDescription": "They will not be able to send messages or speak in voice until the timeout expires.",
@@ -292,7 +292,7 @@
     "timeoutLifted": "{{name}}'s timeout was lifted",
     "banned": "{{name}} was banned",
     "unbanned": "{{name}} was unbanned",
-    "mutedBadge": "Muted — cannot speak in voice",
+    "mutedBadge": "Muted - cannot speak in voice",
     "timedOutBadge": "Timed out until {{date}}",
     "timedOutUntilLabel": "Timed out",
     "preset": {
@@ -324,11 +324,11 @@
     "regenerateDescription": "This invalidates your existing codes and issues ten new ones.",
     "recoveryTitle": "Your recovery codes",
     "recoveryDescription": "Use one of these if you lose access to your authenticator app.",
-    "recoveryWarning": "Save these now — they are shown once and cannot be retrieved later. Each works only once.",
+    "recoveryWarning": "Save these now - they are shown once and cannot be retrieved later. Each works only once.",
     "remainingCodes": "{{count}} recovery codes remaining",
     "copyCodes": "Copy codes",
     "copied": "Copied",
-    "copyFailed": "Could not copy — select and copy the codes manually.",
+    "copyFailed": "Could not copy - select and copy the codes manually.",
     "savedCodes": "I've saved them"
   },
   "qrLogin": {
@@ -435,7 +435,7 @@
     "auditShowMetadata": "Show details",
     "auditHideMetadata": "Hide details",
     "auditNoMetadata": "No additional details",
-    "auditNoTarget": "—"
+    "auditNoTarget": "-"
   },
   "reports": {
     "reportMessage": "Report Message",
@@ -445,7 +445,7 @@
     "reportUserTitle": "Report {{name}}?",
     "reportUserDescription": "Tell moderators what's wrong. They'll see your report along with this person's basic profile info.",
     "reason": "Reason",
-    "reasonHint": "Required — describe why you're reporting this.",
+    "reasonHint": "Required - describe why you're reporting this.",
     "submit": "Submit Report",
     "submitted": "Report submitted"
   }

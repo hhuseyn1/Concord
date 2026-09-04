@@ -9,8 +9,6 @@ import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-/// Owner-only ownership transfer, mirroring the web app's `TransferOwnershipModal`: pick another
-/// member from the (already-loaded) member list to become the new owner.
 Future<void> showTransferOwnershipSheet(
   BuildContext context,
   WidgetRef ref, {

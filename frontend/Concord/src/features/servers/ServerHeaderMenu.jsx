@@ -93,7 +93,7 @@ export function ServerHeaderMenu({ server, isOwner }) {
                 Leave Server
               </span>
               <span className="pl-6 text-xs font-normal text-fg-muted">
-                Transfer ownership first — owners can't leave their own server.
+                Transfer ownership first - owners can't leave their own server.
               </span>
             </DropdownMenuItem>
           ) : (

@@ -277,7 +277,7 @@ class VoiceCallController extends StateNotifier<VoiceCallState> {
       final wasIntentional = event.reason == null || event.reason == lk.DisconnectReason.clientInitiated;
       _resetCallState();
       if (!wasIntentional) {
-        state = state.copyWith(lastError: 'Call ended unexpectedly — check your connection.');
+        state = state.copyWith(lastError: 'Call ended unexpectedly - check your connection.');
       }
     });
     listener.on<lk.RoomReconnectingEvent>((_) {

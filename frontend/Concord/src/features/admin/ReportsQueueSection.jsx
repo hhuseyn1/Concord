@@ -23,9 +23,9 @@ const selectClassName = cn(
 function targetLabel(t, report) {
   const typeLabel = t(report.TargetType === 'User' ? 'admin.targetTypeUser' : 'admin.targetTypeMessage')
   if (!report.TargetSnippet) {
-    return `${typeLabel} — ${t('admin.targetDeleted')}`
+    return `${typeLabel} - ${t('admin.targetDeleted')}`
   }
-  return `${typeLabel} — ${report.TargetSnippet}`
+  return `${typeLabel} - ${report.TargetSnippet}`
 }
 
 export function ReportsQueueSection() {
@@ -151,7 +151,7 @@ export function ReportsQueueSection() {
                           </Button>
                         </div>
                       ) : (
-                        <span className="text-xs text-fg-muted">—</span>
+                        <span className="text-xs text-fg-muted">-</span>
                       )}
                     </td>
                   </tr>

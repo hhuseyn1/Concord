@@ -13,7 +13,7 @@ export function mapCreateReportError(error) {
     return error.message || "You can't report yourself, and a reason is required."
   }
   if (error?.status === 404) {
-    return "That message or user no longer exists — it may have already been deleted."
+    return "That message or user no longer exists - it may have already been deleted."
   }
   if (error?.status === 403) {
     return "You no longer have access to that message."

@@ -1,10 +1,6 @@
 import 'api_client.dart';
 import 'models/member_moderation_response.dart';
 
-/// Ban, mute, and timeout (P1) — mirrors `ModerationController`
-/// (`Api/V1.0/Servers/{serverId}`). Kick is *not* here: it stays on
-/// `ServersService.kickMember` (`DELETE Servers/{id}/Members/{userId}`), matching how the web
-/// app's `moderationService.js` also leaves kick on `serversService`.
 class ModerationService {
   ModerationService(this._client);
 

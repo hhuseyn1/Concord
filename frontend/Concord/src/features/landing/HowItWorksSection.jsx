@@ -5,7 +5,7 @@ const STEPS = [
   {
     icon: UserPlus,
     title: 'Create an account',
-    description: 'Sign up with your email in under a minute — no downloads required to get started.',
+    description: 'Sign up with your email in under a minute - no downloads required to get started.',
   },
   {
     icon: Compass,

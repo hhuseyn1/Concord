@@ -54,7 +54,7 @@ export function ProfileCard({ userId }) {
     setIsMessaging(true)
     try {
       const conversation = await directMessagesService.createOrGetConversation(userId)
-      navigate(`/dm/${conversation.Id}`)
+      navigate(`/cabinet/dm/${conversation.Id}`)
     } catch (messageError) {
       toast({ variant: 'danger', title: 'Could not open conversation', description: mapCreateConversationError(messageError) })
     } finally {

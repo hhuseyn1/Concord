@@ -124,7 +124,7 @@
     "testMic": "Mikrofonu sınayın",
     "testSpeaker": "Dinamiki sınayın",
     "cameraPreview": "Kamera önizləməsi",
-    "permissionDenied": "İcazə verilmədi — brauzer ayarlarınızı yoxlayın.",
+    "permissionDenied": "İcazə verilmədi - brauzer ayarlarınızı yoxlayın.",
     "deviceUnavailable": "Heç bir cihaz tapılmadı.",
     "noPermissionYet": "Cihazlarınızı görmək üçün mikrofon/kamera girişinə icazə verin.",
     "defaultDevice": "Sistem defolt",
@@ -181,7 +181,7 @@
   },
   "connection": {
     "reconnecting": "Yenidən qoşulur…",
-    "disconnected": "Bağlantı kəsildi — yenidən qoşulmağa çalışılır…"
+    "disconnected": "Bağlantı kəsildi - yenidən qoşulmağa çalışılır…"
   },
   "desktopNotifications": {
     "title": "Masaüstü Bildirişləri",
@@ -217,7 +217,7 @@
     "defaultRoleHint": "Bütün üzvlərə şamildir. Adı dəyişdirilə və ya silinə bilməz, lakin icazələri bütün server üçün baza təşkil edir.",
     "readOnlyHint": "Bu serverdə rolları dəyişmək üçün “Rolları idarə et” icazəsi lazımdır.",
     "outrankedHint": "Bu rol sizin ən yüksək rolunuzla eyni və ya ondan yüksəkdir, ona görə də onu dəyişə bilməzsiniz.",
-    "reservedHint": "Növbəti buraxlış üçün saxlanılıb — henüz tətbiq olunmur.",
+    "reservedHint": "Növbəti buraxlış üçün saxlanılıb - henüz tətbiq olunmur.",
     "saved": "Rol yeniləndi",
     "created": "Rol yaradıldı",
     "deleted": "Rol silindi",
@@ -272,7 +272,7 @@
     "ban": "Serverdən blokla",
     "unban": "Bloku ləğv et",
     "reason": "Səbəb",
-    "reasonOptional": "Seçimlə — blok və məhdudiyyət siyahısında görünür.",
+    "reasonOptional": "Seçimlə - blok və məhdudiyyət siyahısında görünür.",
     "duration": "Müddət",
     "timeoutTitle": "{{name}} üçün müvəqqəti məhdudiyyət",
     "timeoutDescription": "Müddət bitməyənədək mesaj göndərə və səs kanalında danışa bilməyəcək.",
@@ -292,7 +292,7 @@
     "timeoutLifted": "{{name}} üçün məhdudiyyət ləğv edildi",
     "banned": "{{name}} bloklandı",
     "unbanned": "{{name}} üçün blok ləğv edildi",
-    "mutedBadge": "Susdurulub — səs kanalında danışa bilməz",
+    "mutedBadge": "Susdurulub - səs kanalında danışa bilməz",
     "timedOutBadge": "{{date}} tarixinədək məhdudlaşdırılıb",
     "timedOutUntilLabel": "Məhdudlaşdırılıb",
     "preset": {
@@ -324,11 +324,11 @@
     "regenerateDescription": "Bu, mövcud kodlarınızı etibarsız edir və on yeni kod verir.",
     "recoveryTitle": "Bərpa kodlarınız",
     "recoveryDescription": "Autentifikator tətbiqinə girişi itirsəniz, bunlardan birini istifadə edin.",
-    "recoveryWarning": "İndi yadda saxlayın — bir dəfə göstərilir və sonra əldə edilə bilməz. Hər biri yalnız bir dəfə işləyir.",
+    "recoveryWarning": "İndi yadda saxlayın - bir dəfə göstərilir və sonra əldə edilə bilməz. Hər biri yalnız bir dəfə işləyir.",
     "remainingCodes": "{{count}} bərpa kodu qalıb",
     "copyCodes": "Kodları kopyala",
     "copied": "Kopyalandı",
-    "copyFailed": "Kopyalanmadı — kodları əl ilə seçib kopyalayın.",
+    "copyFailed": "Kopyalanmadı - kodları əl ilə seçib kopyalayın.",
     "savedCodes": "Yadda saxladım"
   },
   "qrLogin": {
@@ -435,7 +435,7 @@
     "auditShowMetadata": "Ətraflı göstər",
     "auditHideMetadata": "Ətraflını gizlət",
     "auditNoMetadata": "Əlavə məlumat yoxdur",
-    "auditNoTarget": "—"
+    "auditNoTarget": "-"
   },
   "reports": {
     "reportMessage": "Mesajı Şikayət Et",
@@ -445,7 +445,7 @@
     "reportUserTitle": "{{name}} şikayət edilsin?",
     "reportUserDescription": "Moderatorlara nə yanlış olduğunu bildirin. Onlar şikayətinizi bu şəxsin əsas profil məlumatı ilə birlikdə görəcəklər.",
     "reason": "Səbəb",
-    "reasonHint": "Tələb olunur — bunu niyə şikayət etdiyinizi izah edin.",
+    "reasonHint": "Tələb olunur - bunu niyə şikayət etdiyinizi izah edin.",
     "submit": "Şikayəti Göndər",
     "submitted": "Şikayət göndərildi"
   }

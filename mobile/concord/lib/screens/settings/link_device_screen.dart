@@ -7,14 +7,6 @@ import '../../providers/api_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-/// `Link a Device` — the approval half of QR sign-in, reached by scanning the QR shown on another
-/// device, or by typing its user code by hand.
-///
-/// Authenticated by design: reaching this screen already requires being signed in, so approving is
-/// an act only a signed-in account can perform. The requesting device's browser, OS, and IP are
-/// shown *before* the approve button, because approving blind is the real risk here.
-///
-/// Mirrors the web app's `LinkDeviceScreen`.
 class LinkDeviceScreen extends ConsumerStatefulWidget {
   const LinkDeviceScreen({super.key});
 
@@ -42,10 +34,6 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
 
   QrLoginService get _qrLoginService => ref.read(qrLoginServiceProvider);
 
-  /// The QR encodes an `.../link?code=XXXX` deep link (see the backend's `QrLoginService`), so a
-  /// scanned value is normally a URL. Falling back to the raw text keeps typed/manual codes and any
-  /// future bare-code QR working the same way; the server itself strips dashes/spaces and
-  /// uppercases, so no further normalisation is needed here.
   String _extractUserCode(String rawValue) {
     final uri = Uri.tryParse(rawValue);
     final fromQuery = uri?.queryParameters['code'];

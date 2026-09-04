@@ -7,7 +7,7 @@ export function ServerIcon({ server }) {
   return (
     <Tooltip content={server.Name || 'Server'} side="right">
       <NavLink
-        to={`/servers/${server.Id}`}
+        to={`/cabinet/servers/${server.Id}`}
         aria-label={server.Name || 'Server'}
         className={({ isActive }) =>
           cn(

@@ -131,7 +131,7 @@ export function AccountSettingsForm() {
         label="Username"
         htmlFor="settings-username"
         error={errors.username?.message}
-        hint={!errors.username ? 'Letters, numbers, and underscores only — up to 32 characters.' : undefined}
+        hint={!errors.username ? 'Letters, numbers, and underscores only - up to 32 characters.' : undefined}
         required
       >
         <Input
@@ -141,7 +141,7 @@ export function AccountSettingsForm() {
             required: 'Username is required',
             pattern: {
               value: USERNAME_PATTERN,
-              message: 'Only letters, numbers, and underscores — up to 32 characters.',
+              message: 'Only letters, numbers, and underscores - up to 32 characters.',
             },
           })}
         />

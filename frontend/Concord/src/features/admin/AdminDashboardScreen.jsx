@@ -13,7 +13,7 @@ export function AdminDashboardScreen() {
   if (isLoading) return null
 
   if (user?.Role !== 'Admin') {
-    return <Navigate to="/" replace />
+    return <Navigate to="/cabinet" replace />
   }
 
   return (

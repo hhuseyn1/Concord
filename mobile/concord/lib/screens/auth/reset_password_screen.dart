@@ -8,12 +8,6 @@ import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import 'auth_layout.dart';
 
-/// Reached via the `concord://reset-password?token=...` deep link (see `app_router.dart`), which
-/// mirrors the web app's `/reset-password?token=...` — the token comes from a password-reset email,
-/// which this app doesn't itself send (there's no "forgot password" *request* screen on mobile yet,
-/// only this confirmation half; requesting a reset still has to be done from the web app or another
-/// channel). Submitting revokes every existing session server-side, so — same as the web version —
-/// there's nothing to sign back into automatically; this always ends at `/login`.
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key, required this.token});
 

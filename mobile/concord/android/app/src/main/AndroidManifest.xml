@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- INTERNET was missing from this file entirely before Phase 5 — every
+    <!-- INTERNET was missing from this file entirely before Phase 5 - every
          REST/SignalR call this app makes needs it, and (unlike the debug/
          profile manifests, which the Flutter tool adds it to automatically
          for hot reload) a release build only gets it if it's declared here.
@@ -40,7 +40,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Custom URL scheme deep links (invite links, password-reset links) — a plain
+            <!-- Custom URL scheme deep links (invite links, password-reset links) - a plain
                  `concord://` scheme, not an https Android App Link, since App Links require owning
                  a domain and hosting a verified `assetlinks.json`, which this project doesn't have.
                  No plugin is needed to receive these: Flutter's engine turns the incoming Intent's

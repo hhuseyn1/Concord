@@ -32,7 +32,7 @@ export function DirectMessagesProvider({ children }) {
     hubRef.current = hub
     const timeouts = typingTimeoutsRef.current
 
-    const isConversationOpen = (conversationId) => window.location.pathname === `/dm/${conversationId}`
+    const isConversationOpen = (conversationId) => window.location.pathname === `/cabinet/dm/${conversationId}`
 
     const unsubscribeReceived = hub.onDirectMessageReceived((message) => {
       const conversationOpen = isConversationOpen(message.ConversationId)
@@ -49,7 +49,7 @@ export function DirectMessagesProvider({ children }) {
           [message.Sender.Name, message.Sender.Surname].filter(Boolean).join(' ') ||
           'Someone'
         const description = message.Content || 'Sent an attachment'
-        const handleClick = () => navigateTo(`/dm/${message.ConversationId}`)
+        const handleClick = () => navigateTo(`/cabinet/dm/${message.ConversationId}`)
 
         toast({
           variant: 'info',

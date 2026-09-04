@@ -22,10 +22,6 @@ const _iconExtensionToContentType = {
   'gif': 'image/gif',
 };
 
-/// [initialMode]/[initialInviteCode] pre-select the "Join" tab and pre-fill its invite code field —
-/// used by the `concord://invite/{code}` deep link (see `app_router.dart` and
-/// `deep_link_providers.dart`'s `pendingInviteCodeProvider`) to land the user here with the code
-/// already typed in, one tap away from joining, rather than auto-submitting it unattended.
 Future<void> showAddServerSheet(
   BuildContext context, {
   AddServerMode initialMode = AddServerMode.create,

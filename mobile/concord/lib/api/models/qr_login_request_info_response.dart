@@ -1,7 +1,5 @@
 import 'json_utils.dart';
 
-/// What the approving device is shown before it decides. Approving blind is the central risk of a
-/// cross-device sign-in, so the requesting device's details are surfaced rather than just the code.
 class QrLoginRequestInfoResponse {
   const QrLoginRequestInfoResponse({
     required this.userCode,

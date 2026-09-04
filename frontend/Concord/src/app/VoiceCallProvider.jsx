@@ -231,7 +231,7 @@ export function VoiceCallProvider({ children }) {
         title: name,
         body: i18n.t(call.Type === 'Video' ? 'calls.incomingVideoCall' : 'calls.incomingVoiceCall'),
         icon: avatarUrl,
-        onClick: () => navigateTo(`/dm/${call.ConversationId}`),
+        onClick: () => navigateTo(`/cabinet/dm/${call.ConversationId}`),
       })
     })
 

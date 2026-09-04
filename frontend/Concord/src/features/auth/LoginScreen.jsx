@@ -21,7 +21,7 @@ export function LoginScreen() {
 
   const redirectTo = location.state?.from?.pathname
     ? `${location.state.from.pathname}${location.state.from.search ?? ''}`
-    : '/'
+    : '/cabinet'
   const {
     register,
     handleSubmit,

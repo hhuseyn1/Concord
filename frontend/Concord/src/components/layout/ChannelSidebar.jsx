@@ -27,7 +27,7 @@ function FriendsNav() {
   return (
     <nav className="flex flex-col gap-0.5 p-2" aria-label="Friends navigation">
       <NavLink
-        to="/"
+        to="/cabinet"
         end
         className={({ isActive }) =>
           cn(
@@ -74,7 +74,7 @@ function ConversationsNav() {
           return (
             <NavLink
               key={conversation.Id}
-              to={`/dm/${conversation.Id}`}
+              to={`/cabinet/dm/${conversation.Id}`}
               className={({ isActive }) =>
                 cn(
                   'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-fg-muted motion-safe:animate-row-in',

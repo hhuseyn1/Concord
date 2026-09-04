@@ -31,7 +31,7 @@ export function useChannelNavigationShortcuts() {
       if (!nextChannel || nextChannel.Id === channelId) return
 
       event.preventDefault()
-      navigate(`/servers/${serverId}/channels/${nextChannel.Id}`)
+      navigate(`/cabinet/servers/${serverId}/channels/${nextChannel.Id}`)
     }
 
     window.addEventListener('keydown', handleKeyDown)

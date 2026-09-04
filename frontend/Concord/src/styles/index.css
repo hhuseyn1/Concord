@@ -3,7 +3,7 @@
 
 /*
  * Base styles / reset. Tailwind's Preflight already normalizes most
- * browser defaults — this only covers the app-wide baseline that sits on
+ * browser defaults - this only covers the app-wide baseline that sits on
  * top of the design tokens above.
  *
  * Wrapped in `@layer base` (Tailwind v4's documented spot for custom base

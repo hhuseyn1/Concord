@@ -22,7 +22,7 @@ export function ServerRail() {
     >
       <Tooltip content="Home" side="right">
         <NavLink
-          to="/"
+          to="/cabinet"
           end
           className={({ isActive }) =>
             cn(
