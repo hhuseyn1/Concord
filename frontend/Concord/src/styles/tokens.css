@@ -242,12 +242,15 @@
 
     --color-fg-default: #4a4453;
     --color-fg-muted: #6b6375;
-    --color-fg-link: #aa3bff;
+    --color-fg-link: #a229ff;
     --color-fg-heading: #08060d;
     --color-fg-on-brand: #ffffff;
     --color-fg-on-danger: #ffffff;
 
-    --color-brand: #aa3bff;
+    /* #aa3bff (the seed accent) is only 4.39:1 on white - just under WCAG AA's 4.5:1 for normal
+     * text - since it doubles as both link-text color and the fg-on-brand/bg-brand button pairing.
+     * Darkened slightly along the same hue to 4.89:1; visually near-identical, same brand hue. */
+    --color-brand: #a229ff;
     --color-brand-hover: #9526e8;
     --color-brand-pressed: #7f1fc7;
     --color-brand-bg: rgb(170 59 255 / 10%);
