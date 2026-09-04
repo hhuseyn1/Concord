@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /cabinet
+Disallow: /link
+Disallow: /reset-password

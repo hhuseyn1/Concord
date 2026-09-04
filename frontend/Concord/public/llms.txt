@@ -1,0 +1,10 @@
+# Concord
+
+> Concord is where your community hangs out - servers and channels, instant messaging, crystal-clear voice & video, and presence that keeps everyone in the loop.
+
+## Pages
+
+- [Home](/): Product overview, features, and how Concord works.
+- [Sign up](/register): Create a new Concord account.
+- [Log in](/login): Sign in to an existing account.
+- [Forgot password](/forgot-password): Request a password reset link.
