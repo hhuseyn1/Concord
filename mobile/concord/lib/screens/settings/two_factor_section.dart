@@ -10,11 +10,6 @@ import '../../providers/api_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-/// Mirrors the web app's `TwoFactorSection`: enrol, disable, and regenerate recovery codes.
-///
-/// Enrolment is deliberately three steps - QR, confirm a code, then save the recovery codes -
-/// matching the server's two-phase flow, where the secret stays inert until a real code confirms
-/// the authenticator was actually set up.
 class TwoFactorSection extends ConsumerStatefulWidget {
   const TwoFactorSection({super.key});
 
@@ -289,7 +284,7 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
               child: SvgPicture.memory(svgBytes, width: 176, height: 176),
             )
           else
-            Text("Couldn't render the QR code — enter the key below manually.",
+            Text("Couldn't render the QR code - enter the key below manually.",
                 style: textTheme.bodySmall?.copyWith(color: colors.danger)),
           const SizedBox(height: ConcordSpacing.md),
           Text('Or enter this key manually', style: textTheme.labelLarge),
@@ -333,10 +328,6 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
   }
 }
 
-/// One-time display of freshly generated recovery codes.
-///
-/// These are shown here and nowhere else - the server keeps only hashes, so once this closes they
-/// are unrecoverable.
 class _RecoveryCodesPanel extends StatefulWidget {
   const _RecoveryCodesPanel({required this.codes, required this.onDone});
 

@@ -47,7 +47,7 @@ export function GlobalSearchModal({ open, onOpenChange }) {
   const results = data?.Items ?? []
 
   const handleResultClick = (result) => {
-    const path = result.SourceType === 'Channel' ? `/servers/${result.ServerId}/channels/${result.ChannelId}` : `/dm/${result.ConversationId}`
+    const path = result.SourceType === 'Channel' ? `/cabinet/servers/${result.ServerId}/channels/${result.ChannelId}` : `/cabinet/dm/${result.ConversationId}`
     navigate(path)
     onOpenChange(false)
     setTimeout(() => jumpToMessage(result.MessageId), JUMP_AFTER_NAVIGATE_DELAY_MS)

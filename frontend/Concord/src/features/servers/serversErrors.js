@@ -17,7 +17,7 @@ export function mapCreateServerError(error) {
 
 export function mapServerIconUploadError(error) {
   if (error?.status === 400) {
-    return error.message || "That image can't be used — check the file type and size (max 5 MB)."
+    return error.message || "That image can't be used - check the file type and size (max 5 MB)."
   }
   return genericMessage(error)
 }
@@ -32,7 +32,7 @@ export function mapJoinServerError(error) {
 export function mapLeaveServerError(error) {
   if (error?.status === 403) {
     return typeof error.message === 'string' && error.message.toLowerCase().includes('owner')
-      ? "Owners can't leave their own server — transfer ownership first."
+      ? "Owners can't leave their own server - transfer ownership first."
       : "You're not a member of this server."
   }
   if (error?.status === 404) {
@@ -58,7 +58,7 @@ export function mapRemoveMemberError(error) {
       : 'You need the Kick Members permission to remove members.'
   }
   if (error?.status === 400) {
-    return "You can't remove yourself this way — use Leave Server instead."
+    return "You can't remove yourself this way - use Leave Server instead."
   }
   return genericMessage(error)
 }

@@ -20,7 +20,7 @@ export function mapUpdateProfileError(error) {
 
 export function mapAvatarUploadError(error) {
   if (error?.status === 400) {
-    return error.message || "That image can't be used — check the file type and size (max 5 MB)."
+    return error.message || "That image can't be used - check the file type and size (max 5 MB)."
   }
   return genericMessage(error)
 }
@@ -37,7 +37,7 @@ export function mapChangePasswordError(error) {
 
 export function mapSessionActionError(error) {
   if (error?.status === 404) {
-    return 'That session no longer exists — it may have already been signed out.'
+    return 'That session no longer exists - it may have already been signed out.'
   }
   return genericMessage(error)
 }

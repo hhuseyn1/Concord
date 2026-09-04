@@ -1,12 +1,3 @@
-// Smoke test for the API/data-access layer under lib/api/.
-//
-// This deliberately does not hit a real backend (no guarantee one is
-// running wherever this executes) — it instead exercises the pure-Dart
-// parts that are easiest to get wrong silently: model (de)serialization
-// against both REST's PascalCase wire shape and SignalR's camelCase wire
-// shape (see lib/api/models/json_utils.dart), enum wire-format mapping,
-// pagination parsing, and that every client/service/hub class constructs
-// without touching a platform channel eagerly.
 import 'package:concord/api/api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -122,8 +113,6 @@ void main() {
   });
 
   test('ApiException.isLikelyAccountLockout matches the documented lockout message', () {
-    // UserLockoutException inherits UnauthorizedAccessException server-side, so this is a 401,
-    // same status as plain bad credentials — see ApiException.isLikelyAccountLockout's doc comment.
     const lockout = ApiException(
       401,
       "User '123' has exceeded the number of allowed authentication attempts.",
@@ -219,8 +208,6 @@ void main() {
     expect(restMessage.forwardedFromSenderId, 'u3');
     expect(restMessage.forwardedFromCreatedAt, DateTime.parse('2025-12-31T00:00:00Z'));
 
-    // Same shape, camelCase (hub payload) — same case-insensitive `field`
-    // lookup this whole model relies on, see json_utils.dart.
     final hubJson = {
       'id': 'm3',
       'channelId': 'c1',

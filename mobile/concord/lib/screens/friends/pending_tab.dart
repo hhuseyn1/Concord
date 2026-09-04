@@ -99,7 +99,7 @@ class _IncomingSectionState extends ConsumerState<_IncomingSection> {
       children: [
         _SectionHeading(
           icon: Icons.call_received,
-          label: 'INCOMING${requestsAsync.maybeWhen(data: (r) => ' — ${r.length}', orElse: () => '')}',
+          label: 'INCOMING${requestsAsync.maybeWhen(data: (r) => ' - ${r.length}', orElse: () => '')}',
         ),
         const SizedBox(height: ConcordSpacing.xs),
         requestsAsync.when(
@@ -187,7 +187,7 @@ class _OutgoingSectionState extends ConsumerState<_OutgoingSection> {
       children: [
         _SectionHeading(
           icon: Icons.call_made,
-          label: 'OUTGOING${requestsAsync.maybeWhen(data: (r) => ' — ${r.length}', orElse: () => '')}',
+          label: 'OUTGOING${requestsAsync.maybeWhen(data: (r) => ' - ${r.length}', orElse: () => '')}',
         ),
         const SizedBox(height: ConcordSpacing.xs),
         requestsAsync.when(

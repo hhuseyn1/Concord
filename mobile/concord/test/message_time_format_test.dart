@@ -1,8 +1,3 @@
-// Ports the intent of `formatMessageTime.js`'s formatting contract into a
-// couple of light regex-shaped assertions rather than exact strings, since
-// the exact wall-clock text depends on the test runner's local timezone
-// (there's no `intl` dependency here to fix a locale/timezone for testing —
-// see message_time_format.dart's doc comment for why).
 import 'package:concord/utils/message_time_format.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,9 +14,6 @@ void main() {
 
   test('formatGroupTimestamp labels a message from exactly a day ago as "Yesterday"', () {
     final yesterday = DateTime.now().toUtc().subtract(const Duration(hours: 20));
-    // Depending on time-of-day this may still fall on "Today" for an early
-    // local hour, so only assert it's one of the two recent-day labels
-    // rather than exactly "Yesterday" (avoids a flaky boundary condition).
     final formatted = formatGroupTimestamp(yesterday);
     expect(formatted.startsWith('Today at ') || formatted.startsWith('Yesterday at '), isTrue);
   });

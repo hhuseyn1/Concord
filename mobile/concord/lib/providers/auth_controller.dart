@@ -72,18 +72,9 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
-    // Best-effort server-side session revocation: this tells the backend to
-    // invalidate the refresh token immediately instead of leaving it valid
-    // until natural expiry. It must never block or fail the user-visible
-    // logout — if the access token is already expired this call may 401 and
-    // trigger the API client's refresh-then-retry logic, which itself may
-    // fail (e.g. offline, refresh token already invalid); either way we
-    // swallow the error and fall through to clearing local tokens, which is
-    // what actually logs the user out on-device.
     try {
       await _sessionsService.revokeCurrentSession();
     } catch (_) {
-      // Ignore: local logout must proceed regardless of server outcome.
     }
     await _authService.logout();
     state = const AuthState(status: AuthStatus.unauthenticated);
@@ -101,7 +92,6 @@ class AuthController extends StateNotifier<AuthState> {
         state = state.copyWith(profile: profile);
       }
     } on ApiException {
-      // ignore: empty_catches
     }
   }
 

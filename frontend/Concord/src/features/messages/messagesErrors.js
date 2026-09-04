@@ -94,7 +94,7 @@ export function mapForwardMessageError(error) {
 
 export function mapAttachmentUploadError(error) {
   if (error?.status === 400) {
-    return error.message || "That file can't be attached — check the file type and size (max 25 MB)."
+    return error.message || "That file can't be attached - check the file type and size (max 25 MB)."
   }
   return genericMessage(error)
 }

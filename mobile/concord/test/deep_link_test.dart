@@ -1,7 +1,3 @@
-// Exercises `app_router.dart`'s `concord://` deep-link handling end to end (custom-scheme URI ->
-// normalized in-app path -> route match/redirect), since there's no Android/iOS device or emulator
-// available in this environment to tap an actual OS-level deep link and confirm the manifest/plist
-// wiring hands it to the app the way `flutter build apk`/`flutter build ios` alone can't verify.
 import 'package:concord/api/api.dart';
 import 'package:concord/main.dart';
 import 'package:concord/providers/api_providers.dart';
@@ -83,7 +79,6 @@ void main() {
     container.read(routerProvider).go('concord://invite/ABC123');
     await tester.pumpAndSettle();
 
-    // No session yet, so it's bounced to /login same as any other route — but the code survives.
     expect(find.text('Welcome back'), findsOneWidget);
     expect(container.read(pendingInviteCodeProvider), 'ABC123');
   });

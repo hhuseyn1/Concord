@@ -27,7 +27,7 @@ export function DeleteServerModal({ server, open, onOpenChange }) {
       await deleteMutation.mutateAsync(server.Id)
       toast({ description: `${serverName} was deleted.` })
       handleClose(false)
-      navigate('/')
+      navigate('/cabinet')
     } catch (error) {
       toast({ variant: 'danger', title: 'Could not delete server', description: mapDeleteServerError(error) })
     }

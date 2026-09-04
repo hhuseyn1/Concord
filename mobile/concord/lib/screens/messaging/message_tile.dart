@@ -39,8 +39,6 @@ class MessageTile extends ConsumerStatefulWidget {
 
   final String? serverId;
 
-  /// This thread's own channel/conversation id, if any — passed through to the forward picker so it
-  /// can exclude the current destination from its own list of targets.
   final String? sourceChannelId;
   final String? sourceConversationId;
 
@@ -167,7 +165,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
         content: Text(
           canDeleteForEveryone
               ? "This deletes it for everyone in the ${widget.threadNoun}. This can't be undone."
-              : "It'll disappear from your view only — everyone else can still see it. "
+              : "It'll disappear from your view only - everyone else can still see it. "
                   "There's no way to unhide it yourself afterward.",
         ),
         actions: [
@@ -397,11 +395,6 @@ class _MessageTileState extends ConsumerState<MessageTile> {
     );
   }
 
-  /// Resolves `MentionedUserIds` (server-authoritative — parsed once at send time from the same
-  /// `@([a-zA-Z0-9_]{1,32})` shape used below) to a lowercased-username lookup, mirroring the web
-  /// app's `useMentionedUsers`. Splitting `content` on that same token shape and only highlighting a
-  /// match that resolves to one of these usernames means an arbitrary "@word" in prose (or an
-  /// email-like "user@host") is never mistaken for a mention.
   Map<String, PublicProfileResponse> _resolveMentionedUsers() {
     if (widget.message.mentionedUserIds.isEmpty) return const {};
     final byUsername = <String, PublicProfileResponse>{};

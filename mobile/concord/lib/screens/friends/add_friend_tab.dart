@@ -175,14 +175,14 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
         const SizedBox(height: ConcordSpacing.md),
         if (_query.isNotEmpty && !enabled)
           Text(
-            'Keep typing — at least $_minQueryLength characters.',
+            'Keep typing - at least $_minQueryLength characters.',
             style: TextStyle(fontSize: 13, color: colors.fgMuted),
           ),
         if (_query.isEmpty)
           const ConcordEmptyState(
             icon: Icons.person_add_alt_outlined,
             title: 'Find friends by username',
-            subtitle: "You, existing friends, and blocked users won't show up here — results reflect your "
+            subtitle: "You, existing friends, and blocked users won't show up here - results reflect your "
                 'real relationship with each person.',
           ),
         if (enabled && _isSearching) const Center(child: Padding(padding: EdgeInsets.all(ConcordSpacing.lg), child: CircularProgressIndicator())),

@@ -25,7 +25,7 @@ const selectClassName = cn(
 )
 
 function inviteUrl(code) {
-  return `${window.location.origin}/?invite=${code}`
+  return `${window.location.origin}/cabinet?invite=${code}`
 }
 
 function describeExpiry(expiresAtUtc) {
@@ -38,7 +38,7 @@ function describeExpiry(expiresAtUtc) {
 function describeUses(maxUses, useCount) {
   if (!maxUses) return `${useCount} use${useCount === 1 ? '' : 's'}`
   const exhausted = useCount >= maxUses
-  return `${useCount} / ${maxUses} uses${exhausted ? ' — exhausted' : ''}`
+  return `${useCount} / ${maxUses} uses${exhausted ? ' - exhausted' : ''}`
 }
 
 function isInviteUsable(invite) {
@@ -58,7 +58,7 @@ function InviteRow({ invite }) {
       toast({ variant: 'success', description: 'Invite link copied to clipboard.' })
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      toast({ variant: 'danger', description: 'Could not copy automatically — copy the code manually.' })
+      toast({ variant: 'danger', description: 'Could not copy automatically - copy the code manually.' })
     }
   }
 

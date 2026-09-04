@@ -87,7 +87,7 @@ export function mapTwoFactorSetupError(error) {
       return 'That password is not correct.'
     }
     if (message.includes('start two-factor setup')) {
-      return 'Start setup again — the previous code expired.'
+      return 'Start setup again - the previous code expired.'
     }
     return 'That code is not valid. Check your authenticator app and try again.'
   }

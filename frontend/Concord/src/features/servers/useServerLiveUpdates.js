@@ -57,7 +57,7 @@ export function useServerLiveUpdates(serverId) {
       if (event?.serverId !== serverId) return
       queryClient.invalidateQueries({ queryKey: serversKeys.list() })
       toast({ variant: 'info', title: 'Removed from server', description: "You're no longer a member of this server." })
-      navigate('/')
+      navigate('/cabinet')
     })
 
     hub

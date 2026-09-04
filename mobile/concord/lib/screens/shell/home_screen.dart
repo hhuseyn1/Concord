@@ -27,9 +27,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    // Covers a `concord://invite/{code}` deep link that set `pendingInviteCodeProvider` before this
-    // screen was even built (the common case: app cold-started straight from the link). `ref.listen`
-    // in `build`, below, covers the same link arriving while this screen is already on screen.
     WidgetsBinding.instance.addPostFrameCallback((_) => _consumePendingInviteIfAny());
   }
 

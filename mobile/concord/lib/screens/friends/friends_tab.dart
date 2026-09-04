@@ -50,7 +50,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
         title: const Text('Block this user?'),
         content: Text(
           '$displayName will be removed from your friends and won\'t be able to message you or see your '
-          'profile. There\'s no separate "unfriend" — this is the only way to end the friendship.',
+          'profile. There\'s no separate "unfriend" - this is the only way to end the friendship.',
         ),
         actions: [
           TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
@@ -119,7 +119,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md),
           child: Text(
-            'ALL FRIENDS — ${friends.length}',
+            'ALL FRIENDS - ${friends.length}',
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
           ),
         ),

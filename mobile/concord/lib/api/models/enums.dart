@@ -1,7 +1,5 @@
 library;
 
-/// Mirrors `Concord.Application.Enums.PresenceStatus`.
-/// `Online = 0`, `Idle = 1`, `DoNotDisturb = 2`, `Invisible = 3`, `Offline = 4`.
 enum PresenceStatus {
   online,
   idle,
@@ -25,8 +23,6 @@ enum PresenceStatus {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.ChannelType`.
-/// `Text = 0`, `Voice = 1`.
 enum ChannelType {
   text,
   voice;
@@ -47,8 +43,6 @@ enum ChannelType {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.FriendRequestStatus`.
-/// `Pending = 0`, `Accepted = 1`.
 enum FriendRequestStatus {
   pending,
   accepted;
@@ -69,9 +63,6 @@ enum FriendRequestStatus {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.NotificationType`.
-/// `FriendRequestReceived = 0`, `FriendRequestAccepted = 1`, `MissedCall = 2`,
-/// `Mention = 3`, `FriendRequestDeclined = 4`, `FriendRequestCancelled = 5`.
 enum NotificationType {
   friendRequestReceived,
   friendRequestAccepted,
@@ -96,8 +87,6 @@ enum NotificationType {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.FriendRequestPrivacy`.
-/// `Everyone = 0`, `FriendsOfFriends = 1`, `Nobody = 2`.
 enum FriendRequestPrivacy {
   everyone,
   friendsOfFriends,
@@ -119,8 +108,6 @@ enum FriendRequestPrivacy {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.DirectMessagePrivacy`.
-/// `Everyone = 0`, `FriendsOnly = 1`, `Nobody = 2`.
 enum DirectMessagePrivacy {
   everyone,
   friendsOnly,
@@ -142,8 +129,6 @@ enum DirectMessagePrivacy {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.ActivityVisibility`.
-/// `Everyone = 0`, `FriendsOnly = 1`, `Nobody = 2`.
 enum ActivityVisibility {
   everyone,
   friendsOnly,
@@ -165,8 +150,6 @@ enum ActivityVisibility {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.ActivityType`.
-/// `Playing = 0`, `Listening = 1`, `Coding = 2`, `Using = 3`.
 enum ActivityType {
   playing,
   listening,
@@ -189,7 +172,6 @@ enum ActivityType {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.CallType`. `Voice = 0`, `Video = 1`.
 enum CallType {
   voice,
   video;
@@ -210,8 +192,6 @@ enum CallType {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.CallStatus`.
-/// `Ringing = 0`, `Accepted = 1`, `Declined = 2`, `Missed = 3`, `Ended = 4`.
 enum CallStatus {
   ringing,
   accepted,
@@ -233,8 +213,6 @@ enum CallStatus {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.MessageSourceType` — discriminates a
-/// `GlobalSearchResultResponse` row. `Channel = 0`, `DirectMessage = 1`.
 enum MessageSourceType {
   channel,
   directMessage;
@@ -253,8 +231,6 @@ enum MessageSourceType {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.CustomStatusExpiryPreset`.
-/// `Never = 0`, `ThirtyMinutes = 1`, `OneHour = 2`, `FourHours = 3`, `Today = 4`.
 enum CustomStatusExpiryPreset {
   never,
   thirtyMinutes,
@@ -278,9 +254,6 @@ enum CustomStatusExpiryPreset {
   }
 }
 
-/// Mirrors `Concord.Application.Enums.FriendRelationshipStatus`.
-/// `None = 0`, `Friends = 1`, `OutgoingRequest = 2`, `IncomingRequest = 3`,
-/// `Blocked = 4`.
 enum FriendRelationshipStatus {
   none,
   friends,

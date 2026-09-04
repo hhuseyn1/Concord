@@ -278,7 +278,7 @@ export function MessageComposer({ serverId, channelId, onSent, onTyping, onStopT
           {!rateLimitedHint && overLimit && (
             <p className="flex items-center gap-1.5 text-xs text-danger">
               <AlertTriangle className="size-3.5 shrink-0" aria-hidden="true" />
-              Message is too long — trim it to {MAX_CONTENT_LENGTH} characters or fewer to send.
+              Message is too long - trim it to {MAX_CONTENT_LENGTH} characters or fewer to send.
             </p>
           )}
         </div>

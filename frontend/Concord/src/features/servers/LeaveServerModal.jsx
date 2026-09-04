@@ -15,7 +15,7 @@ export function LeaveServerModal({ server, open, onOpenChange }) {
       await leaveMutation.mutateAsync(server.Id)
       toast({ description: `You left ${server?.Name || 'the server'}.` })
       onOpenChange(false)
-      navigate('/')
+      navigate('/cabinet')
     } catch (error) {
       toast({ variant: 'danger', title: 'Could not leave server', description: mapLeaveServerError(error) })
     }

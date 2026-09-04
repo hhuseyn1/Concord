@@ -17,7 +17,7 @@ export function DeleteChannelModal({ channel, serverId, open, onOpenChange }) {
       toast({ description: `#${channel.Name} was deleted.` })
       onOpenChange(false)
       if (channel.Id === activeChannelId) {
-        navigate(`/servers/${serverId}`)
+        navigate(`/cabinet/servers/${serverId}`)
       }
     } catch (error) {
       toast({ variant: 'danger', title: 'Could not delete channel', description: mapDeleteChannelError(error) })

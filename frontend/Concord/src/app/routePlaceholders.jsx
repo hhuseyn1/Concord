@@ -24,7 +24,7 @@ export function ServerPlaceholder() {
 
   if (channels && channels.length > 0) {
     const target = channels.find((channel) => channel.Type === 'Text') ?? channels[0]
-    return <Navigate to={`/servers/${serverId}/channels/${target.Id}`} replace />
+    return <Navigate to={`/cabinet/servers/${serverId}/channels/${target.Id}`} replace />
   }
 
   return (

@@ -69,7 +69,7 @@ class ServerMemberListScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(ConcordSpacing.md, ConcordSpacing.md, ConcordSpacing.md, ConcordSpacing.xs),
             child: Text(
-              '${group.label.toUpperCase()} — ${group.members.length}',
+              '${group.label.toUpperCase()} - ${group.members.length}',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
             ),
           ),

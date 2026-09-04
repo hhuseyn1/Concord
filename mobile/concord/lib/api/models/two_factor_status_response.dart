@@ -20,7 +20,6 @@ class TwoFactorStatusResponse {
   final bool enabled;
   final DateTime? enabledAt;
 
-  /// True when a secret exists but has never been confirmed with a code.
   final bool setupPending;
   final int remainingRecoveryCodes;
 }

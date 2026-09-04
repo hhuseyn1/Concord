@@ -47,15 +47,9 @@ class MessageListView extends StatefulWidget {
 
   final String? serverId;
 
-  /// This thread's own channel/conversation id, threaded through to each [MessageTile]'s forward
-  /// picker so it can exclude the current destination from its own target list.
   final String? sourceChannelId;
   final String? sourceConversationId;
 
-  /// For DM threads only: the timestamp up to which the other participant has read the
-  /// conversation (from `DirectMessagesHub.onConversationRead`). When it's at or after the
-  /// current user's most recent message, a "Seen" marker is shown beneath it — mirrors the web
-  /// app's `DirectMessageList` read-receipt behavior. Null/unused for channel threads.
   final DateTime? otherReadAt;
 
   @override

@@ -23,7 +23,7 @@ export function RegisterScreen() {
     setFormError('')
     try {
       await authService.register({ Name: name, Surname: surname, Email: email, Password: password })
-      navigate('/', { replace: true })
+      navigate('/cabinet', { replace: true })
     } catch (error) {
       setFormError(mapRegisterError(error))
     }

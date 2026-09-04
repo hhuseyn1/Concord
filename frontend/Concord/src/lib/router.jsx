@@ -26,6 +26,7 @@ export const router = createBrowserRouter([
     children: [
       { path: 'link', element: <LinkDeviceScreen /> },
       {
+        path: 'cabinet',
         element: <AppShell />,
         children: [
           { index: true, element: <FriendsScreen /> },

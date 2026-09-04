@@ -63,13 +63,13 @@ function VoiceCallStrip() {
   if (isChannelCall) {
     const channel = channels?.find((item) => item.Id === activeCall.channelId)
     label = channel?.Name ?? 'Voice channel'
-    linkTo = `/servers/${activeCall.serverId}/channels/${activeCall.channelId}`
+    linkTo = `/cabinet/servers/${activeCall.serverId}/channels/${activeCall.channelId}`
   } else {
     const cached = queryClient.getQueryData(directMessagesKeys.conversations())
     const conversation = flattenConversationPages(cached?.pages).find((item) => item.Id === activeCall.conversationId)
     const otherUser = conversation?.OtherUser
     label = otherUser?.Username || [otherUser?.Name, otherUser?.Surname].filter(Boolean).join(' ') || 'Direct call'
-    linkTo = `/dm/${activeCall.conversationId}`
+    linkTo = `/cabinet/dm/${activeCall.conversationId}`
   }
 
   return (
@@ -170,14 +170,14 @@ export function UserPanel({ className }) {
                   {t('customStatus.title')}
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/settings">
+                  <Link to="/cabinet/settings">
                     <Settings className="size-4" aria-hidden="true" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
                 {user?.Role === 'Admin' && (
                   <DropdownMenuItem asChild>
-                    <Link to="/admin">
+                    <Link to="/cabinet/admin">
                       <ShieldCheck className="size-4" aria-hidden="true" />
                       {t('admin.dashboardLink')}
                     </Link>

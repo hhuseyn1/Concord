@@ -19,14 +19,14 @@ export function HeroSection() {
       <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-32">
         <Reveal>
           <p className="mb-4 inline-flex items-center rounded-full border border-border-default bg-surface-sidebar px-3 py-1 text-xs font-medium text-fg-muted">
-            Real-time chat, voice &amp; video — all in one place
+            Real-time chat, voice &amp; video - all in one place
           </p>
           <h1 className="text-4xl font-bold text-balance text-fg-heading sm:text-5xl lg:text-6xl">
             Your community,
             <span className="bg-linear-to-r from-brand to-[#47bfff] bg-clip-text text-transparent"> always in sync.</span>
           </h1>
           <p className="mt-6 max-w-lg text-lg text-fg-muted">
-            Concord is where your people hang out — servers and channels for your communities, instant messaging,
+            Concord is where your people hang out - servers and channels for your communities, instant messaging,
             crystal-clear voice &amp; video, and presence that keeps everyone in the loop.
           </p>
 

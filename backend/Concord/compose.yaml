@@ -25,15 +25,7 @@ services:
             - "${API_HTTP_PORT}:8080"
         volumes:
             - backend-uploads:/App/wwwroot/uploads
-            # Data Protection key ring (see Program.cs's AddDataProtection/PersistKeysToFileSystem) -
-            # without this, every container restart rotates the keys and permanently locks every
-            # enrolled user's TOTP secret (TwoFactorService can no longer decrypt it).
             - backend-dataprotection-keys:/App/keys
-        # Program.cs's startup migration (await context.Database.MigrateAsync()) has no retry
-        # policy, so a plain `up` with no ordering guarantee lets this container start and hit
-        # Postgres before it's accepting connections - an unhandled NpgsqlException crashes the
-        # whole process before it ever binds a port. Waiting on both services' own healthchecks
-        # (not just container-started) closes that race.
         depends_on:
             db:
                 condition: service_healthy
@@ -89,58 +81,40 @@ services:
         profiles:
             - db
 
-    livekit:
-        container_name: ${APP_ENV}-concord.livekit
-        <<: *general-blocks
-        image: livekit/livekit-server:latest
-        # turn.enabled + rtc.use_external_ip are real-deployment behavior (need a resolvable
-        # LIVEKIT_TURN_DOMAIN + a real TLS cert) and are off locally via LIVEKIT_TURN_ENABLED /
-        # LIVEKIT_USE_EXTERNAL_IP — see the env file for the per-environment values (decided in
-        # Phase 8). LIVEKIT_CONFIG is LiveKit's own env-var config mechanism (the equivalent of
-        # --config-body); Compose substitutes the ${...} placeholders below from this service's
-        # env file before the container ever starts, so livekit-server itself never needs to know
-        # about environment-specific values.
-        environment:
-            LIVEKIT_CONFIG: |
-                port: 7880
-                rtc:
-                    tcp_port: 7881
-                    port_range_start: ${LIVEKIT_RTC_PORT_START}
-                    port_range_end: ${LIVEKIT_RTC_PORT_END}
-                    use_external_ip: ${LIVEKIT_USE_EXTERNAL_IP}
-                turn:
-                    enabled: ${LIVEKIT_TURN_ENABLED}
-                    domain: ${LIVEKIT_TURN_DOMAIN}
-                    tls_port: 5349
-                    udp_port: 3478
-                keys:
-                    ${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}
-        ports:
-            - "${LIVEKIT_HTTP_PORT}:7880"
-            - "${LIVEKIT_TCP_PORT}:7881"
-            - "${LIVEKIT_RTC_PORT_START}-${LIVEKIT_RTC_PORT_END}:${LIVEKIT_RTC_PORT_START}-${LIVEKIT_RTC_PORT_END}/udp"
-            - "3478:3478/udp"
-            - "5349:5349/tcp"
-        healthcheck:
-            # Best-effort reachability check (community-sourced, e.g. Dokploy's LiveKit template
-            # uses the same wget-against-root approach) — the livekit-server image is a minimal
-            # Alpine build and may not even have wget installed, and the expected status code from
-            # "/" isn't independently confirmed here. Verify against the actual running container
-            # before relying on this in CI, and swap it out if it doesn't hold up.
-            test: ["CMD", "wget", "-qO-", "http://localhost:7880/"]
-            interval: 10s
-            timeout: 5s
-            retries: 5
-            start_period: 10s
-        profiles:
-            - db
+    # livekit:
+    #     container_name: ${APP_ENV}-concord.livekit
+    #     <<: *general-blocks
+    #     image: livekit/livekit-server:latest
+    #     environment:
+    #         LIVEKIT_CONFIG: |
+    #             port: 7880
+    #             rtc:
+    #                 tcp_port: 7881
+    #                 port_range_start: ${LIVEKIT_RTC_PORT_START}
+    #                 port_range_end: ${LIVEKIT_RTC_PORT_END}
+    #                 use_external_ip: ${LIVEKIT_USE_EXTERNAL_IP}
+    #             turn:
+    #                 enabled: ${LIVEKIT_TURN_ENABLED}
+    #                 domain: ${LIVEKIT_TURN_DOMAIN}
+    #                 tls_port: 5349
+    #                 udp_port: 3478
+    #             keys:
+    #                 ${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}
+    #     ports:
+    #         - "${LIVEKIT_HTTP_PORT}:7880"
+    #         - "${LIVEKIT_TCP_PORT}:7881"
+    #         - "${LIVEKIT_RTC_PORT_START}-${LIVEKIT_RTC_PORT_END}:${LIVEKIT_RTC_PORT_START}-${LIVEKIT_RTC_PORT_END}/udp"
+    #         - "3478:3478/udp"
+    #         - "5349:5349/tcp"
+    #     healthcheck:
+    #         test: ["CMD", "wget", "-qO-", "http://localhost:7880/"]
+    #         interval: 10s
+    #         timeout: 5s
+    #         retries: 5
+    #         start_period: 10s
+    #     profiles:
+    #         - db
 
-    # Split from the `db` profile deliberately: Serilog ships logs here (LoggingConfig.cs's
-    # WriteTo.Elasticsearch), but that sink is non-blocking - the API starts and runs fine with
-    # neither of these up, it just has nowhere to ship logs to. Bundling ~2GB+ of Elasticsearch/
-    # Kibana RAM into every routine `up` was starving out anything else running on the same
-    # machine at the same time (e.g. an Android emulator) for no benefit on a day nobody's
-    # actually looking at logs. Bring them up explicitly with `--profile logging` when needed.
     elasticsearch:
         container_name: ${APP_ENV}-concord.elasticsearch
         <<: *general-blocks

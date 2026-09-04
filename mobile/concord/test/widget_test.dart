@@ -1,12 +1,3 @@
-// Smoke test for the real app shell (replaces the counter-demo smoke test
-// that shipped with the Flutter project template — main.dart is no longer a
-// counter demo as of Phase 2).
-//
-// Overrides `tokenStorageProvider` with an in-memory fake so the test never
-// touches `flutter_secure_storage`'s platform channel (unavailable/unmocked
-// under `flutter test`), then asserts the unauthenticated app renders the
-// login screen — the same "no session -> RequireAuth sends you to /login"
-// behavior as the web app's route guard.
 import 'package:concord/api/api.dart';
 import 'package:concord/main.dart';
 import 'package:concord/providers/api_providers.dart';

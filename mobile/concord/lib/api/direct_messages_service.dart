@@ -106,8 +106,6 @@ class DirectMessagesService {
         .toList();
   }
 
-  /// Forwards a message sourced from this conversation into another channel or DM conversation.
-  /// See `MessagesService.forwardMessage`'s doc comment — same contract, mirrored for a DM source.
   Future<void> forwardMessage(
     String conversationId,
     String messageId, {

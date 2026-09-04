@@ -78,7 +78,7 @@ class _BlockedTabState extends ConsumerState<BlockedTab> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md),
           child: Text(
-            'BLOCKED — ${state.items.length}',
+            'BLOCKED - ${state.items.length}',
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
           ),
         ),

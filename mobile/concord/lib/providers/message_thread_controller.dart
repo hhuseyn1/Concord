@@ -11,8 +11,6 @@ abstract class MessageThreadController {
 
   Future<void> unpinMessage(String messageId);
 
-  /// Forwards [messageId] (sourced from this thread) into another channel or DM conversation.
-  /// Exactly one of [targetChannelId]/[targetConversationId] must be set.
   Future<void> forwardMessage(String messageId, {String? targetChannelId, String? targetConversationId});
 
   Future<MessageLike> sendMessage({

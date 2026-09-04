@@ -73,7 +73,7 @@ export function BlockedTab() {
   return (
     <div className="flex flex-col gap-2">
       <p className="px-3 text-xs font-semibold tracking-wide text-fg-muted uppercase">
-        Blocked — {totalCount}
+        Blocked - {totalCount}
       </p>
       <div className="flex flex-col gap-0.5">
         {blocked.map((user) => (

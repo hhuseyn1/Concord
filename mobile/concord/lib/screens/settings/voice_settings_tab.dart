@@ -30,7 +30,7 @@ class VoiceSettingsTab extends StatelessWidget {
                 child: Text(
                   "Concord will ask for microphone access the first time you join a call, and camera "
                   "access the first time you turn your camera on. There's no separate device picker on "
-                  'mobile — audio output (earpiece/speaker/Bluetooth) is controlled by your device, not '
+                  'mobile - audio output (earpiece/speaker/Bluetooth) is controlled by your device, not '
                   'this app.',
                   style: textTheme.bodyMedium?.copyWith(color: colors.fgDefault),
                 ),

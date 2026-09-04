@@ -8,8 +8,6 @@ import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-/// Offered timeout lengths, in minutes — mirrors the presets the web app's `MemberModerationMenu`
-/// exposes (which itself mirrors Discord's).
 const _timeoutPresets = <int, String>{
   5: '5 minutes',
   60: '1 hour',
@@ -17,20 +15,6 @@ const _timeoutPresets = <int, String>{
   7 * 24 * 60: '7 days',
 };
 
-/// Per-member moderation sheet (P1): mute, timeout, kick, ban — mirrors the web app's
-/// `MemberModerationMenu`. Visibility is per-action: each item only appears if the caller holds
-/// that specific permission (`MuteMembers`/`ModerateMembers`/`KickMembers`/`BanMembers`).
-///
-/// The hierarchy rule (an actor cannot act on the owner, on themselves, or on anyone ranked at or
-/// above them) is enforced server-side by `PermissionService.AssertCanActOnMemberAsync`. This sheet
-/// only re-derives the two cases it can know cheaply — self and owner — to hide the entry point
-/// outright (see the caller in `ServerMemberRow`); rank is deliberately not re-derived here, so
-/// anything that slips through simply comes back as a 403 surfaced via a snackbar.
-///
-/// Takes `ref` from the caller (the member row) rather than watching providers itself: several
-/// actions here (timeout, kick, ban) close this sheet before their follow-up dialog/mutation runs,
-/// which would tear down a `ConsumerState`-owned `ref` mid-flight. The row's `ref`/`context` outlive
-/// that, since kicking/banning *this* member doesn't unmount the row list itself mid-callback.
 Future<void> showMemberModerationSheet(
   BuildContext context,
   WidgetRef ref, {
@@ -60,9 +44,6 @@ class _MemberModerationSheet extends StatefulWidget {
     required this.permissions,
   });
 
-  /// The context that opened this sheet (the member row) — used for any follow-up
-  /// dialog/sheet/snackbar shown *after* this sheet pops, since this widget's own `context`
-  /// becomes unmounted the moment its route is popped.
   final BuildContext rootContext;
   final WidgetRef ref;
   final String serverId;

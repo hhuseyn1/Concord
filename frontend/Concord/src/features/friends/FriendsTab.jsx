@@ -48,7 +48,7 @@ export function FriendsTab() {
     setStartingDmFor(user.Id)
     try {
       const conversation = await directMessagesService.createOrGetConversation(user.Id)
-      navigate(`/dm/${conversation.Id}`)
+      navigate(`/cabinet/dm/${conversation.Id}`)
     } catch (dmError) {
       toast({ variant: 'danger', title: 'Could not start conversation', description: mapCreateConversationError(dmError) })
     } finally {
@@ -103,7 +103,7 @@ export function FriendsTab() {
   return (
     <div className="flex flex-col gap-2">
       <p className="px-3 text-xs font-semibold tracking-wide text-fg-muted uppercase">
-        All friends — {totalCount}
+        All friends - {totalCount}
       </p>
       <div className="flex flex-col gap-0.5">
         {friends.map((user) => (
@@ -156,7 +156,7 @@ export function FriendsTab() {
         open={Boolean(blockTarget)}
         onOpenChange={(open) => !open && setBlockTarget(null)}
         title="Block this user?"
-        description={`${blockTarget?.Username || 'This user'} will be removed from your friends and won't be able to message you or see your profile. There's no separate "unfriend" — this is the only way to end the friendship.`}
+        description={`${blockTarget?.Username || 'This user'} will be removed from your friends and won't be able to message you or see your profile. There's no separate "unfriend" - this is the only way to end the friendship.`}
         footer={
           <>
             <Button variant="ghost" onClick={() => setBlockTarget(null)}>

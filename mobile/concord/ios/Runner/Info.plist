@@ -27,18 +27,18 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<!-- Required at Info.plist level for `livekit_client`'s mic/camera
-	     capture (Phase 5 voice/video calling) — iOS crashes the process
+	     capture (Phase 5 voice/video calling) - iOS crashes the process
 	     outright if a permission is requested with no matching usage
 	     description here, rather than just denying it. -->
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Concord needs microphone access so others can hear you during voice and video calls.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Concord needs camera access to show your video during video calls.</string>
-	<!-- Custom URL scheme deep links (invite links, password-reset links) — a plain `concord://`
+	<!-- Custom URL scheme deep links (invite links, password-reset links) - a plain `concord://`
 	     scheme, not a Universal Link, since those require owning a domain and hosting a verified
 	     `apple-app-site-association` file, which this project doesn't have. iOS routes an incoming
 	     `concord://...` URL to the app via `application(_:open:options:)`, which Flutter's engine
-	     turns into the initial/updated route for `go_router` to match — see `app_router.dart`. -->
+	     turns into the initial/updated route for `go_router` to match - see `app_router.dart`. -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

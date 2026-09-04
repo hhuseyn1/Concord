@@ -33,7 +33,7 @@ public class MessagesHub(ChannelsService channelsService) : Hub
     }
 
     /// <summary>
-    /// Ephemeral typing signal (M-03) — no persistence. The recipient side also expires the indicator
+    /// Ephemeral typing signal (M-03) - no persistence. The recipient side also expires the indicator
     /// locally after a short timeout since the last event, as a safety net for a sender's client
     /// closing mid-type without ever calling <see cref="StopTyping"/>. Only reaches whoever is already
     /// in the group (i.e. already joined via <see cref="JoinChannel"/>), so no separate membership

@@ -78,7 +78,7 @@ export function KitchenSink() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-fg-heading">Concord — Kitchen sink</h1>
+        <h1 className="text-2xl font-semibold text-fg-heading">Concord - Kitchen sink</h1>
         <p className="text-sm text-fg-muted">
           Dev-only visual reference for Phase 0 design tokens and UI primitives. Not linked from
           any real navigation.
@@ -129,10 +129,10 @@ export function KitchenSink() {
           <p className="text-2xl font-semibold text-fg-heading">Heading 2xl / semibold</p>
           <p className="text-xl font-semibold text-fg-heading">Heading xl / semibold</p>
           <p className="text-base text-fg-default">
-            Message body text (text-base) — the size used for chat message content, optimized for
+            Message body text (text-base) - the size used for chat message content, optimized for
             long-form readability.
           </p>
-          <p className="text-xs text-fg-muted">Timestamp / metadata (text-xs, fg-muted) — Today at 14:32</p>
+          <p className="text-xs text-fg-muted">Timestamp / metadata (text-xs, fg-muted) - Today at 14:32</p>
           <p className="text-2xs text-fg-muted">Extra-small metadata (text-2xs, fg-muted)</p>
         </div>
       </Section>

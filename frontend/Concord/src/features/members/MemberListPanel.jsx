@@ -142,7 +142,7 @@ export function MemberListPanel() {
           return (
             <div key={key} className="flex flex-col gap-0.5">
               <p className="px-2 pb-1 text-xs font-semibold tracking-wide text-fg-muted uppercase">
-                {label} — {items.length}
+                {label} - {items.length}
               </p>
               {items.map((member) => {
                 const canRemove = canKick && member.User?.Id && member.User.Id !== user?.Id && member.User.Id !== server?.OwnerId

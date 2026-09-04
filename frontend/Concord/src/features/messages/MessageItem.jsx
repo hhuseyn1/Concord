@@ -543,7 +543,7 @@ export function MessageItem({
           open={confirmHideOpen}
           onOpenChange={setConfirmHideOpen}
           title="Hide this message?"
-          description="It'll disappear from your view only — everyone else can still see it. There's no way to unhide it yourself afterward."
+          description="It'll disappear from your view only - everyone else can still see it. There's no way to unhide it yourself afterward."
           footer={
             <>
               <Button variant="ghost" onClick={() => setConfirmHideOpen(false)}>

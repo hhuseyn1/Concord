@@ -26,7 +26,7 @@ export function mapSendFriendRequestError(error) {
 
 export function mapRequestActionError(error) {
   if (error?.status === 404) {
-    return 'That friend request no longer exists — it may have already been handled.'
+    return 'That friend request no longer exists - it may have already been handled.'
   }
   return genericMessage(error)
 }
