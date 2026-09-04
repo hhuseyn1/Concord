@@ -6,29 +6,20 @@ import { ToastProvider } from '../components/ui/Toast'
 import { queryClient } from '../lib/queryClient'
 import { router } from '../lib/router'
 import { AuthProvider } from './AuthProvider'
-import { DirectMessagesProvider } from './DirectMessagesProvider'
 import { ErrorBoundary } from './ErrorBoundary'
-import { NotificationsProvider } from './NotificationsProvider'
-import { PresenceProvider } from './PresenceProvider'
-import { VoiceCallProvider } from './VoiceCallProvider'
 
+// Presence/Notifications/DirectMessages/VoiceCall providers live inside CabinetRoot (mounted only
+// for the '/cabinet' route) rather than here, so their dependencies (livekit-client, SignalR hub
+// wrappers) aren't part of the bundle a signed-out visitor downloads for the public landing page.
 function App() {
   return (
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
           <AuthProvider>
-            <PresenceProvider>
-              <NotificationsProvider>
-                <DirectMessagesProvider>
-                  <VoiceCallProvider>
-                    <ErrorBoundary>
-                      <RouterProvider router={router} />
-                    </ErrorBoundary>
-                  </VoiceCallProvider>
-                </DirectMessagesProvider>
-              </NotificationsProvider>
-            </PresenceProvider>
+            <ErrorBoundary>
+              <RouterProvider router={router} />
+            </ErrorBoundary>
           </AuthProvider>
         </ToastProvider>
       </QueryClientProvider>

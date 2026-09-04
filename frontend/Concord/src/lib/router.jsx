@@ -1,44 +1,47 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { RequireAuth } from '../app/RequireAuth'
 import { NotFoundPlaceholder, ServerPlaceholder } from '../app/routePlaceholders'
-import { AppShell } from '../components/layout/AppShell'
-import { KitchenSink } from '../dev/KitchenSink'
-import { AdminDashboardScreen } from '../features/admin/AdminDashboardScreen'
-import { ForgotPasswordScreen } from '../features/auth/ForgotPasswordScreen'
-import { LinkDeviceScreen } from '../features/auth/LinkDeviceScreen'
-import { LoginScreen } from '../features/auth/LoginScreen'
-import { RegisterScreen } from '../features/auth/RegisterScreen'
-import { ResetPasswordScreen } from '../features/auth/ResetPasswordScreen'
-import { DirectMessageView } from '../features/directMessages/DirectMessageView'
-import { FriendsScreen } from '../features/friends/FriendsScreen'
 import { LandingScreen } from '../features/landing/LandingScreen'
-import { ChannelView } from '../features/messages/ChannelView'
-import { SettingsScreen } from '../features/settings/SettingsScreen'
+import {
+  AdminDashboardScreen,
+  CabinetRoot,
+  ChannelView,
+  DirectMessageView,
+  ForgotPasswordScreen,
+  FriendsScreen,
+  KitchenSink,
+  LinkDeviceScreen,
+  LoginScreen,
+  RegisterScreen,
+  ResetPasswordScreen,
+  SettingsScreen,
+} from './routeLazy'
+import { withSuspense } from './withSuspense'
 
 export const router = createBrowserRouter([
   { path: '/', element: <LandingScreen /> },
-  { path: '/login', element: <LoginScreen /> },
-  { path: '/register', element: <RegisterScreen /> },
-  { path: '/forgot-password', element: <ForgotPasswordScreen /> },
-  { path: '/reset-password', element: <ResetPasswordScreen /> },
+  { path: '/login', element: withSuspense(<LoginScreen />) },
+  { path: '/register', element: withSuspense(<RegisterScreen />) },
+  { path: '/forgot-password', element: withSuspense(<ForgotPasswordScreen />) },
+  { path: '/reset-password', element: withSuspense(<ResetPasswordScreen />) },
   {
     element: <RequireAuth />,
     children: [
-      { path: 'link', element: <LinkDeviceScreen /> },
+      { path: 'link', element: withSuspense(<LinkDeviceScreen />) },
       {
         path: 'cabinet',
-        element: <AppShell />,
+        element: withSuspense(<CabinetRoot />),
         children: [
-          { index: true, element: <FriendsScreen /> },
+          { index: true, element: withSuspense(<FriendsScreen />) },
           { path: 'servers/:serverId', element: <ServerPlaceholder /> },
-          { path: 'servers/:serverId/channels/:channelId', element: <ChannelView /> },
-          { path: 'dm/:conversationId', element: <DirectMessageView /> },
-          { path: 'settings', element: <SettingsScreen /> },
-          { path: 'admin', element: <AdminDashboardScreen /> },
+          { path: 'servers/:serverId/channels/:channelId', element: withSuspense(<ChannelView />) },
+          { path: 'dm/:conversationId', element: withSuspense(<DirectMessageView />) },
+          { path: 'settings', element: withSuspense(<SettingsScreen />) },
+          { path: 'admin', element: withSuspense(<AdminDashboardScreen />) },
         ],
       },
     ],
   },
-  ...(import.meta.env.DEV ? [{ path: '/__kitchen-sink', element: <KitchenSink /> }] : []),
+  ...(import.meta.env.DEV ? [{ path: '/__kitchen-sink', element: withSuspense(<KitchenSink />) }] : []),
   { path: '*', element: <NotFoundPlaceholder /> },
 ])
