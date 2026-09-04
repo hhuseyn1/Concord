@@ -16,7 +16,7 @@ import { ChannelView } from '../features/messages/ChannelView'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 
 export const router = createBrowserRouter([
-  { path: '/welcome', element: <LandingScreen /> },
+  { path: '/', element: <LandingScreen /> },
   { path: '/login', element: <LoginScreen /> },
   { path: '/register', element: <RegisterScreen /> },
   { path: '/forgot-password', element: <ForgotPasswordScreen /> },
