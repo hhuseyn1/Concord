@@ -1,9 +1,10 @@
-using System.Net;
-using System.Net.Mail;
 using Concord.Application.Email;
 using Concord.Infrastructure.Settings;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeKit;
 
 namespace Concord.Infrastructure.Services;
 
@@ -16,15 +17,20 @@ public class SmtpEmailSender(IOptions<EmailSettings> emailOptions, ILogger<SmtpE
     {
         const string subject = "Reset your Concord password";
         var body = $"""
-            We received a request to reset your Concord password.
-
-            Reset your password: {resetLink}
-
-            This link expires in 30 minutes. If you didn't request this, you can safely ignore this email.
+            <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;">
+              <h2 style="color:#4f46e5;">Reset Your Password</h2>
+              <p>Hello,</p>
+              <p>We received a request to reset your Concord password. Click the button below to choose a new one:</p>
+              <p style="margin:24px 0;">
+                <a href="{resetLink}" style="background:#4f46e5;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Reset Password</a>
+              </p>
+              <p>Or copy and paste this link into your browser:</p>
+              <p style="word-break:break-all;color:#4f46e5;">{resetLink}</p>
+              <p>This link expires in 30 minutes. If you didn't request this, you can safely ignore this email.</p>
+              <p style="color:#6b7280;font-size:0.875rem;">This email was sent automatically.</p>
+            </body></html>
             """;
 
-        // Dev fallback: no SMTP host configured, so log the link instead of failing every
-        // forgot-password request locally.
         if (string.IsNullOrWhiteSpace(_settings.SmtpHost))
         {
             _logger.LogWarning(
@@ -33,37 +39,27 @@ public class SmtpEmailSender(IOptions<EmailSettings> emailOptions, ILogger<SmtpE
             return;
         }
 
-        using var message = new MailMessage
-        {
-            From = new MailAddress(_settings.FromAddress, _settings.FromName),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = false,
-        };
-        message.To.Add(toEmail);
-
-        using var client = new SmtpClient(_settings.SmtpHost, _settings.SmtpPort)
-        {
-            EnableSsl = _settings.EnableSsl,
-            Credentials = new NetworkCredential(_settings.SmtpUsername, _settings.SmtpPassword),
-        };
-
-        await client.SendMailAsync(message);
+        await SendAsync(toEmail, subject, body);
     }
 
     public async Task SendVerificationEmailAsync(string toEmail, string verificationLink)
     {
         const string subject = "Verify your Concord email";
         var body = $"""
-            Welcome to Concord! Please confirm this is your email address.
-
-            Verify your email: {verificationLink}
-
-            This link expires in 60 minutes. If you didn't create this account, you can safely ignore this email.
+            <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;">
+              <h2 style="color:#16a34a;">Verify Your Email</h2>
+              <p>Welcome to Concord!</p>
+              <p>Please confirm this is your email address by clicking the button below:</p>
+              <p style="margin:24px 0;">
+                <a href="{verificationLink}" style="background:#16a34a;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Verify Email</a>
+              </p>
+              <p>Or copy and paste this link into your browser:</p>
+              <p style="word-break:break-all;color:#16a34a;">{verificationLink}</p>
+              <p>This link expires in 60 minutes. If you didn't create this account, you can safely ignore this email.</p>
+              <p style="color:#6b7280;font-size:0.875rem;">This email was sent automatically.</p>
+            </body></html>
             """;
 
-        // Dev fallback: no SMTP host configured, so log the link instead of failing every
-        // registration locally.
         if (string.IsNullOrWhiteSpace(_settings.SmtpHost))
         {
             _logger.LogWarning(
@@ -72,21 +68,25 @@ public class SmtpEmailSender(IOptions<EmailSettings> emailOptions, ILogger<SmtpE
             return;
         }
 
-        using var message = new MailMessage
-        {
-            From = new MailAddress(_settings.FromAddress, _settings.FromName),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = false,
-        };
-        message.To.Add(toEmail);
+        await SendAsync(toEmail, subject, body);
+    }
 
-        using var client = new SmtpClient(_settings.SmtpHost, _settings.SmtpPort)
-        {
-            EnableSsl = _settings.EnableSsl,
-            Credentials = new NetworkCredential(_settings.SmtpUsername, _settings.SmtpPassword),
-        };
+    private async Task SendAsync(string toEmail, string subject, string body)
+    {
+        using var client = new SmtpClient();
+        await client.ConnectAsync(_settings.SmtpHost, _settings.SmtpPort, SecureSocketOptions.StartTls);
+        await client.AuthenticateAsync(_settings.SenderEmail, _settings.SmtpPassword);
+        await client.SendAsync(BuildMimeMessage(toEmail, subject, body));
+        await client.DisconnectAsync(true);
+    }
 
-        await client.SendMailAsync(message);
+    private MimeMessage BuildMimeMessage(string toEmail, string subject, string body)
+    {
+        var mime = new MimeMessage();
+        mime.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+        mime.To.Add(MailboxAddress.Parse(toEmail));
+        mime.Subject = subject;
+        mime.Body = new TextPart("html") { Text = body };
+        return mime;
     }
 }

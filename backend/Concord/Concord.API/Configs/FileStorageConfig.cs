@@ -8,11 +8,6 @@ namespace Concord.API.Configs;
 
 public static class FileStorageConfig
 {
-    /// <summary>
-    /// Local disk everywhere except Production, where uploads instead go to Azure Blob Storage -
-    /// a container's filesystem doesn't survive a redeploy, so local storage would silently lose
-    /// every avatar/server-icon/attachment the next time the API container is rebuilt.
-    /// </summary>
     public static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration, bool isProduction)
     {
         if (!isProduction)
@@ -21,18 +16,16 @@ public static class FileStorageConfig
             return services;
         }
 
-        var settings = configuration.GetSection(nameof(AzureBlobStorageSettings)).Get<AzureBlobStorageSettings>();
+        var settings = configuration.GetSection(nameof(BlobStorageSettings)).Get<BlobStorageSettings>();
 
         if (string.IsNullOrWhiteSpace(settings?.ConnectionString))
-            throw new MissingSettingException(nameof(AzureBlobStorageSettings.ConnectionString));
+            throw new MissingSettingException(nameof(BlobStorageSettings.ConnectionString));
 
-        if (string.IsNullOrWhiteSpace(settings.ContainerName))
-            throw new MissingSettingException(nameof(AzureBlobStorageSettings.ContainerName));
+        if (string.IsNullOrWhiteSpace(settings.PublicContainerName))
+            throw new MissingSettingException(nameof(BlobStorageSettings.PublicContainerName));
 
-        var containerClient = new BlobContainerClient(settings.ConnectionString, settings.ContainerName);
+        var containerClient = new BlobContainerClient(settings.ConnectionString, settings.PublicContainerName);
 
-        // Public read access so uploaded URLs stay directly linkable, matching how UseStaticFiles
-        // serves the local /uploads folder with no auth check today.
         containerClient.CreateIfNotExists(PublicAccessType.Blob);
 
         services.AddSingleton(containerClient);
