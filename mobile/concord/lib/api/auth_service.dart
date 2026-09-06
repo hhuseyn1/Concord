@@ -47,20 +47,25 @@ class AuthService {
     return tokens;
   }
 
-  Future<TokenResponse> register({
+  /// Registration no longer returns a usable session - the backend requires the email to be
+  /// confirmed before the account can log in, so it responds with `EmailConfirmationRequired`
+  /// and null tokens instead of a `TokenResponse`. There is nothing to store here; the caller
+  /// just needs to know the request succeeded so it can prompt the user to check their email.
+  Future<void> register({
     required String name,
     required String surname,
     required String email,
     required String password,
   }) async {
-    final data = await _client.post(
+    await _client.post(
       '/Register',
       body: {'Name': name, 'Surname': surname, 'Email': email, 'Password': password},
       auth: false,
     );
-    final tokens = TokenResponse.fromJson(data as Map<String, dynamic>);
-    await _tokenStorage.saveTokens(tokens);
-    return tokens;
+  }
+
+  Future<void> resendVerificationEmail({required String email}) async {
+    await _client.post('/Resend-verification-email', body: {'Email': email}, auth: false);
   }
 
   Future<void> resetPassword({required String userId, required String newPassword}) async {

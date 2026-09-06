@@ -30,4 +30,11 @@ public class TokenResponse
     /// </summary>
     [JsonPropertyName("TwoFactorToken")]
     public string? TwoFactorToken { get; set; }
+
+    /// <summary>
+    /// Set when registration succeeded but the account is not yet usable until the verification
+    /// email is confirmed. In that case every token field is null - there is no session yet.
+    /// </summary>
+    [JsonPropertyName("EmailConfirmationRequired")]
+    public bool EmailConfirmationRequired { get; set; }
 }

@@ -22,6 +22,10 @@
 
   html {
     color-scheme: dark light;
+    /* Stops iOS Safari/old Android from auto-boosting text size for "readability" on a narrow
+     * viewport - that boost happens after layout, so it reads as the page opening zoomed in. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {

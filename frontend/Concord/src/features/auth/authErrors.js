@@ -94,6 +94,20 @@ export function mapTwoFactorSetupError(error) {
   return error?.message || 'Something went wrong. Please try again.'
 }
 
+export function mapVerifyEmailError(error) {
+  if (error?.isNetworkError) {
+    return "Can't reach the server. Check your connection."
+  }
+  if (error?.isRateLimited) {
+    return 'Too many attempts. Please wait a moment and try again.'
+  }
+  return 'This verification link is invalid or has expired.'
+}
+
+export function isUnverifiedEmailError(error) {
+  return typeof error?.message === 'string' && error.message.includes('verify your email address')
+}
+
 export function mapQrLoginApprovalError(error) {
   if (error?.isNetworkError) {
     return "Can't reach the server. Check your connection."

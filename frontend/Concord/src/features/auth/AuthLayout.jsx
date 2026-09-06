@@ -7,9 +7,9 @@ export function AuthLayout({ title, subtitle, children, footer, className }) {
         <div className="mb-6 flex flex-col items-center gap-3 text-center">
           <span
             aria-hidden="true"
-            className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand text-lg font-semibold text-fg-on-brand"
+            className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand text-fg-on-brand"
           >
-            C
+            <img src="/favicon.svg" alt="" className="size-7" aria-hidden="true" />
           </span>
           <div>
             <h1 className="text-xl font-semibold text-fg-heading">{title}</h1>

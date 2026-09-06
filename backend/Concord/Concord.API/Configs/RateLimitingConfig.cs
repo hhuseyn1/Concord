@@ -43,6 +43,13 @@ public static class RateLimitingConfig
                             $"forgot-password:{GetClientIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
+                    // ResendVerificationEmail: unauthenticated, same concern as Forgot-password - could
+                    // otherwise be used to spam a victim's inbox with verification emails.
+                    "POST Api/V1.0/Resend-verification-email" =>
+                        RateLimitPartition.GetFixedWindowLimiter(
+                            $"resend-verification:{GetClientIp(httpContext)}",
+                            _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
+
                     // ResetPassword: unauthenticated - bounds brute-forcing the reset token itself.
                     "POST Api/V1.0/Reset-password" =>
                         RateLimitPartition.GetFixedWindowLimiter(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../providers/server_providers.dart';
@@ -30,10 +31,7 @@ class ServerRailDrawer extends ConsumerWidget {
                 Navigator.of(context).pop();
                 context.go('/');
               },
-              child: Text(
-                'C',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: colors.fgDefault),
-              ),
+              child: SvgPicture.asset('assets/logo.svg', width: 22, height: 22),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),

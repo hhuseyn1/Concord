@@ -33,7 +33,9 @@ public class ServersController(ServersService serversService) : BaseApiControlle
     [HttpPost("Join/{inviteCode}")]
     public async Task<ServerResponse> JoinServerAsync(string inviteCode)
     {
-        return (await _serversService.JoinServerAsync(GetUserId(), inviteCode)).Server;
+        var (server, joinedNow) = await _serversService.JoinServerAsync(GetUserId(), inviteCode);
+        server.JoinedNow = joinedNow;
+        return server;
     }
 
     [HttpDelete("{serverId:guid}/Members/Me")]

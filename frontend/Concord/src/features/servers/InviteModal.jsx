@@ -20,7 +20,7 @@ const EXPIRY_OPTIONS = [
 ]
 
 const selectClassName = cn(
-  'h-9 w-full rounded-md border border-border-default bg-surface-sidebar px-3 text-sm text-fg-default',
+  'h-9 w-full rounded-md border border-border-default bg-surface-sidebar px-3 text-base sm:text-sm text-fg-default',
   'outline-none focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-brand',
 )
 

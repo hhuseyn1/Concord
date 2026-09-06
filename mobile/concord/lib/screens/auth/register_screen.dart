@@ -29,6 +29,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   String? _formError;
   bool _isSubmitting = false;
 
+  bool _registered = false;
+  String? _registeredEmail;
+  bool _isResending = false;
+  String? _resendMessage;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -64,6 +69,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       await ref
           .read(authControllerProvider.notifier)
           .register(name: name, surname: surname, email: email, password: password);
+      setState(() {
+        _registered = true;
+        _registeredEmail = email;
+      });
     } on ApiException catch (error) {
       setState(() => _formError = mapRegisterError(error));
     } finally {
@@ -71,9 +80,60 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+  Future<void> _resend() async {
+    final email = _registeredEmail;
+    if (email == null || _isResending) return;
+    setState(() {
+      _isResending = true;
+      _resendMessage = null;
+    });
+    try {
+      await ref.read(authControllerProvider.notifier).resendVerificationEmail(email: email);
+      if (mounted) setState(() => _resendMessage = 'Verification email sent.');
+    } on ApiException {
+      if (mounted) setState(() => _resendMessage = 'Could not resend right now. Try again shortly.');
+    } finally {
+      if (mounted) setState(() => _isResending = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+
+    if (_registered) {
+      return ConcordAuthLayout(
+        title: 'Check your email',
+        subtitle:
+            "We've sent a confirmation link to ${_registeredEmail ?? 'your email'}. "
+            'Click it to activate your account, then log in.',
+        footer: Wrap(
+          alignment: WrapAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () => context.go('/login'),
+              child: Text(
+                'Back to Log In',
+                style: TextStyle(color: colors.brand, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        children: [
+          if (_resendMessage != null) ...[
+            Text(_resendMessage!, style: TextStyle(color: colors.fgMuted, fontSize: 13)),
+            const SizedBox(height: ConcordSpacing.md),
+          ],
+          ConcordButton(
+            label: _isResending ? 'Sending…' : 'Resend email',
+            size: ConcordButtonSize.lg,
+            expand: true,
+            loading: _isResending,
+            onPressed: _isResending ? null : _resend,
+          ),
+        ],
+      );
+    }
 
     return ConcordAuthLayout(
       title: 'Create an account',

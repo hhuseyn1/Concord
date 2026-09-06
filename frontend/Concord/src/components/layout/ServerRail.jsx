@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { NavLink, useSearchParams } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { AddServerModal } from '../../features/servers/AddServerModal'
 import { ServerIcon } from '../../features/servers/ServerIcon'
 import { useServers } from '../../features/servers/serversQueries'
@@ -10,9 +10,7 @@ import { Skeleton } from '../ui/Skeleton'
 import { Tooltip } from '../ui/Tooltip'
 
 export function ServerRail() {
-  const [searchParams] = useSearchParams()
-  const hasInviteParam = searchParams.has('invite')
-  const [addServerOpen, setAddServerOpen] = useState(hasInviteParam)
+  const [addServerOpen, setAddServerOpen] = useState(false)
   const { data: servers, isLoading } = useServers()
 
   return (
@@ -34,9 +32,7 @@ export function ServerRail() {
             )
           }
         >
-          <span className="text-lg font-semibold" aria-hidden="true">
-            C
-          </span>
+          <img src="/favicon.svg" alt="" className="size-6" aria-hidden="true" />
           <span className="sr-only">Home (Friends)</span>
         </NavLink>
       </Tooltip>
@@ -63,11 +59,7 @@ export function ServerRail() {
         </IconButton>
       </Tooltip>
 
-      <AddServerModal
-        open={addServerOpen}
-        onOpenChange={setAddServerOpen}
-        defaultTab={hasInviteParam ? 'join' : 'create'}
-      />
+      <AddServerModal open={addServerOpen} onOpenChange={setAddServerOpen} />
     </nav>
   )
 }
