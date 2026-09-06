@@ -101,6 +101,12 @@ public class AuthenticationService(
 
         await _context.SaveChangesAsync();
 
+        // Unverified accounts can't log in at all - not even into the two-factor interstitial below,
+        // since that would still leak "these credentials are correct" for an account that hasn't
+        // proven the email is real yet.
+        if (!user.EmailConfirmed)
+            throw new EmailNotConfirmedException();
+
         // P2: with a second factor enrolled the password alone buys nothing but the right to try a
         // code. No Session row is created here, so there is no session to steal if the second step
         // is never completed.
@@ -145,6 +151,12 @@ public class AuthenticationService(
 
         if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             throw new UserLockoutException(user.Id);
+
+        // Defense in depth: LoginAsync no longer issues a two-factor token to an unverified account,
+        // so this should be unreachable in practice, but a stale/edge-case token should never be
+        // redeemable into a real session for one either.
+        if (!user.EmailConfirmed)
+            throw new EmailNotConfirmedException();
 
         if (!await _twoFactorService.VerifyForLoginAsync(user, request.Code))
         {
@@ -240,14 +252,14 @@ public class AuthenticationService(
 
         await SendVerificationEmailAsync(user);
 
-        return await CreateNewSessionAsync(user, rememberMe: true);
+        return new TokenResponse { EmailConfirmationRequired = true };
     }
 
     /// <summary>
-    /// Best-effort: registration and login never depend on a verified email, so a broken/unreachable
-    /// SMTP server should never fail the request that got a user this far - it just means they have
-    /// to ask for the link again later (not yet built - there's no "resend" endpoint, only the one
-    /// sent at registration).
+    /// Best-effort: a broken/unreachable SMTP server should never fail the request that got a user
+    /// this far - it just means they have to ask for the link again via
+    /// <see cref="ResendVerificationEmailAsync"/> instead of a successful registration turning into a
+    /// 500.
     /// </summary>
     private async Task SendVerificationEmailAsync(User user)
     {
@@ -480,6 +492,27 @@ public class AuthenticationService(
 
         await _context.SaveChangesAsync();
         await LogoutAllAsync(user.Id);
+    }
+
+    public async Task ResendVerificationEmailAsync(ResendVerificationEmailRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new ParameterValidationException(nameof(request.Email));
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(user => user.Email == request.Email);
+
+        // Same non-committal response whether the account doesn't exist, is disabled, or is
+        // already verified - avoids leaking account state to an anonymous caller (user enumeration),
+        // matching ForgotPasswordAsync's pattern above.
+        if (user is null || user.Disabled.HasValue || user.EmailConfirmed)
+            return;
+
+        await _context.EmailVerificationTokens
+            .Where(token => token.UserId == user.Id && !token.Used)
+            .ExecuteDeleteAsync();
+
+        await SendVerificationEmailAsync(user);
     }
 
     public async Task ConfirmEmailAsync(ConfirmEmailRequest request)

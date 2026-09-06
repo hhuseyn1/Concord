@@ -13,6 +13,9 @@ export const ForgotPasswordScreen = lazy(() =>
 export const ResetPasswordScreen = lazy(() =>
   import('../features/auth/ResetPasswordScreen').then((m) => ({ default: m.ResetPasswordScreen })),
 )
+export const VerifyEmailScreen = lazy(() =>
+  import('../features/auth/VerifyEmailScreen').then((m) => ({ default: m.VerifyEmailScreen })),
+)
 export const LinkDeviceScreen = lazy(() =>
   import('../features/auth/LinkDeviceScreen').then((m) => ({ default: m.LinkDeviceScreen })),
 )

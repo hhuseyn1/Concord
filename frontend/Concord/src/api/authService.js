@@ -45,7 +45,9 @@ export async function regenerateRecoveryCodes(password) {
 
 export async function register({ Name, Surname, Email, Password }) {
   const tokens = await request('Register', { method: 'POST', body: { Name, Surname, Email, Password }, auth: false });
-  setTokens(tokens, { rememberMe: true });
+  if (tokens?.AccessToken) {
+    setTokens(tokens, { rememberMe: true });
+  }
   return tokens;
 }
 
@@ -55,6 +57,14 @@ export async function requestPasswordReset(email) {
 
 export async function confirmPasswordReset(token, newPassword) {
   await request('Reset-password', { method: 'POST', body: { Token: token, NewPassword: newPassword }, auth: false });
+}
+
+export async function confirmEmail(token) {
+  await request('Verify-email', { method: 'POST', body: { Token: token }, auth: false });
+}
+
+export async function resendVerificationEmail(email) {
+  await request('Resend-verification-email', { method: 'POST', body: { Email: email }, auth: false });
 }
 
 export async function resetPassword(userId, newPassword) {

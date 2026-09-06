@@ -102,17 +102,20 @@ export function VoiceChannelView({ channel, serverId, channelId }) {
         </ScrollArea>
       )}
       <div className="flex shrink-0 items-center justify-center border-t border-border-subtle bg-surface-sidebar p-3">
-        <VoiceCallControls
-          isMuted={isMuted}
-          isDeafened={isDeafened}
-          isVideoEnabled={isVideoEnabled}
-          isScreenSharing={isScreenSharing}
-          onToggleMute={toggleMute}
-          onToggleDeafen={toggleDeafen}
-          onToggleVideo={toggleVideo}
-          onToggleScreenShare={isScreenShareSupported ? toggleScreenShare : undefined}
-          onLeave={leaveCall}
-        />
+        <div className="rounded-2xl bg-surface-sidebar shadow-md ring-1 ring-border-default px-3 py-2">
+          <VoiceCallControls
+            isMuted={isMuted}
+            isDeafened={isDeafened}
+            isVideoEnabled={isVideoEnabled}
+            isScreenSharing={isScreenSharing}
+            onToggleMute={toggleMute}
+            onToggleDeafen={toggleDeafen}
+            onToggleVideo={toggleVideo}
+            onToggleScreenShare={isScreenShareSupported ? toggleScreenShare : undefined}
+            onLeave={leaveCall}
+            size="lg"
+          />
+        </div>
       </div>
     </div>
   )

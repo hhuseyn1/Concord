@@ -1,18 +1,24 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import * as authService from '../../api/authService'
 import { Button } from '../../components/ui/Button'
 import { FormField } from '../../components/ui/FormField'
 import { Input } from '../../components/ui/Input'
 import { PasswordInput } from '../../components/ui/PasswordInput'
 import { Spinner } from '../../components/ui/Spinner'
+import { useCapturePendingInviteFromUrl } from '../servers/pendingInvite'
 import { AuthLayout } from './AuthLayout'
 import { mapRegisterError } from './authErrors'
 
 export function RegisterScreen() {
-  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  useCapturePendingInviteFromUrl(searchParams)
+
   const [formError, setFormError] = useState('')
+  const [registered, setRegistered] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState('')
+  const [resendState, setResendState] = useState('idle')
   const {
     register,
     handleSubmit,
@@ -23,10 +29,47 @@ export function RegisterScreen() {
     setFormError('')
     try {
       await authService.register({ Name: name, Surname: surname, Email: email, Password: password })
-      navigate('/cabinet', { replace: true })
+      setRegisteredEmail(email)
+      setRegistered(true)
     } catch (error) {
       setFormError(mapRegisterError(error))
     }
+  }
+
+  const handleResend = async () => {
+    setResendState('pending')
+    try {
+      await authService.resendVerificationEmail(registeredEmail)
+      setResendState('sent')
+    } catch {
+      setResendState('idle')
+    }
+  }
+
+  if (registered) {
+    return (
+      <AuthLayout
+        title="Check your email"
+        subtitle={`We've sent a confirmation link to ${registeredEmail}. Click it to activate your account, then log in.`}
+        footer={
+          <Link to="/login" className="font-medium text-brand hover:underline">
+            Back to Log In
+          </Link>
+        }
+      >
+        <div className="flex flex-col items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={resendState === 'pending'}
+            onClick={handleResend}
+          >
+            {resendState === 'pending' && <Spinner size="sm" />}
+            {resendState === 'sent' ? 'Sent!' : resendState === 'pending' ? 'Sending…' : 'Resend email'}
+          </Button>
+        </div>
+      </AuthLayout>
+    )
   }
 
   return (

@@ -76,6 +76,13 @@ public class AuthenticationController(
         await _authenticationService.ConfirmEmailAsync(request);
     }
 
+    [HttpPost("Resend-verification-email")]
+    [AllowAnonymous]
+    public async Task ResendVerificationEmailAsync([FromBody] ResendVerificationEmailRequest request)
+    {
+        await _authenticationService.ResendVerificationEmailAsync(request);
+    }
+
     [HttpPost("Me:Change-password")]
     [Authorize]
     public async Task ChangePasswordAsync([FromBody] ChangePasswordRequest request)

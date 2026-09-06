@@ -5,6 +5,7 @@ import { useChannelNavigationShortcuts } from '../../features/channels/useChanne
 import { MemberListPanel } from '../../features/members/MemberListPanel'
 import { GlobalSearchModal } from '../../features/search/GlobalSearchModal'
 import { useServerLiveUpdates } from '../../features/servers/useServerLiveUpdates'
+import { VoiceCallStrip } from '../../features/voice/VoiceCallStrip'
 import { useGlobalKeyboardShortcuts } from '../../hooks/useGlobalKeyboardShortcuts'
 import { setNavigate } from '../../lib/navigation'
 import { ChannelSidebar } from './ChannelSidebar'
@@ -63,6 +64,7 @@ export function AppShell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <ConnectionStatusBanner />
+        <VoiceCallStrip className="sm:hidden" />
         <TopBar
           onToggleMembers={() => setMembersOpen((open) => !open)}
           membersOpen={membersOpen}

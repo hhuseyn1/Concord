@@ -1,18 +1,14 @@
 import { LogOut, Settings, ShieldCheck, Smile } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import * as sessionsService from '../../api/sessionsService'
 import * as tokenStorage from '../../api/tokenStorage'
-import { useChannels } from '../../features/channels/channelsQueries'
 import { CustomStatusModal } from '../../features/settings/CustomStatusModal'
-import { directMessagesKeys, flattenConversationPages } from '../../features/directMessages/directMessagesQueries'
 import { toAvatarPresence } from '../../features/friends/presence'
-import { VoiceCallControls } from '../../features/voice/VoiceCallControls'
+import { VoiceCallStrip } from '../../features/voice/VoiceCallStrip'
 import { useAuth } from '../../hooks/useAuth'
 import { usePresence } from '../../hooks/usePresence'
-import { useVoiceCall } from '../../hooks/useVoiceCall'
 import { cn } from '../../lib/cn'
 import { Avatar } from '../ui/Avatar'
 import {
@@ -35,71 +31,6 @@ const STATUS_VALUES = [
   { value: 'DoNotDisturb', dotClassName: 'bg-presence-dnd' },
   { value: 'Invisible', dotClassName: 'bg-presence-offline' },
 ]
-
-function VoiceCallStrip() {
-  const { serverId, channelId, conversationId } = useParams()
-  const queryClient = useQueryClient()
-  const {
-    activeCall,
-    isMuted,
-    isDeafened,
-    isVideoEnabled,
-    isScreenSharing,
-    toggleMute,
-    toggleDeafen,
-    toggleVideo,
-    toggleScreenShare,
-    leaveCall,
-  } = useVoiceCall()
-  const isChannelCall = activeCall?.kind === 'channel'
-  const { data: channels } = useChannels(isChannelCall ? activeCall.serverId : undefined, { enabled: isChannelCall })
-
-  if (!activeCall) return null
-  if (isChannelCall && activeCall.serverId === serverId && activeCall.channelId === channelId) return null
-  if (activeCall.kind === 'dm' && activeCall.conversationId === conversationId) return null
-
-  let label
-  let linkTo
-  if (isChannelCall) {
-    const channel = channels?.find((item) => item.Id === activeCall.channelId)
-    label = channel?.Name ?? 'Voice channel'
-    linkTo = `/cabinet/servers/${activeCall.serverId}/channels/${activeCall.channelId}`
-  } else {
-    const cached = queryClient.getQueryData(directMessagesKeys.conversations())
-    const conversation = flattenConversationPages(cached?.pages).find((item) => item.Id === activeCall.conversationId)
-    const otherUser = conversation?.OtherUser
-    label = otherUser?.Username || [otherUser?.Name, otherUser?.Surname].filter(Boolean).join(' ') || 'Direct call'
-    linkTo = `/cabinet/dm/${activeCall.conversationId}`
-  }
-
-  return (
-    <div className="flex items-center gap-2 border-t border-border-subtle bg-surface-sidebar px-3 py-2">
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold tracking-wide text-success uppercase">
-          {isChannelCall ? 'Voice connected' : 'Call connected'}
-        </p>
-        <Link
-          to={linkTo}
-          className="block truncate text-sm font-medium text-fg-default hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-        >
-          {label}
-        </Link>
-      </div>
-      <VoiceCallControls
-        isMuted={isMuted}
-        isDeafened={isDeafened}
-        isVideoEnabled={isVideoEnabled}
-        isScreenSharing={isScreenSharing}
-        onToggleMute={toggleMute}
-        onToggleDeafen={toggleDeafen}
-        onToggleVideo={toggleVideo}
-        onToggleScreenShare={toggleScreenShare}
-        onLeave={leaveCall}
-        size="sm"
-      />
-    </div>
-  )
-}
 
 export function UserPanel({ className }) {
   const { t } = useTranslation()

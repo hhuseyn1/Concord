@@ -24,7 +24,11 @@ export function JoinServerForm({ onDone }) {
     setCodeError('')
     try {
       const server = await joinMutation.mutateAsync(trimmed)
-      toast({ variant: 'success', title: 'Joined server', description: `You're in "${server.Name}".` })
+      toast(
+        server.JoinedNow
+          ? { variant: 'success', title: 'Joined server', description: `You're in "${server.Name}".` }
+          : { variant: 'info', title: 'Already a member', description: `You're already in "${server.Name}".` },
+      )
       onDone?.()
     } catch (error) {
       if (error?.status === 404) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../theme/theme.dart';
 
@@ -52,14 +53,7 @@ class ConcordAuthLayout extends StatelessWidget {
                             color: colors.brand,
                             borderRadius: BorderRadius.circular(ConcordRadii.lg),
                           ),
-                          child: Text(
-                            'C',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: colors.fgOnBrand,
-                            ),
-                          ),
+                          child: SvgPicture.asset('assets/logo.svg', width: 28, height: 28),
                         ),
                         const SizedBox(height: ConcordSpacing.md),
                         Text(

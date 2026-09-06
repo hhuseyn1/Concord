@@ -15,6 +15,7 @@ import {
   RegisterScreen,
   ResetPasswordScreen,
   SettingsScreen,
+  VerifyEmailScreen,
 } from './routeLazy'
 import { withSuspense } from './withSuspense'
 
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
   { path: '/register', element: withSuspense(<RegisterScreen />) },
   { path: '/forgot-password', element: withSuspense(<ForgotPasswordScreen />) },
   { path: '/reset-password', element: withSuspense(<ResetPasswordScreen />) },
+  { path: '/verify-email', element: withSuspense(<VerifyEmailScreen />) },
   {
     element: <RequireAuth />,
     children: [

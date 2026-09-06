@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import * as authService from '../../api/authService'
 import { Button } from '../../components/ui/Button'
 import { Checkbox } from '../../components/ui/Checkbox'
@@ -8,28 +8,45 @@ import { FormField } from '../../components/ui/FormField'
 import { Input } from '../../components/ui/Input'
 import { PasswordInput } from '../../components/ui/PasswordInput'
 import { Spinner } from '../../components/ui/Spinner'
+import { getPendingInvite, useCapturePendingInviteFromUrl } from '../servers/pendingInvite'
 import { AuthLayout } from './AuthLayout'
 import { QrLoginPanel } from './QrLoginPanel'
 import { TwoFactorChallenge } from './TwoFactorChallenge'
-import { mapLoginError } from './authErrors'
+import { isUnverifiedEmailError, mapLoginError } from './authErrors'
 
 export function LoginScreen() {
   const navigate = useNavigate()
   const location = useLocation()
+  const [searchParams] = useSearchParams()
+  useCapturePendingInviteFromUrl(searchParams)
+
   const [formError, setFormError] = useState('')
   const [challenge, setChallenge] = useState(null)
+  const [unverifiedEmail, setUnverifiedEmail] = useState(false)
+  const [resendState, setResendState] = useState('idle')
 
-  const redirectTo = location.state?.from?.pathname
-    ? `${location.state.from.pathname}${location.state.from.search ?? ''}`
-    : '/cabinet'
+  const redirectTo = useMemo(() => {
+    if (location.state?.from?.pathname) {
+      return `${location.state.from.pathname}${location.state.from.search ?? ''}`
+    }
+    const pendingInvite = getPendingInvite()
+    if (pendingInvite) {
+      return `/cabinet?invite=${encodeURIComponent(pendingInvite)}`
+    }
+    return '/cabinet'
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: { email: '', password: '', rememberMe: true } })
 
   const onSubmit = async ({ email, password, rememberMe }) => {
     setFormError('')
+    setUnverifiedEmail(false)
+    setResendState('idle')
     try {
       const result = await authService.login({ Email: email, Password: password, RememberMe: rememberMe })
 
@@ -41,6 +58,19 @@ export function LoginScreen() {
       navigate(redirectTo, { replace: true })
     } catch (error) {
       setFormError(mapLoginError(error))
+      setUnverifiedEmail(isUnverifiedEmailError(error))
+    }
+  }
+
+  const handleResend = async () => {
+    const email = watch('email')
+    if (!email) return
+    setResendState('pending')
+    try {
+      await authService.resendVerificationEmail(email)
+      setResendState('sent')
+    } catch {
+      setResendState('idle')
     }
   }
 
@@ -105,6 +135,22 @@ export function LoginScreen() {
           >
             {formError}
           </p>
+        )}
+
+        {unverifiedEmail && (
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={resendState === 'pending'}
+              onClick={handleResend}
+            >
+              {resendState === 'pending' && <Spinner size="sm" />}
+              {resendState === 'pending' ? 'Sending…' : 'Resend confirmation email'}
+            </Button>
+            {resendState === 'sent' && <span className="text-sm text-fg-muted">Verification email sent.</span>}
+          </div>
         )}
 
         <Button type="submit" size="lg" disabled={isSubmitting} className="mt-2">

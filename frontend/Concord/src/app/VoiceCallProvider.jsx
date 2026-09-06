@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { DisconnectReason, Room, RoomEvent, Track } from 'livekit-client'
+import { AudioPresets, DisconnectReason, Room, RoomEvent, Track } from 'livekit-client'
 import { useQueryClient } from '@tanstack/react-query'
 import i18n from '../i18n'
 import { createVoiceHub } from '../api/hubs/voiceHub'
@@ -324,7 +324,29 @@ export function VoiceCallProvider({ children }) {
       return
     }
 
-    const newRoom = new Room()
+    // The SDK's default publishDefaults.audioPreset is AudioPresets.music, a
+    // higher-bitrate, stereo-capable profile meant for music/high-fidelity
+    // content. On real-world connections with jitter/packet loss, that extra
+    // bitrate makes audible crackling/static more likely than a profile
+    // tuned for speech. dtx/red are already SDK defaults but are made
+    // explicit here since they materially help packet-loss resilience for
+    // voice, and channelCount: 1 pins mono capture since some devices
+    // default to stereo, which some browsers/pipelines handle inconsistently.
+    const newRoom = new Room({
+      audioCaptureDefaults: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1,
+      },
+      publishDefaults: {
+        audioPreset: AudioPresets.speech,
+        dtx: true,
+        red: true,
+      },
+      adaptiveStream: true,
+      dynacast: true,
+    })
 
     newRoom.once(RoomEvent.Disconnected, (reason) => {
       if (roomRef.current !== newRoom) return
