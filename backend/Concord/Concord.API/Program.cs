@@ -7,8 +7,6 @@ using Concord.Infrastructure.Services;
 using Concord.Infrastructure.Settings;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -22,7 +20,7 @@ builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSect
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection(nameof(ApiSettings)));
 builder.Services.Configure<LiveKitSettings>(builder.Configuration.GetSection(nameof(LiveKitSettings)));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
-builder.Services.Configure<AzureBlobStorageSettings>(builder.Configuration.GetSection(nameof(AzureBlobStorageSettings)));
+builder.Services.Configure<BlobStorageSettings>(builder.Configuration.GetSection(nameof(BlobStorageSettings)));
 
 var authSettings = builder.Configuration.GetSection(nameof(AuthenticationSettings)).Get<AuthenticationSettings>();
 

@@ -44,8 +44,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(modelBuilder);
 
-        // P2.3 global search: trigram similarity/ILIKE index support, ships with stock postgres
-        // images - no separate infrastructure dependency (see the P2 plan's search decision).
         modelBuilder.HasPostgresExtension("pg_trgm");
 
         ConfigureSession(modelBuilder.Entity<Session>());
