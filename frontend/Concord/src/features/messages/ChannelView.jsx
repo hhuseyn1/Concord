@@ -55,7 +55,7 @@ export function ChannelView() {
     return <VoiceChannelView channel={channel} serverId={serverId} channelId={channelId} />
   }
 
-  return <TextChannelView key={channelId} serverId={serverId} channelId={channelId} />
+  return <TextChannelView serverId={serverId} channelId={channelId} />
 }
 
 function TextChannelView({ serverId, channelId }) {
@@ -63,6 +63,19 @@ function TextChannelView({ serverId, channelId }) {
   const queryClient = useQueryClient()
   const listRef = useRef(null)
   const [replyingTo, setReplyingTo] = useState(null)
+
+  // TextChannelView no longer remounts per channel (see ChannelView above) so
+  // that the messages SignalR connection persists across channel switches;
+  // per-channel UI state that remounting used to reset for free now has to be
+  // reset explicitly. MessageList keeps its own key={channelId} for scroll
+  // position/virtualization reset. Reset during render (React's documented
+  // pattern for state that depends on a prop) rather than in an effect, which
+  // would cause an extra cascading render.
+  const [prevChannelId, setPrevChannelId] = useState(channelId)
+  if (channelId !== prevChannelId) {
+    setPrevChannelId(channelId)
+    setReplyingTo(null)
+  }
 
   const { typingUserIds, notifyTyping, stopTyping } = useMessagesLiveUpdates(serverId, channelId)
 
