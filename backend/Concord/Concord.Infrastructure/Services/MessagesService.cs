@@ -140,7 +140,7 @@ public class MessagesService(
                 }));
 
                 foreach (var mentionedUserId in mentionedUserIds)
-                    await _notificationsService.NotifyMentionAsync(mentionedUserId, message.SenderId, channel.ServerId, channelId, null, message.Id);
+                    await _notificationsService.NotifyMentionAsync(mentionedUserId, message.SenderId, channel.ServerId, channelId, null, message.Id, content);
             }
         }
 
