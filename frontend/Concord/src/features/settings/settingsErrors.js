@@ -35,6 +35,16 @@ export function mapChangePasswordError(error) {
   return genericMessage(error)
 }
 
+export function mapDeleteAccountError(error) {
+  if (error?.status === 401) {
+    return 'Current password is incorrect.'
+  }
+  if (error?.status === 400) {
+    return error.message || 'Current password is incorrect.'
+  }
+  return genericMessage(error)
+}
+
 export function mapSessionActionError(error) {
   if (error?.status === 404) {
     return 'That session no longer exists - it may have already been signed out.'

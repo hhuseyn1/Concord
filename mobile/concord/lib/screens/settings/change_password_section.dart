@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
@@ -30,21 +31,22 @@ class _ChangePasswordSectionState extends ConsumerState<ChangePasswordSection> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _error = null;
       _success = false;
     });
 
     if (_currentController.text.isEmpty) {
-      setState(() => _error = 'Current password is required.');
+      setState(() => _error = l10n.currentPasswordRequired);
       return;
     }
     if (_newController.text.length < 8) {
-      setState(() => _error = 'New password must be at least 8 characters.');
+      setState(() => _error = l10n.newPasswordTooShort);
       return;
     }
     if (_newController.text != _confirmController.text) {
-      setState(() => _error = "Passwords don't match.");
+      setState(() => _error = l10n.validationPasswordsDontMatch);
       return;
     }
 
@@ -69,15 +71,16 @@ class _ChangePasswordSectionState extends ConsumerState<ChangePasswordSection> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Change Password', style: textTheme.titleMedium),
+        Text(l10n.changePasswordTitle, style: textTheme.titleMedium),
         const SizedBox(height: ConcordSpacing.md),
         ConcordTextField(
           controller: _currentController,
-          label: 'Current password',
+          label: l10n.currentPasswordLabel,
           obscureText: true,
           required: true,
           autofillHints: const [AutofillHints.password],
@@ -85,8 +88,8 @@ class _ChangePasswordSectionState extends ConsumerState<ChangePasswordSection> {
         const SizedBox(height: ConcordSpacing.md),
         ConcordTextField(
           controller: _newController,
-          label: 'New password',
-          hint: 'At least 8 characters.',
+          label: l10n.fieldNewPasswordLabel,
+          hint: l10n.passwordMinCharactersHint,
           obscureText: true,
           required: true,
           autofillHints: const [AutofillHints.newPassword],
@@ -94,7 +97,7 @@ class _ChangePasswordSectionState extends ConsumerState<ChangePasswordSection> {
         const SizedBox(height: ConcordSpacing.md),
         ConcordTextField(
           controller: _confirmController,
-          label: 'Confirm new password',
+          label: l10n.fieldConfirmNewPasswordLabel,
           obscureText: true,
           required: true,
           autofillHints: const [AutofillHints.newPassword],
@@ -106,12 +109,12 @@ class _ChangePasswordSectionState extends ConsumerState<ChangePasswordSection> {
         if (_success) ...[
           const SizedBox(height: ConcordSpacing.sm),
           Text(
-            'Password changed. Your other devices have been signed out.',
+            l10n.passwordChangedNotice,
             style: TextStyle(color: colors.success),
           ),
         ],
         const SizedBox(height: ConcordSpacing.md),
-        ConcordButton(label: 'Change Password', loading: _saving, onPressed: _saving ? null : _submit),
+        ConcordButton(label: l10n.changePasswordTitle, loading: _saving, onPressed: _saving ? null : _submit),
       ],
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
 
@@ -15,13 +16,14 @@ class TypingIndicatorBar extends ConsumerWidget {
     if (ids.isEmpty) return const SizedBox.shrink();
 
     final colors = Theme.of(context).extension<ConcordColors>()!;
-    final firstName = ids.isNotEmpty ? _watchName(ref, ids[0]) : null;
-    final secondName = ids.length > 1 ? _watchName(ref, ids[1]) : null;
+    final l10n = AppLocalizations.of(context);
+    final firstName = ids.isNotEmpty ? _watchName(ref, ids[0], l10n) : null;
+    final secondName = ids.length > 1 ? _watchName(ref, ids[1], l10n) : null;
 
     final text = switch (ids.length) {
-      1 => '$firstName is typing…',
-      2 => '$firstName and $secondName are typing…',
-      _ => '$firstName, $secondName, and others are typing…',
+      1 => l10n.typingSingular(firstName!),
+      2 => l10n.typingTwo(firstName!, secondName!),
+      _ => l10n.typingMany(firstName!, secondName!),
     };
 
     return Container(
@@ -55,8 +57,11 @@ class TypingIndicatorBar extends ConsumerWidget {
     );
   }
 
-  String _watchName(WidgetRef ref, String userId) {
+  String _watchName(WidgetRef ref, String userId, AppLocalizations l10n) {
     final profileAsync = ref.watch(userProfileProvider(userId));
-    return profileAsync.maybeWhen(data: (profile) => displayNameFor(profile, fallback: 'Someone'), orElse: () => 'Someone');
+    return profileAsync.maybeWhen(
+      data: (profile) => displayNameFor(profile, fallback: l10n.someoneFallback),
+      orElse: () => l10n.someoneFallback,
+    );
   }
 }

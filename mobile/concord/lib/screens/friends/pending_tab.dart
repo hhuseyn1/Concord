@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/friends_providers.dart';
 import '../../theme/theme.dart';
@@ -60,23 +61,26 @@ class _IncomingSectionState extends ConsumerState<_IncomingSection> {
   bool _busy = false;
 
   Future<void> _accept(FriendRequestSummary request) async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _busy = true);
     try {
       await ref.read(friendsServiceProvider).acceptRequest(request.id);
       if (!mounted) return;
       invalidateFriendsState(ref);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You and ${request.user.username ?? 'this user'} are now friends.')),
+        SnackBar(content: Text(l10n.nowFriendsSnackbar(request.user.username ?? l10n.thisUserFallback))),
       );
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not accept request: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.errorAcceptRequestFailed(e.message))));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _decline(FriendRequestSummary request) async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _busy = true);
     try {
       await ref.read(friendsServiceProvider).declineRequest(request.id);
@@ -84,7 +88,8 @@ class _IncomingSectionState extends ConsumerState<_IncomingSection> {
       invalidateFriendsState(ref);
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not decline request: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.errorDeclineRequestFailed(e.message))));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -92,6 +97,7 @@ class _IncomingSectionState extends ConsumerState<_IncomingSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final requestsAsync = ref.watch(incomingRequestsProvider);
 
     return Column(
@@ -99,7 +105,7 @@ class _IncomingSectionState extends ConsumerState<_IncomingSection> {
       children: [
         _SectionHeading(
           icon: Icons.call_received,
-          label: 'INCOMING${requestsAsync.maybeWhen(data: (r) => ' - ${r.length}', orElse: () => '')}',
+          label: '${l10n.incomingHeader}${requestsAsync.maybeWhen(data: (r) => l10n.sectionCountSuffix(r.length), orElse: () => '')}',
         ),
         const SizedBox(height: ConcordSpacing.xs),
         requestsAsync.when(
@@ -109,10 +115,10 @@ class _IncomingSectionState extends ConsumerState<_IncomingSection> {
           ),
           error: (error, stackTrace) => ConcordEmptyState(
             compact: true,
-            title: "Couldn't load incoming requests",
+            title: l10n.couldNotLoadIncomingTitle,
             subtitle: error is ApiException ? error.message : error.toString(),
             action: ConcordButton(
-              label: 'Try again',
+              label: l10n.tryAgainButton,
               variant: ConcordButtonVariant.secondary,
               size: ConcordButtonSize.sm,
               onPressed: () => ref.invalidate(incomingRequestsProvider),
@@ -120,7 +126,7 @@ class _IncomingSectionState extends ConsumerState<_IncomingSection> {
           ),
           data: (requests) {
             if (requests.isEmpty) {
-              return const ConcordEmptyState(compact: true, title: 'No incoming requests.');
+              return ConcordEmptyState(compact: true, title: l10n.noIncomingRequestsText);
             }
             return Column(
               children: [
@@ -131,13 +137,13 @@ class _IncomingSectionState extends ConsumerState<_IncomingSection> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         ConcordButton(
-                          label: 'Accept',
+                          label: l10n.acceptButton,
                           size: ConcordButtonSize.sm,
                           onPressed: _busy ? null : () => _accept(request),
                         ),
                         const SizedBox(width: ConcordSpacing.xs),
                         ConcordButton(
-                          label: 'Decline',
+                          label: l10n.declineButton,
                           variant: ConcordButtonVariant.secondary,
                           size: ConcordButtonSize.sm,
                           onPressed: _busy ? null : () => _decline(request),
@@ -165,6 +171,15 @@ class _OutgoingSectionState extends ConsumerState<_OutgoingSection> {
   bool _busy = false;
 
   Future<void> _cancel(FriendRequestSummary request) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmDialog(
+      context,
+      title: l10n.cancelRequestConfirmTitle,
+      message: l10n.cancelRequestConfirmMessage(request.user.username ?? l10n.thisUserFallback),
+      confirmLabel: l10n.cancelRequestButton,
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
     setState(() => _busy = true);
     try {
       await ref.read(friendsServiceProvider).cancelRequest(request.id);
@@ -172,7 +187,8 @@ class _OutgoingSectionState extends ConsumerState<_OutgoingSection> {
       invalidateFriendsState(ref);
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not cancel request: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.errorCancelRequestFailed(e.message))));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -180,6 +196,7 @@ class _OutgoingSectionState extends ConsumerState<_OutgoingSection> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final requestsAsync = ref.watch(outgoingRequestsProvider);
 
     return Column(
@@ -187,7 +204,7 @@ class _OutgoingSectionState extends ConsumerState<_OutgoingSection> {
       children: [
         _SectionHeading(
           icon: Icons.call_made,
-          label: 'OUTGOING${requestsAsync.maybeWhen(data: (r) => ' - ${r.length}', orElse: () => '')}',
+          label: '${l10n.outgoingHeader}${requestsAsync.maybeWhen(data: (r) => l10n.sectionCountSuffix(r.length), orElse: () => '')}',
         ),
         const SizedBox(height: ConcordSpacing.xs),
         requestsAsync.when(
@@ -197,10 +214,10 @@ class _OutgoingSectionState extends ConsumerState<_OutgoingSection> {
           ),
           error: (error, stackTrace) => ConcordEmptyState(
             compact: true,
-            title: "Couldn't load outgoing requests",
+            title: l10n.couldNotLoadOutgoingTitle,
             subtitle: error is ApiException ? error.message : error.toString(),
             action: ConcordButton(
-              label: 'Try again',
+              label: l10n.tryAgainButton,
               variant: ConcordButtonVariant.secondary,
               size: ConcordButtonSize.sm,
               onPressed: () => ref.invalidate(outgoingRequestsProvider),
@@ -208,16 +225,16 @@ class _OutgoingSectionState extends ConsumerState<_OutgoingSection> {
           ),
           data: (requests) {
             if (requests.isEmpty) {
-              return const ConcordEmptyState(compact: true, title: 'No outgoing requests.');
+              return ConcordEmptyState(compact: true, title: l10n.noOutgoingRequestsText);
             }
             return Column(
               children: [
                 for (final request in requests)
                   FriendRow(
                     user: request.user,
-                    subtitle: 'Pending',
+                    subtitle: l10n.pendingSubtitle,
                     actions: ConcordButton(
-                      label: 'Cancel',
+                      label: l10n.cancelButton,
                       variant: ConcordButtonVariant.secondary,
                       size: ConcordButtonSize.sm,
                       onPressed: _busy ? null : () => _cancel(request),

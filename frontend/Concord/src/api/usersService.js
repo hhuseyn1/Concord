@@ -8,6 +8,10 @@ export async function updateMe({ Name, Surname, Username, AvatarUrl = null }) {
   return request('Users/Me', { method: 'PUT', body: { Name, Surname, Username, AvatarUrl } });
 }
 
+export async function deleteMe({ Password }) {
+  return request('Users/Me', { method: 'DELETE', body: { Password } });
+}
+
 export async function getUserById(userId) {
   return request(`Users/${userId}`);
 }

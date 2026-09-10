@@ -24,6 +24,10 @@ export function mapRegisterError(error) {
     return 'Too many attempts. Please wait a moment and try again.'
   }
   if (error?.status === 409) {
+    const message = typeof error.message === 'string' ? error.message.toLowerCase() : ''
+    if (message.includes('username')) {
+      return 'That username is already taken.'
+    }
     return 'An account with that email already exists.'
   }
   return error?.message || 'Something went wrong. Please try again.'

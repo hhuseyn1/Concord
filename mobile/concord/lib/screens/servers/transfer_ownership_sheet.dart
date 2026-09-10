@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/auth_controller.dart';
 import '../../providers/server_providers.dart';
@@ -46,19 +47,17 @@ class _TransferOwnershipSheetState extends ConsumerState<_TransferOwnershipSheet
   }
 
   Future<void> _confirmAndTransfer() async {
+    final l10n = AppLocalizations.of(context);
     final userId = _selectedUserId;
     if (userId == null) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Transfer ownership of ${widget.serverName}?'),
-        content: Text(
-          "$_selectedDisplayName will become the new owner. You'll remain a member and will then be able to "
-          'leave the server yourself if you want to.',
-        ),
+        title: Text(l10n.transferOwnershipConfirmTitle(widget.serverName)),
+        content: Text(l10n.transferOwnershipConfirmMessage(_selectedDisplayName ?? '')),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Transfer')),
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.cancelButton)),
+          TextButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.transferButton)),
         ],
       ),
     );
@@ -75,7 +74,7 @@ class _TransferOwnershipSheetState extends ConsumerState<_TransferOwnershipSheet
       if (mounted) Navigator.of(context).pop();
     } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.message.isNotEmpty ? e.message : 'Could not transfer ownership.');
+      setState(() => _error = e.message.isNotEmpty ? e.message : l10n.errorTransferOwnershipFailed);
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -84,6 +83,7 @@ class _TransferOwnershipSheetState extends ConsumerState<_TransferOwnershipSheet
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final currentUserId = ref.watch(authControllerProvider).profile?.id;
     final membersAsync = ref.watch(serverMembersProvider(widget.serverId));
     final query = _queryController.text.trim().toLowerCase();
@@ -100,16 +100,16 @@ class _TransferOwnershipSheetState extends ConsumerState<_TransferOwnershipSheet
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Transfer ownership', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.transferOwnershipTitle, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 4),
             Text(
-              'Pick another member to become the new owner of ${widget.serverName}.',
+              l10n.transferOwnershipSubtitle(widget.serverName),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.fgMuted),
             ),
             const SizedBox(height: ConcordSpacing.md),
             ConcordTextField(
               controller: _queryController,
-              hint: 'Filter members by username…',
+              hint: l10n.filterMembersHint,
               onChanged: (_) => setState(() {}),
             ),
             if (_error != null) ...[
@@ -122,7 +122,7 @@ class _TransferOwnershipSheetState extends ConsumerState<_TransferOwnershipSheet
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) => Center(
                   child: Text(
-                    "Couldn't load members.",
+                    l10n.couldNotLoadMembersPeriod,
                     style: TextStyle(color: colors.fgMuted),
                   ),
                 ),
@@ -135,7 +135,7 @@ class _TransferOwnershipSheetState extends ConsumerState<_TransferOwnershipSheet
                   if (candidates.isEmpty) {
                     return Center(
                       child: Text(
-                        "There's nobody else in this server to transfer ownership to yet.",
+                        l10n.noOtherMembersText,
                         textAlign: TextAlign.center,
                         style: TextStyle(color: colors.fgMuted),
                       ),
@@ -171,13 +171,13 @@ class _TransferOwnershipSheetState extends ConsumerState<_TransferOwnershipSheet
               children: [
                 const Spacer(),
                 ConcordButton(
-                  label: 'Cancel',
+                  label: l10n.cancelButton,
                   variant: ConcordButtonVariant.secondary,
                   onPressed: _submitting ? null : () => Navigator.of(context).pop(),
                 ),
                 const SizedBox(width: ConcordSpacing.sm),
                 ConcordButton(
-                  label: 'Transfer',
+                  label: l10n.transferButton,
                   variant: ConcordButtonVariant.danger,
                   loading: _submitting,
                   onPressed: (_selectedUserId == null || _submitting) ? null : _confirmAndTransfer,

@@ -10,5 +10,6 @@ public enum NotificationType
     MissedCall,
     Mention,
     FriendRequestDeclined,
-    FriendRequestCancelled
+    FriendRequestCancelled,
+    DirectMessageReceived
 }

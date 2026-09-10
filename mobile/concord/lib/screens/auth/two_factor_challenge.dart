@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api_exception.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
@@ -33,10 +34,11 @@ class _TwoFactorChallengeState extends ConsumerState<TwoFactorChallenge> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final code = _codeController.text.trim();
 
     setState(() {
-      _codeError = code.isEmpty ? 'Enter your authentication code' : null;
+      _codeError = code.isEmpty ? l10n.validationCodeRequired : null;
       _formError = null;
     });
     if (_codeError != null) return;
@@ -47,7 +49,7 @@ class _TwoFactorChallengeState extends ConsumerState<TwoFactorChallenge> {
           .read(authControllerProvider.notifier)
           .completeTwoFactorLogin(twoFactorToken: widget.twoFactorToken, code: code);
     } on ApiException catch (error) {
-      setState(() => _formError = mapTwoFactorLoginError(error));
+      setState(() => _formError = mapTwoFactorLoginError(l10n, error));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -56,22 +58,23 @@ class _TwoFactorChallengeState extends ConsumerState<TwoFactorChallenge> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     return ConcordAuthLayout(
-      title: 'Two-factor authentication',
-      subtitle: 'Enter the code from your authenticator app, or one of your recovery codes.',
+      title: l10n.twoFactorTitle,
+      subtitle: l10n.twoFactorSubtitle,
       footer: GestureDetector(
         onTap: widget.onCancel,
         child: Text(
-          'Back to sign in',
+          l10n.twoFactorBackToSignIn,
           style: TextStyle(color: colors.brand, fontWeight: FontWeight.w500),
         ),
       ),
       children: [
         ConcordTextField(
           controller: _codeController,
-          label: 'Authentication code',
-          hint: '123456 or ABCD-EFGH',
+          label: l10n.fieldAuthCodeLabel,
+          hint: l10n.fieldAuthCodeHint,
           required: true,
           errorText: _codeError,
           keyboardType: TextInputType.text,
@@ -94,7 +97,7 @@ class _TwoFactorChallengeState extends ConsumerState<TwoFactorChallenge> {
         ],
         const SizedBox(height: ConcordSpacing.xl - 4),
         ConcordButton(
-          label: _isSubmitting ? 'Verifying…' : 'Verify',
+          label: _isSubmitting ? l10n.twoFactorVerifyButtonLoading : l10n.twoFactorVerifyButton,
           size: ConcordButtonSize.lg,
           expand: true,
           loading: _isSubmitting,

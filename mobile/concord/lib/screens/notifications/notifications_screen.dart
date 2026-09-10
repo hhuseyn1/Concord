@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/notifications_controller.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
@@ -15,15 +16,16 @@ class NotificationsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(notificationsControllerProvider);
     final controller = ref.read(notificationsControllerProvider.notifier);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(l10n.notificationsScreenTitle),
         actions: [
           if (state.unreadCount > 0)
             TextButton(
               onPressed: () => controller.markAllRead(),
-              child: const Text('Mark all read'),
+              child: Text(l10n.markAllReadButton),
             ),
         ],
       ),
@@ -40,6 +42,7 @@ class _NotificationsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -48,10 +51,10 @@ class _NotificationsBody extends StatelessWidget {
       return Center(
         child: ConcordEmptyState(
           icon: Icons.error_outline,
-          title: "Couldn't load notifications",
+          title: l10n.couldNotLoadNotificationsTitle,
           subtitle: state.loadError,
           action: ConcordButton(
-            label: 'Try again',
+            label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
             size: ConcordButtonSize.sm,
             onPressed: controller.retryInitialLoad,
@@ -61,11 +64,11 @@ class _NotificationsBody extends StatelessWidget {
     }
 
     if (state.items.isEmpty) {
-      return const Center(
+      return Center(
         child: ConcordEmptyState(
           icon: Icons.notifications_none,
-          title: 'No notifications yet',
-          subtitle: "Friend requests, missed calls, and mentions will show up here.",
+          title: l10n.noNotificationsYetTitle,
+          subtitle: l10n.noNotificationsYetSubtitle,
         ),
       );
     }
@@ -95,15 +98,16 @@ class _NotificationRow extends StatelessWidget {
   final NotificationResponse notification;
   final NotificationsController controller;
 
-  String get _text {
-    final name = displayNameFor(notification.relatedUser, fallback: 'Someone');
+  String _text(AppLocalizations l10n) {
+    final name = displayNameFor(notification.relatedUser, fallback: l10n.someoneFallback);
     return switch (notification.type) {
-      NotificationType.friendRequestReceived => '$name sent you a friend request',
-      NotificationType.friendRequestAccepted => '$name accepted your friend request',
-      NotificationType.missedCall => 'Missed call from $name',
-      NotificationType.mention => '$name mentioned you',
-      NotificationType.friendRequestDeclined => '$name declined your friend request',
-      NotificationType.friendRequestCancelled => '$name cancelled their friend request',
+      NotificationType.friendRequestReceived => l10n.notifFriendRequestReceived(name),
+      NotificationType.friendRequestAccepted => l10n.notifFriendRequestAccepted(name),
+      NotificationType.missedCall => l10n.notifMissedCall(name),
+      NotificationType.mention => l10n.notifMention(name),
+      NotificationType.friendRequestDeclined => l10n.notifFriendRequestDeclined(name),
+      NotificationType.friendRequestCancelled => l10n.notifFriendRequestCancelled(name),
+      NotificationType.directMessageReceived => l10n.notifMessageReceived(name),
     };
   }
 
@@ -114,12 +118,14 @@ class _NotificationRow extends StatelessWidget {
     NotificationType.mention => Icons.alternate_email,
     NotificationType.friendRequestDeclined => Icons.person_remove_outlined,
     NotificationType.friendRequestCancelled => Icons.person_remove_outlined,
+    NotificationType.directMessageReceived => Icons.chat_bubble_outline,
   };
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return InkWell(
       onTap: notification.isRead ? null : () => controller.markRead(notification.id),
@@ -145,14 +151,14 @@ class _NotificationRow extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _text,
+                    _text(l10n),
                     style: textTheme.bodyMedium?.copyWith(
                       color: colors.fgDefault,
                       fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w500,
                     ),
                   ),
                   Text(
-                    formatGroupTimestamp(notification.created),
+                    formatGroupTimestamp(l10n, notification.created),
                     style: textTheme.bodySmall?.copyWith(color: colors.fgMuted),
                   ),
                 ],

@@ -1,0 +1,812 @@
+{
+  "@@locale": "en",
+
+  "errorCouldNotReachServer": "Couldn't reach Concord — check your connection and try again.",
+  "errorServerTrouble": "Concord is having trouble on its end right now. Please try again shortly.",
+  "errorSomethingWentWrong": "Something went wrong. Please try again.",
+  "errorCantReachServer": "Can't reach the server. Check your connection.",
+  "errorTooManyAttempts": "Too many attempts. Please wait a moment and try again.",
+  "errorAccountLocked": "Your account is temporarily locked. Try again in a few minutes.",
+  "errorInvalidEmailPassword": "Invalid email or password",
+  "errorSignInExpired": "That sign-in attempt expired. Go back and enter your password again.",
+  "errorInvalidCode": "That code is not valid. Check your authenticator app, or use a recovery code.",
+  "errorAccountExists": "An account with that email already exists.",
+
+  "validationEmailRequired": "Email is required",
+  "validationPasswordRequired": "Password is required",
+  "validationNameRequired": "Name is required",
+  "validationSurnameRequired": "Surname is required",
+  "validationEmailInvalid": "Enter a valid email address",
+  "validationPasswordMinLength": "Password must be at least 8 characters",
+  "validationPasswordTooShortPeriod": "Password must be at least 8 characters.",
+  "validationPasswordsDontMatch": "Passwords don't match.",
+  "validationCodeRequired": "Enter your authentication code",
+
+  "loginWelcomeBack": "Welcome back",
+  "loginSubtitle": "We're excited to see you again.",
+  "loginNeedAccount": "Need an account? ",
+  "registerLink": "Register",
+  "fieldEmailLabel": "Email",
+  "fieldEmailHint": "you@example.com",
+  "fieldPasswordLabel": "Password",
+  "loginSubmitButton": "Log In",
+  "loginSubmitButtonLoading": "Logging in…",
+
+  "registerAlreadyHaveAccount": "Already have an account? ",
+  "loginLink": "Log In",
+  "backToLoginButton": "Back to Log In",
+  "registerCheckEmailTitle": "Check your email",
+  "registerCheckEmailSubtitle": "We've sent a confirmation link to {email}. Click it to activate your account, then log in.",
+  "@registerCheckEmailSubtitle": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "registerCheckEmailFallbackEmail": "your email",
+  "registerResendMessageSent": "Verification email sent.",
+  "registerResendMessageFailed": "Could not resend right now. Try again shortly.",
+  "registerResendButton": "Resend email",
+  "registerResendButtonLoading": "Sending…",
+  "registerCreateAccountTitle": "Create an account",
+  "registerCreateAccountSubtitle": "Join Concord and start chatting.",
+  "fieldNameLabel": "Name",
+  "fieldNameHint": "Jane",
+  "fieldSurnameLabel": "Surname",
+  "fieldSurnameHint": "Doe",
+  "passwordMinCharactersHint": "At least 8 characters.",
+  "registerSubmitButton": "Create Account",
+  "registerSubmitButtonLoading": "Creating account…",
+
+  "resetInvalidLinkTitle": "Invalid reset link",
+  "resetInvalidLinkSubtitle": "This password reset link is missing its token.",
+  "resetLinkExpiredError": "This reset link is invalid or has expired. Request a new one.",
+  "resetPasswordTitle": "Reset your password",
+  "resetPasswordSubtitle": "Choose a new password for your account.",
+  "fieldNewPasswordLabel": "New password",
+  "fieldConfirmNewPasswordLabel": "Confirm new password",
+  "resetPasswordButton": "Reset Password",
+  "resetPasswordButtonLoading": "Resetting…",
+
+  "twoFactorTitle": "Two-factor authentication",
+  "twoFactorSubtitle": "Enter the code from your authenticator app, or one of your recovery codes.",
+  "twoFactorBackToSignIn": "Back to sign in",
+  "fieldAuthCodeLabel": "Authentication code",
+  "fieldAuthCodeHint": "123456 or ABCD-EFGH",
+  "twoFactorVerifyButton": "Verify",
+  "twoFactorVerifyButtonLoading": "Verifying…",
+
+  "cancelButton": "Cancel",
+  "saveButton": "Save",
+  "tryAgainButton": "Try again",
+  "loadingEllipsis": "Loading…",
+  "someoneFallback": "Someone",
+  "someoneFallbackLower": "someone",
+
+  "messagesTab": "Messages",
+  "friendsTab": "Friends",
+  "notificationsTooltip": "Notifications",
+  "searchTooltip": "Search",
+  "serversTooltip": "Servers",
+  "voiceConnectedLabel": "Voice connected",
+  "callConnectedLabel": "Call connected",
+  "tapToReturnLabel": "Tap to return",
+  "channelFallbackTitle": "Channel",
+
+  "leaveServerConfirmTitle": "Leave {serverName}?",
+  "@leaveServerConfirmTitle": {
+    "placeholders": {"serverName": {"type": "String"}}
+  },
+  "leaveServerConfirmMessage": "This removes you from the server immediately. You'll need a new invite to rejoin later.",
+  "leaveServerButton": "Leave Server",
+  "errorLeaveServerFailed": "Could not leave server: {message}",
+  "@errorLeaveServerFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "serverFallbackTitle": "Server",
+  "membersTooltip": "Members",
+  "serverOptionsTooltip": "Server options",
+  "invitePeopleMenuItem": "Invite People",
+  "transferOwnershipMenuItem": "Transfer Ownership",
+  "thisServerFallback": "this server",
+  "couldNotLoadChannelsTitle": "Couldn’t load channels",
+  "noChannelsYetTitle": "No channels yet",
+  "noChannelsYetSubtitle": "Channels created on this server will show up here.",
+  "textChannelsLabel": "Text",
+  "voiceChannelsLabel": "Voice",
+  "deleteChannelConfirmTitle": "Delete #{channelName}?",
+  "@deleteChannelConfirmTitle": {
+    "placeholders": {"channelName": {"type": "String"}}
+  },
+  "deleteChannelConfirmMessage": "This removes the channel for everyone in the server immediately. All messages in it will be lost. This can't be undone.",
+  "deleteChannelButton": "Delete Channel",
+  "errorDeleteChannelFailed": "Could not delete channel: {message}",
+  "@errorDeleteChannelFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "renameChannelMenuItem": "Rename Channel",
+  "createChannelTooltip": "Create {channelType} channel",
+  "@createChannelTooltip": {
+    "placeholders": {"channelType": {"type": "String"}}
+  },
+  "noChannelsOfTypeYet": "No {channelType} channels yet.",
+  "@noChannelsOfTypeYet": {
+    "placeholders": {"channelType": {"type": "String"}}
+  },
+  "channelOptionsTooltip": "Channel options",
+
+  "homeTooltip": "Home (Messages & Friends)",
+  "couldNotLoadServersText": "Couldn’t load servers",
+  "addOrJoinServerTooltip": "Add or join a server",
+
+  "settingsTooltip": "Settings",
+  "logOutTooltip": "Log out",
+
+  "statusOnline": "Online",
+  "statusIdle": "Idle",
+  "statusDoNotDisturb": "Do Not Disturb",
+  "statusInvisible": "Invisible",
+  "setStatusTitle": "Set status",
+
+  "messageChannelHint": "Message this channel…",
+  "errorAttachFileFailed": "Could not attach file: {message}",
+  "@errorAttachFileFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "attachFileTooltip": "Attach a file",
+  "sendTooltip": "Send",
+  "rateLimitedMessage": "You're sending messages too fast. Wait a moment and try again.",
+  "messageTooLong": "Message is too long - trim it to {maxLength} characters or fewer to send.",
+  "@messageTooLong": {
+    "placeholders": {"maxLength": {"type": "int"}}
+  },
+  "replyingToPrefix": "Replying to ",
+  "cancelReplyTooltip": "Cancel reply",
+  "uploadingEllipsis": "Uploading…",
+  "readyToSendLabel": "Ready to send",
+  "removeAttachmentTooltip": "Remove attachment",
+
+  "couldNotLoadMessagesTitle": "Couldn't load messages",
+  "noMessagesYetTitle": "No messages yet",
+  "noMessagesYetSubtitle": "Say something to get the conversation started.",
+  "loadOlderMessagesButton": "Load older messages",
+  "reachedBeginningOfThread": "You've reached the beginning of this {threadNoun}.",
+  "@reachedBeginningOfThread": {
+    "placeholders": {"threadNoun": {"type": "String"}}
+  },
+  "seenLabel": "Seen",
+  "scrollToBottomTooltip": "Scroll to bottom",
+  "channelThreadNoun": "channel",
+  "conversationThreadNoun": "conversation",
+
+  "messageCannotBeEmpty": "Message cannot be empty.",
+  "messageTooLongChars": "Messages can be at most {maxLength} characters.",
+  "@messageTooLongChars": {
+    "placeholders": {"maxLength": {"type": "int"}}
+  },
+  "copiedToClipboard": "Copied to clipboard",
+  "errorUpdatePinFailed": "Could not update pin: {message}",
+  "@errorUpdatePinFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "errorReactFailed": "Could not react: {message}",
+  "@errorReactFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "deleteMessageConfirmTitle": "Delete message?",
+  "hideMessageConfirmTitle": "Hide this message?",
+  "deleteMessageConfirmMessage": "This deletes it for everyone in the {threadNoun}. This can't be undone.",
+  "@deleteMessageConfirmMessage": {
+    "placeholders": {"threadNoun": {"type": "String"}}
+  },
+  "hideMessageConfirmMessage": "It'll disappear from your view only - everyone else can still see it. There's no way to unhide it yourself afterward.",
+  "deleteMessageButton": "Delete Message",
+  "hideMessageButton": "Hide Message",
+  "deletedForEveryoneNotice": "This was removed for everyone in the {threadNoun}, not just hidden for you.",
+  "@deletedForEveryoneNotice": {
+    "placeholders": {"threadNoun": {"type": "String"}}
+  },
+  "hiddenOnlyForYouNotice": "You don't currently have permission to delete this for everyone, so it was only hidden for you.",
+  "errorRemoveMessageFailed": "Could not remove message: {message}",
+  "@errorRemoveMessageFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "replyAction": "Reply",
+  "forwardAction": "Forward",
+  "editMessageAction": "Edit Message",
+  "copyTextAction": "Copy Text",
+  "unpinAction": "Unpin",
+  "pinAction": "Pin",
+  "hideForMeAction": "Hide for me",
+  "editedSuffix": "  (edited)",
+  "originalMessageLabel": "Original message",
+  "attachmentLabel": "Attachment",
+  "forwardedFromLabel": "Forwarded from {name}",
+  "@forwardedFromLabel": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+
+  "typingSingular": "{name} is typing…",
+  "@typingSingular": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "typingTwo": "{name1} and {name2} are typing…",
+  "@typingTwo": {
+    "placeholders": {"name1": {"type": "String"}, "name2": {"type": "String"}}
+  },
+  "typingMany": "{name1}, {name2}, and others are typing…",
+  "@typingMany": {
+    "placeholders": {"name1": {"type": "String"}, "name2": {"type": "String"}}
+  },
+
+  "messageForwardedSnackbar": "Message forwarded.",
+  "errorForwardMessageFailed": "Could not forward that message.",
+  "forwardMessageTitle": "Forward Message",
+  "forwardMessageSubtitle": "Choose a channel or a direct message to forward this to.",
+  "forwardSearchHint": "Search channels or people…",
+  "channelsSectionHeader": "CHANNELS",
+  "notInAnyServersText": "You're not in any servers.",
+  "noMatchingServersText": "No matching servers.",
+  "couldNotLoadYourServersText": "Couldn't load your servers.",
+  "directMessagesSectionHeader": "DIRECT MESSAGES",
+  "noMatchingConversationsText": "No matching conversations.",
+  "noMatchingChannelsText": "No matching channels.",
+  "couldNotLoadChannelsPeriod": "Couldn't load channels.",
+
+  "sayHiSubtitle": "Say hi to start the conversation.",
+  "messageEllipsisHint": "Message…",
+  "messageUserHint": "Message @{name}…",
+  "@messageUserHint": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+
+  "settingsScreenTitle": "Settings",
+  "myAccountTab": "My Account",
+  "privacyTabLabel": "Privacy",
+  "voiceTabLabel": "Voice",
+  "editProfileButton": "Edit Profile",
+  "statusButton": "Status",
+  "scanQrCodeButton": "Scan QR Code to Log In on Web",
+  "logOutButton": "Log Out",
+
+  "signOutDeviceConfirmTitle": "Sign out this device?",
+  "signOutDeviceConfirmMessage": "{label} will be signed out immediately.",
+  "@signOutDeviceConfirmMessage": {
+    "placeholders": {"label": {"type": "String"}}
+  },
+  "signOutButton": "Sign out",
+  "errorSignOutDeviceFailed": "Could not sign out that device: {error}",
+  "@errorSignOutDeviceFailed": {
+    "placeholders": {"error": {"type": "String"}}
+  },
+  "signOutAllOthersConfirmTitle": "Sign out all other devices?",
+  "signOutAllOthersConfirmMessage": "Every other device signed into your account will be signed out immediately.",
+  "signOutOthersButton": "Sign out others",
+  "errorSignOutOthersFailed": "Could not sign out other devices: {error}",
+  "@errorSignOutOthersFailed": {
+    "placeholders": {"error": {"type": "String"}}
+  },
+  "activeSessionsTitle": "Active Sessions",
+  "couldNotLoadSessionsTitle": "Couldn't load your sessions",
+  "unknownDeviceLabel": "Unknown device",
+  "thisDeviceBadge": "This device",
+  "lastActiveLabel": "Last active {time}",
+  "@lastActiveLabel": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "signOutDeviceTooltip": "Sign out this device",
+
+  "currentPasswordRequired": "Current password is required.",
+  "newPasswordTooShort": "New password must be at least 8 characters.",
+  "changePasswordTitle": "Change Password",
+  "currentPasswordLabel": "Current password",
+  "passwordChangedNotice": "Password changed. Your other devices have been signed out.",
+
+  "expiryNeverLabel": "Don't clear",
+  "expiryThirtyMinLabel": "30 minutes",
+  "expiryOneHourLabel": "1 hour",
+  "expiryFourHoursLabel": "4 hours",
+  "expiryTodayLabel": "Today",
+  "setCustomStatusTitle": "Set a custom status",
+  "customStatusTextHint": "What's on your mind?",
+  "clearAfterLabel": "Clear after",
+  "clearButton": "Clear",
+
+  "nameRequiredPeriod": "Name is required.",
+  "surnameRequiredPeriod": "Surname is required.",
+  "usernameRequiredPeriod": "Username is required.",
+  "usernameInvalidFormat": "Only letters, numbers, and underscores - up to 32 characters.",
+  "errorUploadAvatarFailed": "Could not upload avatar: {message}",
+  "@errorUploadAvatarFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "usernameTakenError": "That username is already taken.",
+  "checkFieldsError": "Please check the fields and try again.",
+  "updateProfileFailedError": "Could not update profile.",
+  "editProfileTitle": "Edit Profile",
+  "avatarLabel": "Avatar",
+  "avatarFormatHint": "PNG, JPEG, WEBP or GIF, up to 5 MB.",
+  "usernameLabel": "Username",
+  "usernameHint": "Letters, numbers, and underscores only.",
+  "emailLabel": "Email",
+  "emailCannotChangeNotice": "Email can't be changed yet.",
+
+  "cameraAccessTitle": "Camera access",
+  "cameraAccessRationale": "Concord needs camera access to scan the QR code shown on your other device.",
+  "codeInvalidOrExpired": "That code is invalid or has expired.",
+  "couldNotLookUpCode": "Couldn't look up that code.",
+  "deviceApprovedSnackbar": "Device approved.",
+  "errorApproveDeviceFailed": "Could not approve that device.",
+  "signInRequestDeniedSnackbar": "Sign-in request denied.",
+  "errorDenyDeviceFailed": "Could not deny that device.",
+  "linkDeviceTitle": "Link a Device",
+  "linkDeviceInstructions": "Scan the QR code shown on the device you want to sign in, or enter its code below.",
+  "requestingCameraAccess": "Requesting camera access…",
+  "cameraAccessNeeded": "Camera access is needed to scan a QR code.",
+  "errorCameraAccessFailed": "Could not access the camera: {detail}",
+  "@errorCameraAccessFailed": {
+    "placeholders": {"detail": {"type": "String"}}
+  },
+  "enterCodeManuallyButton": "Enter code manually",
+  "deviceCodeLabel": "Device code",
+  "deviceCodeHint": "ABCD1234",
+  "continueButton": "Continue",
+  "scanQrInsteadButton": "Scan a QR code instead",
+  "approveDeviceWarning": "Only approve this if you just started signing in on the device shown above.",
+  "approveButton": "Approve",
+  "denyButton": "Deny",
+
+  "visibilityEveryone": "Everyone",
+  "visibilityFriendsOfFriends": "Friends of friends",
+  "visibilityNobody": "Nobody",
+  "visibilityFriendsOnly": "Friends only",
+  "errorSavePrivacyFailed": "Could not save privacy settings: {message}",
+  "@errorSavePrivacyFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "privacySafetyTitle": "Privacy & Safety",
+  "whoCanSendFriendRequests": "Who can send friend requests",
+  "whoCanDirectMessage": "Who can direct message you",
+  "whoCanSeeActivity": "Who can see your activity",
+  "readReceiptsLabel": "Read receipts",
+  "readReceiptsSubtitle": "Let others see when you've read their messages.",
+  "blockedUsersTitle": "Blocked Users",
+
+  "errorStartTwoFactorFailed": "Could not start two-factor setup.",
+  "enterAuthCodeMessage": "Enter the code from your authenticator app.",
+  "twoFactorDisabledSnackbar": "Two-factor authentication disabled.",
+  "errorDisableTwoFactorFailed": "Could not disable two-factor authentication.",
+  "regenerateRecoveryCodesTitle": "Regenerate recovery codes",
+  "regenerateRecoveryCodesDescription": "Your existing recovery codes will stop working. Confirm your password to continue.",
+  "regenerateButton": "Regenerate",
+  "errorRegenerateCodesFailed": "Could not regenerate recovery codes.",
+  "twoFactorSectionTitle": "Two-Factor Authentication",
+  "couldNotLoadTwoFactorStatus": "Couldn't load two-factor status",
+  "twoFactorOnDescription": "Two-factor authentication is on. Signing in also requires a code from your authenticator app.",
+  "twoFactorOffDescription": "Add an extra layer of security. Once enabled, signing in will require a code from an authenticator app.",
+  "recoveryCodesRemaining": "{count, plural, one{{count} recovery code remaining.} other{{count} recovery codes remaining.}}",
+  "@recoveryCodesRemaining": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "enableTwoFactorButton": "Enable Two-Factor Authentication",
+  "disableButton": "Disable",
+  "scanQrWithAuthenticator": "Scan this QR code with your authenticator app.",
+  "couldNotRenderQr": "Couldn't render the QR code - enter the key below manually.",
+  "enterKeyManually": "Or enter this key manually",
+  "confirmationCodeLabel": "Confirmation code",
+  "confirmationCodeHint": "123456",
+  "confirmButton": "Confirm",
+  "saveRecoveryCodesTitle": "Save your recovery codes",
+  "recoveryCodesWarning": "Each code can be used once to sign in if you lose access to your authenticator. They won't be shown again.",
+  "copiedLabel": "Copied",
+  "copyCodesButton": "Copy codes",
+  "savedCodesButton": "I've saved these codes",
+  "disableTwoFactorDialogTitle": "Disable two-factor authentication",
+  "disableTwoFactorDialogMessage": "Disabling removes this extra layer of security from your account.",
+  "passwordLabel": "Password",
+  "authOrRecoveryCodeLabel": "Authentication code or recovery code",
+  "enterPasswordMessage": "Enter your password.",
+  "enterCurrentOrRecoveryCodeMessage": "Enter a current code or a recovery code.",
+
+  "voiceVideoTitle": "Voice & Video",
+  "voiceInfoText": "Concord will ask for microphone access the first time you join a call, and camera access the first time you turn your camera on. There's no separate device picker on mobile - audio output (earpiece/speaker/Bluetooth) is controlled by your device, not this app.",
+  "voiceNoAudioHint": "If a call connects with no audio, check your device Settings app for Concord's microphone permission.",
+  "twoFactorConfirmCodeFailed": "That code did not work. Try again.",
+
+  "languageLabel": "Language",
+  "languageEnglish": "English",
+  "languageAzerbaijani": "Azərbaycan",
+  "preferencesTitle": "Preferences",
+  "muteNotificationsLabel": "Mute notifications",
+  "muteNotificationsSubtitle": "Suppress in-app notification pop-ups.",
+  "notificationSoundLabel": "Notification sound",
+  "notificationSoundSubtitle": "Play a sound for new notifications.",
+  "errorSavePreferenceFailed": "Could not save preference: {message}",
+  "@errorSavePreferenceFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+
+  "addServerTitle": "Add a Server",
+  "addServerSubtitle": "Create a new server, or join one with an invite code.",
+  "createTab": "Create",
+  "joinTab": "Join",
+  "serverNameRequired": "Server name is required.",
+  "errorUploadIconFailed": "Could not upload icon: {message}",
+  "@errorUploadIconFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "serverNameInvalid": "That server name is not valid.",
+  "errorCreateServerFailed": "Could not create server.",
+  "serverIconLabel": "Server icon",
+  "serverIconHint": "Optional. PNG, JPEG, WEBP or GIF, up to 5 MB.",
+  "serverNameLabel": "Server name",
+  "serverNameHint": "My Server",
+  "creatingServerLoading": "Creating…",
+  "createServerButton": "Create Server",
+  "enterInviteCodeMessage": "Enter an invite code.",
+  "inviteCodeInvalidMessage": "That invite code is invalid, expired, or no longer works.",
+  "errorJoinServerFailed": "Could not join server.",
+  "inviteCodeLabel": "Invite code",
+  "inviteCodeHint": "e.g. aB3xQ9",
+  "joiningServerLoading": "Joining…",
+  "joinServerButton": "Join Server",
+
+  "channelNameRequired": "Channel name is required.",
+  "channelNameInvalid": "That channel name is not valid.",
+  "errorCreateChannelFailed": "Could not create channel.",
+  "createChannelTitle": "Create Channel",
+  "channelTypeLabel": "Channel type",
+  "channelNameLabel": "Channel name",
+  "channelNameHintVoice": "general-voice",
+  "channelNameHintText": "general",
+  "creatingChannelLoading": "Creating…",
+
+  "expiryNeverOption": "Never",
+  "expiryOneDayLabel": "1 day",
+  "expirySevenDaysLabel": "7 days",
+  "maxUsesInvalidMessage": "Max uses must be a positive number.",
+  "errorGenerateInviteFailed": "Could not generate an invite.",
+  "inviteCodeCopiedSnackbar": "Invite code copied to clipboard",
+  "expiresLabel": "Expires",
+  "maxUsesLabel": "Max uses",
+  "unlimitedHint": "Unlimited",
+  "generateInviteLinkButton": "Generate invite link",
+  "couldNotLoadInvitesTitle": "Couldn't load invites",
+  "noInvitesYetText": "No invites generated yet.",
+  "copyButton": "Copy",
+  "inviteUsesCount": "{count, plural, one{{count} use} other{{count} uses}}",
+  "@inviteUsesCount": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "inviteUsesOfMax": "{count} / {max} uses{exhausted}",
+  "@inviteUsesOfMax": {
+    "placeholders": {"count": {"type": "int"}, "max": {"type": "int"}, "exhausted": {"type": "String"}}
+  },
+  "inviteExhaustedSuffix": " - exhausted",
+  "neverExpiresLabel": "Never expires",
+  "expiredLabel": "Expired",
+  "expiresOnLabel": "Expires {date}",
+  "@expiresOnLabel": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+
+  "errorModerationFailed": "Could not {action}: {message}",
+  "@errorModerationFailed": {
+    "placeholders": {"action": {"type": "String"}, "message": {"type": "String"}}
+  },
+  "actionUnmuteMember": "unmute this member",
+  "actionMuteMember": "mute this member",
+  "actionRemoveTimeout": "remove this timeout",
+  "actionTimeoutMember": "time out this member",
+  "actionKickMember": "kick this member",
+  "actionBanMember": "ban this member",
+  "unknownErrorLabel": "unknown error",
+  "unmuteAction": "Unmute",
+  "muteAction": "Mute",
+  "removeTimeoutAction": "Remove Timeout",
+  "timeoutAction": "Timeout",
+  "kickAction": "Kick",
+  "banAction": "Ban",
+  "kickConfirmTitle": "Kick {name}?",
+  "@kickConfirmTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "kickConfirmMessage": "{name} will be removed from the server. They can rejoin with a valid invite.",
+  "@kickConfirmMessage": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "timeoutFiveMin": "5 minutes",
+  "timeoutConfirmTitle": "Time out {name}?",
+  "@timeoutConfirmTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "timeoutConfirmMessage": "They'll temporarily lose the ability to send messages and speak in voice channels.",
+  "durationLabel": "Duration",
+  "reasonLabel": "Reason",
+  "optionalHint": "Optional",
+  "banConfirmTitle": "Ban {name}?",
+  "@banConfirmTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "banConfirmMessage": "This removes them from the server and blocks them from rejoining through any invite.",
+
+  "renameChannelTitle": "Rename #{name}",
+  "@renameChannelTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "errorRenameChannelFailed": "Could not rename channel.",
+
+  "membersTitle": "Members",
+  "couldNotLoadMembersTitle": "Couldn't load members",
+  "noMembersTitle": "No members",
+  "noMembersSubtitle": "This server has no members yet.",
+  "memberGroupHeader": "{label} - {count}",
+  "@memberGroupHeader": {
+    "placeholders": {"label": {"type": "String"}, "count": {"type": "int"}}
+  },
+  "loadMoreButton": "Load more",
+  "memberCountLabel": "{count, plural, one{{count} member} other{{count} members}}",
+  "@memberCountLabel": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "statusOffline": "Offline",
+
+  "mutedTooltip": "Muted",
+  "timedOutUntilTooltip": "Timed out until {date}",
+  "@timedOutUntilTooltip": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "moderateMemberTooltip": "Moderate {name}",
+  "@moderateMemberTooltip": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+
+  "transferOwnershipConfirmTitle": "Transfer ownership of {serverName}?",
+  "@transferOwnershipConfirmTitle": {
+    "placeholders": {"serverName": {"type": "String"}}
+  },
+  "transferOwnershipConfirmMessage": "{name} will become the new owner. You'll remain a member and will then be able to leave the server yourself if you want to.",
+  "@transferOwnershipConfirmMessage": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "transferButton": "Transfer",
+  "errorTransferOwnershipFailed": "Could not transfer ownership.",
+  "transferOwnershipTitle": "Transfer ownership",
+  "transferOwnershipSubtitle": "Pick another member to become the new owner of {serverName}.",
+  "@transferOwnershipSubtitle": {
+    "placeholders": {"serverName": {"type": "String"}}
+  },
+  "filterMembersHint": "Filter members by username…",
+  "couldNotLoadMembersPeriod": "Couldn't load members.",
+  "noOtherMembersText": "There's nobody else in this server to transfer ownership to yet.",
+
+  "errorSendRequestFailed": "Could not send request: {message}",
+  "@errorSendRequestFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "errorAcceptRequestFailed": "Could not accept request: {message}",
+  "@errorAcceptRequestFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "errorDeclineRequestFailed": "Could not decline request: {message}",
+  "@errorDeclineRequestFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "alreadyFriendsBadge": "Already friends",
+  "requestSentLabel": "Request sent",
+  "acceptButton": "Accept",
+  "declineButton": "Decline",
+  "addButton": "Add",
+  "searchByUsernameHint": "Enter their exact username…",
+  "keepTypingMessage": "Keep typing - at least {count} characters.",
+  "@keepTypingMessage": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "findFriendsTitle": "Find friends by username",
+  "findFriendsSubtitle": "You'll need their exact username - this isn't a browsable directory. You, existing friends, and blocked users won't show up here.",
+  "searchFailedTitle": "Search failed",
+  "noUsersFoundTitle": "No users found",
+  "noUsersFoundSubtitle": "Nobody matches \"{query}\".",
+  "@noUsersFoundSubtitle": {
+    "placeholders": {"query": {"type": "String"}}
+  },
+
+  "unblockConfirmTitle": "Unblock {name}?",
+  "@unblockConfirmTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "unblockConfirmMessage": "They will be able to see your profile, send you friend requests, and message you again.",
+  "unblockButton": "Unblock",
+  "unblockedSnackbar": "{name} can interact with you again.",
+  "@unblockedSnackbar": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "errorUnblockFailed": "Could not unblock user: {message}",
+  "@errorUnblockFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "couldNotLoadBlockedTitle": "Couldn't load blocked users",
+  "noBlockedUsersTitle": "No blocked users",
+  "noBlockedUsersSubtitle": "Users you block will show up here. Blocking removes them from your friends and pending requests, and they can't message or friend-request you again unless you unblock them.",
+  "sectionCountSuffix": " - {count}",
+  "@sectionCountSuffix": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "blockedHeader": "BLOCKED",
+  "allFriendsHeader": "ALL FRIENDS",
+  "incomingHeader": "INCOMING",
+  "outgoingHeader": "OUTGOING",
+
+  "pendingTabLabel": "Pending",
+  "blockedTabLabel": "Blocked",
+  "addFriendTabLabel": "Add Friend",
+
+  "errorStartConversationFailed": "Could not start conversation: {message}",
+  "@errorStartConversationFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "blockConfirmTitle": "Block this user?",
+  "blockConfirmMessage": "{name} will be removed from your friends and won't be able to message you or see your profile. There's no separate \"unfriend\" - this is the only way to end the friendship.",
+  "@blockConfirmMessage": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "blockUserButton": "Block User",
+  "blockedSnackbar": "{name} was blocked.",
+  "@blockedSnackbar": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "errorBlockUserFailed": "Could not block user: {message}",
+  "@errorBlockUserFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "couldNotLoadFriendsTitle": "Couldn't load friends",
+  "noFriendsYetTitle": "No friends yet",
+  "noFriendsYetSubtitle": "Search for someone in the Add Friend tab to send a request.",
+  "messageTooltip": "Message",
+  "blockTooltip": "Block",
+
+  "nowFriendsSnackbar": "You and {name} are now friends.",
+  "@nowFriendsSnackbar": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "thisUserFallback": "this user",
+  "couldNotLoadIncomingTitle": "Couldn't load incoming requests",
+  "noIncomingRequestsText": "No incoming requests.",
+  "couldNotLoadOutgoingTitle": "Couldn't load outgoing requests",
+  "noOutgoingRequestsText": "No outgoing requests.",
+  "cancelRequestConfirmTitle": "Cancel friend request?",
+  "cancelRequestConfirmMessage": "This cancels your pending friend request to {name}. You'll need to send a new request if you change your mind.",
+  "@cancelRequestConfirmMessage": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "cancelRequestButton": "Cancel Request",
+  "errorCancelRequestFailed": "Could not cancel request: {message}",
+  "@errorCancelRequestFailed": {
+    "placeholders": {"message": {"type": "String"}}
+  },
+  "pendingSubtitle": "Pending",
+
+  "couldNotLoadConversationsTitle": "Couldn't load conversations",
+  "noConversationsYetTitle": "No conversations yet",
+  "noConversationsYetSubtitle": "Message a friend from the Friends tab to start one.",
+  "sentAttachmentPreview": "Sent an attachment",
+
+  "microphoneAccessTitle": "Microphone access",
+  "microphoneAccessRationale": "Concord needs microphone access so the other person can hear you on the call.",
+  "notificationAccessTitle": "Notifications",
+  "notificationAccessRationale": "Concord can let you know about new messages and friend requests even when the app is closed. Turn on notifications?",
+  "cameraAccessRationaleVideoCalls": "Concord needs camera access for video calls.",
+  "directMessageFallbackTitle": "Direct Message",
+  "startVoiceCallTooltip": "Start voice call",
+  "startVideoCallTooltip": "Start video call",
+  "callingEllipsis": "Calling…",
+  "reconnectingEllipsis": "Reconnecting…",
+  "inCallLabel": "In call",
+
+  "incomingVideoCallTitle": "Incoming video call",
+  "incomingVoiceCallTitle": "Incoming voice call",
+
+  "participantYouSuffix": "{name} (you)",
+  "@participantYouSuffix": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "youFallback": "You",
+  "memberFallback": "Member",
+
+  "unmuteMicTooltip": "Unmute microphone",
+  "muteMicTooltip": "Mute microphone",
+  "undeafenTooltip": "Undeafen",
+  "deafenTooltip": "Deafen",
+  "turnOffCameraTooltip": "Turn off camera",
+  "turnOnCameraTooltip": "Turn on camera",
+  "leaveCallTooltip": "Leave call",
+
+  "microphoneAccessRationaleChannel": "Concord needs microphone access so others in this channel can hear you.",
+  "joinChannelTitle": "Join {channelName}",
+  "@joinChannelTitle": {
+    "placeholders": {"channelName": {"type": "String"}}
+  },
+  "joinVoiceChannelTitle": "Join voice channel",
+  "joinVoiceChannelSubtitle": "Connect to start talking with everyone in this channel.",
+  "connectingEllipsis": "Connecting…",
+  "joinVoiceButton": "Join Voice",
+
+  "notificationsScreenTitle": "Notifications",
+  "markAllReadButton": "Mark all read",
+  "couldNotLoadNotificationsTitle": "Couldn't load notifications",
+  "noNotificationsYetTitle": "No notifications yet",
+  "noNotificationsYetSubtitle": "Friend requests, missed calls, and mentions will show up here.",
+  "notifFriendRequestReceived": "{name} sent you a friend request",
+  "@notifFriendRequestReceived": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "notifFriendRequestAccepted": "{name} accepted your friend request",
+  "@notifFriendRequestAccepted": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "notifMissedCall": "Missed call from {name}",
+  "@notifMissedCall": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "notifMention": "{name} mentioned you",
+  "@notifMention": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "notifMessageReceived": "{name} sent you a message",
+  "@notifMessageReceived": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "notifFriendRequestDeclined": "{name} declined your friend request",
+  "@notifFriendRequestDeclined": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "notifFriendRequestCancelled": "{name} cancelled their friend request",
+  "@notifFriendRequestCancelled": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+
+  "searchMessagesHint": "Search messages…",
+  "keepTypingEllipsis": "Keep typing…",
+  "couldNotSearchTitle": "Couldn't search",
+  "searchAcrossTitle": "Search across your servers and DMs",
+  "searchMinCharsSubtitle": "Type at least 2 characters to start searching.",
+  "noResultsTitle": "No results",
+  "noTextContentPlaceholder": "(no text content)",
+
+  "hidePasswordTooltip": "Hide password",
+  "showPasswordTooltip": "Show password",
+
+  "amLabel": "AM",
+  "pmLabel": "PM",
+  "todayAtLabel": "Today at {time}",
+  "@todayAtLabel": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "yesterdayAtLabel": "Yesterday at {time}",
+  "@yesterdayAtLabel": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "justNowLabel": "just now",
+  "minutesAgoLabel": "{count}m ago",
+  "@minutesAgoLabel": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "hoursAgoLabel": "{count}h ago",
+  "@hoursAgoLabel": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "daysAgoLabel": "{count}d ago",
+  "@daysAgoLabel": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+
+  "dangerZoneTitle": "Danger Zone",
+  "deleteAccountButton": "Delete Account",
+  "deleteAccountSectionDescription": "Permanently delete your account and all of your data.",
+  "deleteAccountDialogTitle": "Delete your account?",
+  "deleteAccountConsequencesMessage": "You'll be logged out of every device immediately. Your account will be deactivated for 30 days - if you log back in during that time, the deletion is cancelled and your account is restored. After 30 days, it's permanently deleted and can't be recovered.",
+  "deleteAccountPasswordLabel": "Enter your password to confirm",
+  "deleteAccountConfirmButton": "Delete My Account",
+  "deleteAccountIncorrectPasswordError": "Incorrect password.",
+  "deleteAccountFailedError": "Could not delete your account.",
+  "deleteAccountSuccessSnackbar": "Your account has been deleted. Log back in within 30 days to cancel the deletion."
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../api/models/message_like.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/message_thread_controller.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
@@ -20,9 +21,9 @@ class MessageListView extends StatefulWidget {
     required this.onReply,
     required this.onLoadMore,
     required this.onRetryInitialLoad,
-    this.threadNoun = 'channel',
-    this.emptyTitle = 'No messages yet',
-    this.emptySubtitle = 'Say something to get the conversation started.',
+    this.threadNoun,
+    this.emptyTitle,
+    this.emptySubtitle,
     this.serverId,
     this.sourceChannelId,
     this.sourceConversationId,
@@ -41,9 +42,10 @@ class MessageListView extends StatefulWidget {
   final VoidCallback onLoadMore;
   final VoidCallback onRetryInitialLoad;
 
-  final String threadNoun;
-  final String emptyTitle;
-  final String emptySubtitle;
+  /// Falls back to [AppLocalizations.channelThreadNoun] when omitted.
+  final String? threadNoun;
+  final String? emptyTitle;
+  final String? emptySubtitle;
 
   final String? serverId;
 
@@ -153,6 +155,8 @@ class _MessageListViewState extends State<MessageListView> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
+    final threadNoun = widget.threadNoun ?? l10n.channelThreadNoun;
 
     if (widget.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -162,10 +166,10 @@ class _MessageListViewState extends State<MessageListView> {
       return Center(
         child: ConcordEmptyState(
           icon: Icons.error_outline,
-          title: "Couldn't load messages",
+          title: l10n.couldNotLoadMessagesTitle,
           subtitle: widget.loadError,
           action: ConcordButton(
-            label: 'Try again',
+            label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
             size: ConcordButtonSize.sm,
             onPressed: widget.onRetryInitialLoad,
@@ -178,8 +182,8 @@ class _MessageListViewState extends State<MessageListView> {
       return Center(
         child: ConcordEmptyState(
           icon: Icons.chat_bubble_outline,
-          title: widget.emptyTitle,
-          subtitle: widget.emptySubtitle,
+          title: widget.emptyTitle ?? l10n.noMessagesYetTitle,
+          subtitle: widget.emptySubtitle ?? l10n.noMessagesYetSubtitle,
         ),
       );
     }
@@ -221,13 +225,13 @@ class _MessageListViewState extends State<MessageListView> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : ConcordButton(
-                              label: 'Load older messages',
+                              label: l10n.loadOlderMessagesButton,
                               variant: ConcordButtonVariant.secondary,
                               size: ConcordButtonSize.sm,
                               onPressed: _handleLoadOlder,
                             ))
                       : Text(
-                          "You've reached the beginning of this ${widget.threadNoun}.",
+                          l10n.reachedBeginningOfThread(threadNoun),
                           style: TextStyle(fontSize: 12, color: colors.fgMuted),
                         ),
                 ),
@@ -247,7 +251,7 @@ class _MessageListViewState extends State<MessageListView> {
                     currentUserId: widget.currentUserId,
                     replyToMessage: group[i].replyToMessageId != null ? messageById[group[i].replyToMessageId] : null,
                     controller: widget.controller,
-                    threadNoun: widget.threadNoun,
+                    threadNoun: threadNoun,
                     onReply: widget.onReply,
                     serverId: widget.serverId,
                     sourceChannelId: widget.sourceChannelId,
@@ -256,7 +260,7 @@ class _MessageListViewState extends State<MessageListView> {
                 if (showReadReceipt && group.last.id == lastOwnMessageId)
                   Padding(
                     padding: const EdgeInsets.only(left: 52, right: ConcordSpacing.lg, top: 2),
-                    child: Text('Seen', style: TextStyle(fontSize: 11, color: colors.fgMuted)),
+                    child: Text(l10n.seenLabel, style: TextStyle(fontSize: 11, color: colors.fgMuted)),
                   ),
               ],
             );
@@ -268,7 +272,7 @@ class _MessageListViewState extends State<MessageListView> {
             bottom: ConcordSpacing.lg,
             child: ConcordIconButton(
               icon: Icons.arrow_downward,
-              tooltip: 'Scroll to bottom',
+              tooltip: l10n.scrollToBottomTooltip,
               variant: ConcordButtonVariant.secondary,
               onPressed: () => _scrollToBottomNow(animate: true),
             ),

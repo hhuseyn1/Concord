@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "599371090195",
+    "project_id": "concord-4115a",
+    "storage_bucket": "concord-4115a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599371090195:android:323d690aea798bff82b2e6",
+        "android_client_info": {
+          "package_name": "com.example.concord"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGaNxGm0jABU7HvWX9bX1ELHcMlZpfH3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

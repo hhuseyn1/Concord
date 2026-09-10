@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/deep_link_providers.dart';
 import '../../providers/notifications_controller.dart';
+import '../../providers/push_notifications_controller.dart';
 import '../../providers/voice_call_controller.dart';
 import '../../providers/voice_call_state.dart';
 import '../../theme/theme.dart';
@@ -27,7 +29,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _consumePendingInviteIfAny());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _consumePendingInviteIfAny();
+      ref.read(pushNotificationsControllerProvider.notifier).ensureRegistered(context);
+    });
   }
 
   @override
@@ -52,15 +57,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
       if (next != null) WidgetsBinding.instance.addPostFrameCallback((_) => _consumePendingInviteIfAny());
     });
 
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       endDrawer: const ServerRailDrawer(),
       appBar: AppBar(
         title: const Text('Concord'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Messages'),
-            Tab(text: 'Friends'),
+          tabs: [
+            Tab(text: l10n.messagesTab),
+            Tab(text: l10n.friendsTab),
           ],
         ),
         actions: [
@@ -69,7 +76,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_outlined),
-                tooltip: 'Notifications',
+                tooltip: l10n.notificationsTooltip,
                 onPressed: () => context.push('/notifications'),
               ),
               if (unreadCount > 0)
@@ -87,13 +94,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with SingleTickerProvid
           ),
           IconButton(
             icon: const Icon(Icons.search),
-            tooltip: 'Search',
+            tooltip: l10n.searchTooltip,
             onPressed: () => context.push('/search'),
           ),
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu),
-              tooltip: 'Servers',
+              tooltip: l10n.serversTooltip,
               onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
@@ -126,8 +133,9 @@ class _ActiveCallBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final call = state.activeCall!;
-    final label = call.kind == ActiveCallKind.channel ? 'Voice connected' : 'Call connected';
+    final label = call.kind == ActiveCallKind.channel ? l10n.voiceConnectedLabel : l10n.callConnectedLabel;
 
     return Material(
       color: colors.brand.withValues(alpha: 0.15),
@@ -146,7 +154,7 @@ class _ActiveCallBanner extends ConsumerWidget {
               Icon(Icons.call, size: 16, color: colors.brand),
               const SizedBox(width: ConcordSpacing.sm),
               Expanded(child: Text(label, style: TextStyle(color: colors.brand, fontWeight: FontWeight.w500))),
-              Text('Tap to return', style: TextStyle(color: colors.fgMuted, fontSize: 12)),
+              Text(l10n.tapToReturnLabel, style: TextStyle(color: colors.fgMuted, fontSize: 12)),
             ],
           ),
         ),

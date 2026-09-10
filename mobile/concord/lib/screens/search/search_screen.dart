@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/search_providers.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
@@ -28,6 +29,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(searchControllerProvider);
     final notifier = ref.read(searchControllerProvider.notifier);
     final trimmedLength = state.query.trim().length;
@@ -37,8 +39,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         title: TextField(
           controller: _controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Search messages…',
+          decoration: InputDecoration(
+            hintText: l10n.searchMessagesHint,
             border: InputBorder.none,
           ),
           onChanged: notifier.setQuery,
@@ -47,7 +49,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       body: Builder(
         builder: (context) {
           if (trimmedLength > 0 && trimmedLength < 2) {
-            return const Center(child: Text('Keep typing…'));
+            return Center(child: Text(l10n.keepTypingEllipsis));
           }
           if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -56,23 +58,23 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             return Center(
               child: ConcordEmptyState(
                 icon: Icons.error_outline,
-                title: "Couldn't search",
+                title: l10n.couldNotSearchTitle,
                 subtitle: state.error,
               ),
             );
           }
           if (trimmedLength == 0) {
-            return const Center(
+            return Center(
               child: ConcordEmptyState(
                 icon: Icons.search,
-                title: 'Search across your servers and DMs',
-                subtitle: 'Type at least 2 characters to start searching.',
+                title: l10n.searchAcrossTitle,
+                subtitle: l10n.searchMinCharsSubtitle,
               ),
             );
           }
           if (state.results.isEmpty) {
-            return const Center(
-              child: ConcordEmptyState(icon: Icons.search_off, title: 'No results'),
+            return Center(
+              child: ConcordEmptyState(icon: Icons.search_off, title: l10n.noResultsTitle),
             );
           }
           return ListView.separated(
@@ -99,7 +101,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ],
                 ),
                 subtitle: Text(
-                  result.content?.isNotEmpty == true ? result.content! : '(no text content)',
+                  result.content?.isNotEmpty == true ? result.content! : l10n.noTextContentPlaceholder,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: colors.fgMuted),

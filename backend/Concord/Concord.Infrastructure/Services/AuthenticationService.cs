@@ -67,9 +67,9 @@ public class AuthenticationService(
         var user = await _context.Users
             .FirstOrDefaultAsync(user => user.Email == request.Email);
 
-        if (user is null || user.Disabled.HasValue)
+        if (user is null || IsBlockedFromLoggingIn(user))
             throw new UnauthorizedAccessException();
-        
+
         if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             throw new UserLockoutException(user.Id);
         
@@ -146,7 +146,7 @@ public class AuthenticationService(
 
         var user = await _context.Users.FirstOrDefaultAsync(user => user.Id == userId);
 
-        if (user is null || user.Disabled.HasValue || !user.TwoFactorEnabled)
+        if (user is null || IsBlockedFromLoggingIn(user) || !user.TwoFactorEnabled)
             throw new UnauthorizedAccessException();
 
         if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
@@ -224,6 +224,9 @@ public class AuthenticationService(
         if (string.IsNullOrWhiteSpace(request.Surname))
             throw new ParameterValidationException(nameof(request.Surname));
 
+        if (!UsernamePolicy.IsValid(request.Username))
+            throw new ParameterValidationException(nameof(request.Username));
+
         if (string.IsNullOrWhiteSpace(request.Email))
             throw new ParameterValidationException(nameof(request.Email));
 
@@ -245,7 +248,10 @@ public class AuthenticationService(
             GlobalConstants.DefaultLocale,
             Roles.User,
             request.Name,
-            request.Surname);
+            request.Surname)
+        {
+            Username = request.Username
+        };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -558,11 +564,37 @@ public class AuthenticationService(
 
         if (emailExists)
             throw new UserAlreadyExistsException(request.Email);
+
+        var usernameExists = await _context.Users
+            .AnyAsync(user => user.Username != null && user.Username.ToLower() == request.Username.ToLower());
+
+        if (usernameExists)
+            throw new UsernameAlreadyTakenException(request.Username);
     }
+
+    /// <summary>
+    /// True when a login attempt for this account must be rejected. A plain admin-disabled account
+    /// (<see cref="User.Disabled"/> set, <see cref="User.DeletionRequestedAt"/> null) is always
+    /// rejected. An account mid self-service deletion (both set) is deliberately let through here -
+    /// logging back in during the grace period is what cancels the deletion, via
+    /// <see cref="CreateNewSessionAsync"/> below. Internal so <c>QrLoginService</c>'s own
+    /// session-minting poll applies the exact same carve-out.
+    /// </summary>
+    internal static bool IsBlockedFromLoggingIn(User user) =>
+        user.Disabled.HasValue && user.DeletionRequestedAt is null;
 
     /// <summary>Internal so QrLoginService can mint a session once a cross-device sign-in is approved.</summary>
     internal async Task<TokenResponse> CreateNewSessionAsync(User user, bool rememberMe)
     {
+        // A successful login is what cancels a pending self-service deletion - see
+        // IsBlockedFromLoggingIn, which is what let this account's login attempt reach here at all
+        // despite Disabled being set.
+        if (user.DeletionRequestedAt is not null)
+        {
+            user.Disabled = null;
+            user.DeletionRequestedAt = null;
+        }
+
         var (userAgent, ipAddress, deviceLabel, browser, os) = ResolveClientInfo();
 
         var session = new Session

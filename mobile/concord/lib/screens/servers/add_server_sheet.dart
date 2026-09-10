@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/server_providers.dart';
 import '../../theme/theme.dart';
@@ -49,6 +50,7 @@ class _AddServerSheetState extends State<_AddServerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         left: ConcordSpacing.lg,
@@ -60,10 +62,10 @@ class _AddServerSheetState extends State<_AddServerSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Add a Server', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.addServerTitle, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            'Create a new server, or join one with an invite code.',
+            l10n.addServerSubtitle,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: ConcordSpacing.lg),
@@ -71,7 +73,7 @@ class _AddServerSheetState extends State<_AddServerSheet> {
             children: [
               Expanded(
                 child: ConcordButton(
-                  label: 'Create',
+                  label: l10n.createTab,
                   expand: true,
                   variant: _mode == AddServerMode.create
                       ? ConcordButtonVariant.primary
@@ -82,7 +84,7 @@ class _AddServerSheetState extends State<_AddServerSheet> {
               const SizedBox(width: ConcordSpacing.sm),
               Expanded(
                 child: ConcordButton(
-                  label: 'Join',
+                  label: l10n.joinTab,
                   expand: true,
                   variant: _mode == AddServerMode.join
                       ? ConcordButtonVariant.primary
@@ -136,9 +138,10 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
     setState(() {
-      _nameError = name.isEmpty ? 'Server name is required.' : null;
+      _nameError = name.isEmpty ? l10n.serverNameRequired : null;
       _formError = null;
     });
     if (_nameError != null) return;
@@ -159,7 +162,7 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
           iconUrl = uploaded.url;
         } on ApiException catch (e) {
           if (!mounted) return;
-          setState(() => _formError = "Could not upload icon: ${e.message}");
+          setState(() => _formError = l10n.errorUploadIconFailed(e.message));
           return;
         }
       }
@@ -171,9 +174,9 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
       context.go('/servers/${server.id}');
     } on ApiException catch (e) {
       if (e.isValidationError) {
-        setState(() => _nameError = e.message.isNotEmpty ? e.message : 'That server name is not valid.');
+        setState(() => _nameError = e.message.isNotEmpty ? e.message : l10n.serverNameInvalid);
       } else {
-        setState(() => _formError = e.message.isNotEmpty ? e.message : 'Could not create server.');
+        setState(() => _formError = e.message.isNotEmpty ? e.message : l10n.errorCreateServerFailed);
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -183,6 +186,7 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,10 +221,10 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Server icon', style: Theme.of(context).textTheme.labelLarge),
+                  Text(l10n.serverIconLabel, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 2),
                   Text(
-                    'Optional. PNG, JPEG, WEBP or GIF, up to 5 MB.',
+                    l10n.serverIconHint,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.fgMuted),
                   ),
                 ],
@@ -231,8 +235,8 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
         const SizedBox(height: ConcordSpacing.lg),
         ConcordTextField(
           controller: _nameController,
-          label: 'Server name',
-          hint: 'My Server',
+          label: l10n.serverNameLabel,
+          hint: l10n.serverNameHint,
           required: true,
           errorText: _nameError,
           textInputAction: TextInputAction.done,
@@ -253,7 +257,7 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
         ],
         const SizedBox(height: ConcordSpacing.lg),
         ConcordButton(
-          label: _submitting ? 'Creating…' : 'Create Server',
+          label: _submitting ? l10n.creatingServerLoading : l10n.createServerButton,
           size: ConcordButtonSize.lg,
           expand: true,
           loading: _submitting,
@@ -285,8 +289,9 @@ class _JoinFormState extends ConsumerState<_JoinForm> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final code = _codeController.text.trim();
-    setState(() => _codeError = code.isEmpty ? 'Enter an invite code.' : null);
+    setState(() => _codeError = code.isEmpty ? l10n.enterInviteCodeMessage : null);
     if (_codeError != null) return;
 
     setState(() => _submitting = true);
@@ -299,8 +304,8 @@ class _JoinFormState extends ConsumerState<_JoinForm> {
     } on ApiException catch (e) {
       setState(() {
         _codeError = e.isNotFound
-            ? 'That invite code is invalid, expired, or no longer works.'
-            : (e.message.isNotEmpty ? e.message : 'Could not join server.');
+            ? l10n.inviteCodeInvalidMessage
+            : (e.message.isNotEmpty ? e.message : l10n.errorJoinServerFailed);
       });
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -309,13 +314,14 @@ class _JoinFormState extends ConsumerState<_JoinForm> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ConcordTextField(
           controller: _codeController,
-          label: 'Invite code',
-          hint: 'e.g. aB3xQ9',
+          label: l10n.inviteCodeLabel,
+          hint: l10n.inviteCodeHint,
           required: true,
           errorText: _codeError,
           textInputAction: TextInputAction.done,
@@ -323,7 +329,7 @@ class _JoinFormState extends ConsumerState<_JoinForm> {
         ),
         const SizedBox(height: ConcordSpacing.lg),
         ConcordButton(
-          label: _submitting ? 'Joining…' : 'Join Server',
+          label: _submitting ? l10n.joiningServerLoading : l10n.joinServerButton,
           size: ConcordButtonSize.lg,
           expand: true,
           loading: _submitting,

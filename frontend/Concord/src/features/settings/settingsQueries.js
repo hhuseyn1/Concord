@@ -54,6 +54,12 @@ export function useChangePasswordMutation() {
   })
 }
 
+export function useDeleteAccountMutation() {
+  return useMutation({
+    mutationFn: usersService.deleteMe,
+  })
+}
+
 export function useSessionsList() {
   return useQuery({
     queryKey: sessionsKeys.all,

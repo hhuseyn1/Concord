@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
@@ -77,7 +78,7 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
       setState(() => _setup = setup);
     } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _setupError = e.message.isNotEmpty ? e.message : 'Could not start two-factor setup.');
+      setState(() => _setupError = e.message.isNotEmpty ? e.message : AppLocalizations.of(context).errorStartTwoFactorFailed);
     } finally {
       if (mounted) setState(() => _startingSetup = false);
     }
@@ -92,9 +93,10 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
   }
 
   Future<void> _confirmSetup() async {
+    final l10n = AppLocalizations.of(context);
     final code = _confirmCodeController.text.trim();
     if (code.isEmpty) {
-      setState(() => _setupError = 'Enter the code from your authenticator app.');
+      setState(() => _setupError = l10n.enterAuthCodeMessage);
       return;
     }
     setState(() {
@@ -112,13 +114,14 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
       await _loadStatus();
     } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _setupError = e.message.isNotEmpty ? e.message : 'That code did not work. Try again.');
+      setState(() => _setupError = e.message.isNotEmpty ? e.message : l10n.twoFactorConfirmCodeFailed);
     } finally {
       if (mounted) setState(() => _confirming = false);
     }
   }
 
   Future<void> _openDisableDialog() async {
+    final l10n = AppLocalizations.of(context);
     final result = await showDialog<_PasswordAndCode>(
       context: context,
       builder: (context) => const _DisableTwoFactorDialog(),
@@ -128,24 +131,25 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
       await _authService.disableTwoFactor(password: result.password, code: result.code);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Two-factor authentication disabled.')),
+        SnackBar(content: Text(l10n.twoFactorDisabledSnackbar)),
       );
       await _loadStatus();
     } on ApiException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message.isNotEmpty ? e.message : 'Could not disable two-factor authentication.')),
+        SnackBar(content: Text(e.message.isNotEmpty ? e.message : l10n.errorDisableTwoFactorFailed)),
       );
     }
   }
 
   Future<void> _openRegenerateDialog() async {
+    final l10n = AppLocalizations.of(context);
     final password = await showDialog<String>(
       context: context,
-      builder: (context) => const _PasswordOnlyDialog(
-        title: 'Regenerate recovery codes',
-        description: 'Your existing recovery codes will stop working. Confirm your password to continue.',
-        confirmLabel: 'Regenerate',
+      builder: (context) => _PasswordOnlyDialog(
+        title: l10n.regenerateRecoveryCodesTitle,
+        description: l10n.regenerateRecoveryCodesDescription,
+        confirmLabel: l10n.regenerateButton,
       ),
     );
     if (password == null || !mounted) return;
@@ -156,7 +160,7 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
     } on ApiException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message.isNotEmpty ? e.message : 'Could not regenerate recovery codes.')),
+        SnackBar(content: Text(e.message.isNotEmpty ? e.message : l10n.errorRegenerateCodesFailed)),
       );
     }
   }
@@ -165,22 +169,23 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Two-Factor Authentication', style: textTheme.titleMedium),
+        Text(l10n.twoFactorSectionTitle, style: textTheme.titleMedium),
         const SizedBox(height: ConcordSpacing.md),
         if (_loadingStatus)
           const Center(child: CircularProgressIndicator())
         else if (_loadError != null)
           ConcordEmptyState(
             icon: Icons.error_outline,
-            title: "Couldn't load two-factor status",
+            title: l10n.couldNotLoadTwoFactorStatus,
             subtitle: _loadError,
             compact: true,
             action: ConcordButton(
-              label: 'Try again',
+              label: l10n.tryAgainButton,
               variant: ConcordButtonVariant.secondary,
               size: ConcordButtonSize.sm,
               onPressed: _loadStatus,
@@ -197,9 +202,7 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
               const SizedBox(width: ConcordSpacing.sm),
               Expanded(
                 child: Text(
-                  _status!.enabled
-                      ? 'Two-factor authentication is on. Signing in also requires a code from your authenticator app.'
-                      : 'Add an extra layer of security. Once enabled, signing in will require a code from an authenticator app.',
+                  _status!.enabled ? l10n.twoFactorOnDescription : l10n.twoFactorOffDescription,
                   style: textTheme.bodySmall?.copyWith(color: colors.fgMuted),
                 ),
               ),
@@ -208,31 +211,31 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
           if (_status!.enabled) ...[
             const SizedBox(height: ConcordSpacing.sm),
             Text(
-              '${_status!.remainingRecoveryCodes} recovery code${_status!.remainingRecoveryCodes == 1 ? '' : 's'} remaining.',
+              l10n.recoveryCodesRemaining(_status!.remainingRecoveryCodes),
               style: textTheme.bodySmall?.copyWith(color: colors.fgMuted),
             ),
           ],
           const SizedBox(height: ConcordSpacing.md),
           if (!_status!.enabled && _setup == null)
             ConcordButton(
-              label: 'Enable Two-Factor Authentication',
+              label: l10n.enableTwoFactorButton,
               size: ConcordButtonSize.sm,
               loading: _startingSetup,
               onPressed: _startingSetup ? null : _startSetup,
             ),
-          if (_setup != null) _buildSetupPanel(colors, textTheme),
+          if (_setup != null) _buildSetupPanel(colors, textTheme, l10n),
           if (_status!.enabled)
             Row(
               children: [
                 ConcordButton(
-                  label: 'Regenerate recovery codes',
+                  label: l10n.regenerateRecoveryCodesTitle,
                   variant: ConcordButtonVariant.secondary,
                   size: ConcordButtonSize.sm,
                   onPressed: _openRegenerateDialog,
                 ),
                 const SizedBox(width: ConcordSpacing.sm),
                 ConcordButton(
-                  label: 'Disable',
+                  label: l10n.disableButton,
                   variant: ConcordButtonVariant.danger,
                   size: ConcordButtonSize.sm,
                   onPressed: _openDisableDialog,
@@ -251,7 +254,7 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
     );
   }
 
-  Widget _buildSetupPanel(ConcordColors colors, TextTheme textTheme) {
+  Widget _buildSetupPanel(ConcordColors colors, TextTheme textTheme, AppLocalizations l10n) {
     Uint8List? svgBytes;
     final qrCodeSvg = _setup!.qrCodeSvg;
     if (qrCodeSvg != null) {
@@ -275,7 +278,7 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Scan this QR code with your authenticator app.', style: textTheme.bodyMedium),
+          Text(l10n.scanQrWithAuthenticator, style: textTheme.bodyMedium),
           const SizedBox(height: ConcordSpacing.md),
           if (svgBytes != null)
             Container(
@@ -284,10 +287,9 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
               child: SvgPicture.memory(svgBytes, width: 176, height: 176),
             )
           else
-            Text("Couldn't render the QR code - enter the key below manually.",
-                style: textTheme.bodySmall?.copyWith(color: colors.danger)),
+            Text(l10n.couldNotRenderQr, style: textTheme.bodySmall?.copyWith(color: colors.danger)),
           const SizedBox(height: ConcordSpacing.md),
-          Text('Or enter this key manually', style: textTheme.labelLarge),
+          Text(l10n.enterKeyManually, style: textTheme.labelLarge),
           const SizedBox(height: 4),
           SelectableText(
             _setup!.secretKey ?? '',
@@ -296,8 +298,8 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
           const SizedBox(height: ConcordSpacing.md),
           ConcordTextField(
             controller: _confirmCodeController,
-            label: 'Confirmation code',
-            hint: '123456',
+            label: l10n.confirmationCodeLabel,
+            hint: l10n.confirmationCodeHint,
             required: true,
             errorText: _setupError,
             keyboardType: TextInputType.number,
@@ -308,14 +310,14 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
           Row(
             children: [
               ConcordButton(
-                label: 'Confirm',
+                label: l10n.confirmButton,
                 size: ConcordButtonSize.sm,
                 loading: _confirming,
                 onPressed: _confirming ? null : _confirmSetup,
               ),
               const SizedBox(width: ConcordSpacing.sm),
               ConcordButton(
-                label: 'Cancel',
+                label: l10n.cancelButton,
                 variant: ConcordButtonVariant.ghost,
                 size: ConcordButtonSize.sm,
                 onPressed: _confirming ? null : _cancelSetup,
@@ -353,6 +355,7 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.all(ConcordSpacing.md),
@@ -363,7 +366,7 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Save your recovery codes', style: Theme.of(context).textTheme.titleSmall),
+          Text(l10n.saveRecoveryCodesTitle, style: Theme.of(context).textTheme.titleSmall),
           const SizedBox(height: ConcordSpacing.sm),
           Container(
             width: double.infinity,
@@ -374,8 +377,7 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
               border: Border.all(color: colors.warning.withValues(alpha: 0.4)),
             ),
             child: Text(
-              "Each code can be used once to sign in if you lose access to your authenticator. "
-              "They won't be shown again.",
+              l10n.recoveryCodesWarning,
               style: TextStyle(color: colors.warning, fontSize: 13),
             ),
           ),
@@ -403,7 +405,7 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
           Row(
             children: [
               ConcordButton(
-                label: _copied ? 'Copied' : 'Copy codes',
+                label: _copied ? l10n.copiedLabel : l10n.copyCodesButton,
                 variant: ConcordButtonVariant.secondary,
                 size: ConcordButtonSize.sm,
                 leading: Icon(_copied ? Icons.check : Icons.copy, size: 16),
@@ -411,7 +413,7 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
               ),
               const SizedBox(width: ConcordSpacing.sm),
               ConcordButton(
-                label: "I've saved these codes",
+                label: l10n.savedCodesButton,
                 size: ConcordButtonSize.sm,
                 onPressed: widget.onDone,
               ),
@@ -450,12 +452,13 @@ class _DisableTwoFactorDialogState extends State<_DisableTwoFactorDialog> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context);
     if (_passwordController.text.isEmpty) {
-      setState(() => _error = 'Enter your password.');
+      setState(() => _error = l10n.enterPasswordMessage);
       return;
     }
     if (_codeController.text.trim().isEmpty) {
-      setState(() => _error = 'Enter a current code or a recovery code.');
+      setState(() => _error = l10n.enterCurrentOrRecoveryCodeMessage);
       return;
     }
     Navigator.of(context).pop(_PasswordAndCode(_passwordController.text, _codeController.text.trim()));
@@ -464,17 +467,18 @@ class _DisableTwoFactorDialogState extends State<_DisableTwoFactorDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
-      title: const Text('Disable two-factor authentication'),
+      title: Text(l10n.disableTwoFactorDialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Disabling removes this extra layer of security from your account.'),
+          Text(l10n.disableTwoFactorDialogMessage),
           const SizedBox(height: ConcordSpacing.md),
           ConcordTextField(
             controller: _passwordController,
-            label: 'Password',
+            label: l10n.passwordLabel,
             obscureText: true,
             required: true,
             autofillHints: const [AutofillHints.password],
@@ -482,7 +486,7 @@ class _DisableTwoFactorDialogState extends State<_DisableTwoFactorDialog> {
           const SizedBox(height: ConcordSpacing.md),
           ConcordTextField(
             controller: _codeController,
-            label: 'Authentication code or recovery code',
+            label: l10n.authOrRecoveryCodeLabel,
             required: true,
             autofillHints: const [AutofillHints.oneTimeCode],
           ),
@@ -493,8 +497,8 @@ class _DisableTwoFactorDialogState extends State<_DisableTwoFactorDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
-        FilledButton(onPressed: _submit, child: const Text('Disable')),
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancelButton)),
+        FilledButton(onPressed: _submit, child: Text(l10n.disableButton)),
       ],
     );
   }
@@ -523,7 +527,7 @@ class _PasswordOnlyDialogState extends State<_PasswordOnlyDialog> {
 
   void _submit() {
     if (_passwordController.text.isEmpty) {
-      setState(() => _error = 'Enter your password.');
+      setState(() => _error = AppLocalizations.of(context).enterPasswordMessage);
       return;
     }
     Navigator.of(context).pop(_passwordController.text);
@@ -532,6 +536,7 @@ class _PasswordOnlyDialogState extends State<_PasswordOnlyDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     return AlertDialog(
       title: Text(widget.title),
       content: Column(
@@ -542,7 +547,7 @@ class _PasswordOnlyDialogState extends State<_PasswordOnlyDialog> {
           const SizedBox(height: ConcordSpacing.md),
           ConcordTextField(
             controller: _passwordController,
-            label: 'Password',
+            label: l10n.passwordLabel,
             obscureText: true,
             required: true,
             autofillHints: const [AutofillHints.password],
@@ -554,7 +559,7 @@ class _PasswordOnlyDialogState extends State<_PasswordOnlyDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.cancelButton)),
         FilledButton(onPressed: _submit, child: Text(widget.confirmLabel)),
       ],
     );

@@ -44,7 +44,11 @@ class PagedListState<T> {
 typedef PageFetcher<T> = Future<PagedResult<T>> Function({required int page, required int pageSize});
 
 class PagedListController<T> extends StateNotifier<PagedListState<T>> {
-  PagedListController(this._fetchPage, {this.pageSize = 30}) : super(const PagedListState()) {
+  // Not `const PagedListState()`: a bare `const` call here can't see this constructor's own `T`,
+  // so Dart freezes it as `PagedListState<Never>` - the first real `copyWith(items: <T>...)` then
+  // fails a runtime type check trying to put actual items into a list typed as `Never`. Writing the
+  // type argument explicitly forces it through instead of leaving it for const inference to guess.
+  PagedListController(this._fetchPage, {this.pageSize = 30}) : super(PagedListState<T>()) {
     unawaited(loadInitial());
   }
 

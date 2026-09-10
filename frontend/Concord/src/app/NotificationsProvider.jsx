@@ -15,6 +15,8 @@ import { jumpToMessage } from '../features/messages/jumpToMessage'
 import { useAuth } from '../hooks/useAuth'
 import { showDesktopNotification } from '../lib/desktopNotifications'
 import { navigateTo } from '../lib/navigation'
+import { playNotificationSound } from '../lib/notificationSound'
+import { startTitleBlink } from '../lib/titleBlink'
 import { NotificationsContext } from './NotificationsContext'
 
 const TOAST_DESCRIPTION_KEY = {
@@ -22,6 +24,7 @@ const TOAST_DESCRIPTION_KEY = {
   FriendRequestAccepted: 'notifications.friendRequestAccepted',
   MissedCall: 'notifications.missedCallFrom',
   Mention: 'notifications.mentionedYou',
+  DirectMessageReceived: 'notifications.sentYouAMessage',
 }
 
 const JUMP_AFTER_NAVIGATE_DELAY_MS = 400
@@ -30,7 +33,7 @@ function navigationForType(event) {
   if (event.type === 'FriendRequestReceived' || event.type === 'FriendRequestAccepted') {
     return () => navigateTo('/cabinet', { state: { tab: 'pending' } })
   }
-  if (event.type === 'Mention' && event.contextMessageId) {
+  if ((event.type === 'Mention' || event.type === 'DirectMessageReceived') && event.contextMessageId) {
     return () => {
       const path = event.contextChannelId
         ? `/cabinet/servers/${event.contextServerId}/channels/${event.contextChannelId}`
@@ -46,10 +49,12 @@ export function NotificationsProvider({ children }) {
   const { isAuthenticated, user } = useAuth()
   const queryClient = useQueryClient()
   const mutedRef = useRef(false)
+  const soundEnabledRef = useRef(false)
 
   useEffect(() => {
     mutedRef.current = Boolean(user?.NotificationsMuted)
-  }, [user?.NotificationsMuted])
+    soundEnabledRef.current = Boolean(user?.NotificationsSoundEnabled)
+  }, [user?.NotificationsMuted, user?.NotificationsSoundEnabled])
 
   useEffect(() => {
     if (!isAuthenticated) return undefined
@@ -85,6 +90,9 @@ export function NotificationsProvider({ children }) {
               : navigationForType(event)
 
           const description = i18n.t(descriptionKey)
+
+          if (soundEnabledRef.current) playNotificationSound()
+          startTitleBlink(`${name} ${description}`)
 
           toast({
             variant: 'info',

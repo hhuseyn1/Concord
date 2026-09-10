@@ -45,7 +45,8 @@
     "friendRequestReceived": "sizə dostluq sorğusu göndərdi",
     "friendRequestAccepted": "dostluq sorğunuzu qəbul etdi",
     "missedCallFrom": "buraxılmış zəng",
-    "mentionedYou": "sizi qeyd etdi"
+    "mentionedYou": "sizi qeyd etdi",
+    "sentYouAMessage": "sizə mesaj göndərdi"
   },
   "settings": {
     "title": "Ayarlar",
@@ -64,7 +65,16 @@
     "language": "Dil",
     "activeSessions": "Aktiv sessiyalar",
     "logoutAllOtherSessions": "Digər bütün sessiyalardan çıxış et",
-    "logout": "Çıxış et"
+    "logout": "Çıxış et",
+    "dangerZone": "Təhlükəli zona",
+    "deleteAccount": "Hesabı sil",
+    "deleteAccountDescription": "Hesabınızı və bütün məlumatlarınızı həmişəlik silin.",
+    "deleteAccountTitle": "Hesabınızı silmək istədiyinizə əminsiniz?",
+    "deleteAccountConsequences": "Dərhal bütün cihazlardan çıxış ediləcəksiniz. Hesabınız 30 gün ərzində deaktiv olunacaq - bu müddət ərzində yenidən daxil olsanız, silinmə ləğv olunacaq və hesabınız bərpa ediləcək. 30 gündən sonra hesab həmişəlik silinir və bərpa edilə bilməz.",
+    "deleteAccountPasswordLabel": "Təsdiqləmək üçün şifrənizi daxil edin",
+    "deleteAccountAction": "Hesabımı sil",
+    "deleteAccountSuccessToastTitle": "Hesabınız silindi.",
+    "deleteAccountSuccessToastDescription": "Silinməni ləğv etmək üçün 30 gün ərzində yenidən daxil olun."
   },
   "sessions": {
     "thisDevice": "Bu cihaz",

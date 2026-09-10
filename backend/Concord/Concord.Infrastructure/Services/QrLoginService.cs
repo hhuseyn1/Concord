@@ -116,8 +116,11 @@ public class QrLoginService(
 
         var user = await _context.Users.FirstOrDefaultAsync(entry => entry.Id == session.ApprovedByUserId);
 
-        // The approver could have been disabled between approving and this poll.
-        if (user is null || user.Disabled.HasValue)
+        // The approver could have been disabled between approving and this poll. An account mid
+        // self-service deletion (DeletionRequestedAt set alongside Disabled) is let through, same as
+        // the password-login paths in AuthenticationService - completing this sign-in cancels the
+        // deletion, since CreateNewSessionAsync clears both fields once it mints the session below.
+        if (user is null || AuthenticationService.IsBlockedFromLoggingIn(user))
             throw new UnauthorizedAccessException();
 
         // Claim the approval atomically, before any session is minted. Read-then-save would let two

@@ -258,6 +258,23 @@ public class DirectMessagesService(
                 contextMessageId: result.Id);
         }
 
+        // A DM is inherently "for" the other person - unlike a channel, there's no one else it could
+        // be meant for, so (unlike channel messages) it shouldn't need an explicit @mention to notify
+        // them. Skipped when they were already @mentioned above: ResolveAndStoreMentionsAsync in a
+        // DM can only ever resolve to this same otherUserId, so that path already persisted and
+        // pushed a notification for this exact message - a second one here would just be a duplicate.
+        if (!mentionedUserIds.Contains(otherUserId))
+        {
+            await _notificationsService.NotifyDirectMessageReceivedAsync(otherUserId, currentUserId, conversationId, result.Id);
+            await _notificationsRealtimeNotifier.NotifyAsync(
+                otherUserId,
+                NotificationType.DirectMessageReceived,
+                currentUserId,
+                contextConversationId: conversationId,
+                contextMessageId: result.Id);
+            await _context.SaveChangesAsync();
+        }
+
         return result;
     }
 

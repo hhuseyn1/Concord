@@ -11,16 +11,22 @@ abstract final class ConcordTheme {
   static ThemeData _build(ConcordColors colors, Brightness brightness) {
     final textTheme = _textTheme(colors);
 
+    // `secondary` is a distinct neutral tone (not the brand color) so that
+    // Material widgets that fall back to theme defaults (no explicit
+    // ButtonStyle override) still read as lower-emphasis than primary
+    // actions. Built from the same neutral surface/border/foreground tokens
+    // ConcordButton's `secondary` variant already uses, rather than `brand`.
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: colors.brand,
       onPrimary: colors.fgOnBrand,
-      secondary: colors.brand,
-      onSecondary: colors.fgOnBrand,
+      secondary: colors.surfaceSidebar,
+      onSecondary: colors.fgDefault,
       error: colors.dangerSolid,
       onError: colors.fgOnDanger,
       surface: colors.surfaceBase,
       onSurface: colors.fgDefault,
+      outline: colors.borderDefault,
     );
 
     return ThemeData(
@@ -69,6 +75,47 @@ abstract final class ConcordTheme {
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(color: colors.brand),
       iconTheme: IconThemeData(color: colors.fgDefault),
+      // Button hierarchy: filled brand = primary action, outlined neutral =
+      // secondary action, plain text = low-emphasis/tertiary action. These
+      // are defaults for raw ElevatedButton/OutlinedButton/TextButton usage
+      // that doesn't already override its own style (e.g. ConcordButton,
+      // which has its own variant system, is unaffected).
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colors.brand,
+          foregroundColor: colors.fgOnBrand,
+          disabledBackgroundColor: colors.brand.withValues(alpha: 0.5),
+          disabledForegroundColor: colors.fgOnBrand.withValues(alpha: 0.5),
+          elevation: 0,
+          minimumSize: const Size(64, 40),
+          padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.lg),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ConcordRadii.md)),
+          textStyle: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colors.fgDefault,
+          disabledForegroundColor: colors.fgDefault.withValues(alpha: 0.5),
+          side: BorderSide(color: colors.borderDefault),
+          minimumSize: const Size(64, 40),
+          padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.lg),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ConcordRadii.md)),
+          textStyle: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        ).copyWith(
+          overlayColor: WidgetStateProperty.all(colors.fgDefault.withValues(alpha: 0.08)),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colors.fgDefault,
+          disabledForegroundColor: colors.fgDefault.withValues(alpha: 0.5),
+          minimumSize: const Size(44, 44),
+          padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(ConcordRadii.md)),
+          textStyle: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        ),
+      ),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: colors.brand,
         selectionColor: colors.brandBg,
@@ -105,6 +152,32 @@ abstract final class ConcordTheme {
         ),
         errorStyle: textTheme.bodySmall?.copyWith(color: colors.danger),
       ),
+    );
+  }
+
+  /// Convention for destructive actions (delete, kick, leave, revoke, etc.):
+  /// Material has no built-in "destructive" button concept, so there's no
+  /// `destructiveButtonTheme`. Instead, screens that need a destructive
+  /// action should explicitly style the button using these helpers, which
+  /// key off [ConcordColors.dangerSolid] (filled, e.g. [ElevatedButton]) or
+  /// [ConcordColors.danger] (text-only, e.g. the confirm action in a
+  /// [TextButton]-based [AlertDialog]) so destructive actions are always
+  /// visually distinct from both the brand-colored primary default and the
+  /// neutral secondary/low-emphasis defaults above. See
+  /// `lib/widgets/confirm_dialog.dart` for the canonical usage.
+  static ButtonStyle destructiveTextButtonStyle(ConcordColors colors) {
+    return TextButton.styleFrom(
+      foregroundColor: colors.danger,
+      disabledForegroundColor: colors.danger.withValues(alpha: 0.5),
+    );
+  }
+
+  static ButtonStyle destructiveButtonStyle(ConcordColors colors) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: colors.dangerSolid,
+      foregroundColor: colors.fgOnDanger,
+      disabledBackgroundColor: colors.dangerSolid.withValues(alpha: 0.5),
+      disabledForegroundColor: colors.fgOnDanger.withValues(alpha: 0.5),
     );
   }
 

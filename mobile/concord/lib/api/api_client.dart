@@ -27,6 +27,11 @@ class ApiClient {
 
   Future<void>? _refreshInFlight;
 
+  /// Bounded timeout applied to every underlying HTTP call so a bad network
+  /// (or a request that never gets a response) surfaces as a distinguishable
+  /// [ApiException] instead of hanging the UI indefinitely.
+  static const Duration _requestTimeout = Duration(seconds: 15);
+
   Uri _buildUri(String path, Map<String, dynamic>? query) {
     final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
     final base = Uri.parse('$_baseUrl/$normalizedPath');
@@ -60,8 +65,13 @@ class ApiClient {
     return _send('PUT', path, query: query, jsonBody: body, auth: auth);
   }
 
-  Future<dynamic> delete(String path, {Map<String, dynamic>? query, bool auth = true}) {
-    return _send('DELETE', path, query: query, auth: auth);
+  Future<dynamic> delete(
+    String path, {
+    Object? body,
+    Map<String, dynamic>? query,
+    bool auth = true,
+  }) {
+    return _send('DELETE', path, query: query, jsonBody: body, auth: auth);
   }
 
   Future<dynamic> postMultipart(
@@ -84,8 +94,15 @@ class ApiClient {
       ),
     );
 
-    final streamedResponse = await _http.send(request);
-    final response = await http.Response.fromStream(streamedResponse);
+    http.Response response;
+    try {
+      final streamedResponse = await _http.send(request).timeout(_requestTimeout);
+      response = await http.Response.fromStream(streamedResponse).timeout(_requestTimeout);
+    } on TimeoutException {
+      throw const ApiException(ApiException.timeoutStatusCode, 'The request timed out.');
+    } catch (e) {
+      throw ApiException(ApiException.networkErrorStatusCode, 'Network error: $e');
+    }
 
     if (response.statusCode == 401 && !isRetry) {
       final refreshed = await _ensureRefreshed();
@@ -133,22 +150,26 @@ class ApiClient {
     try {
       switch (method) {
         case 'GET':
-          response = await _http.get(uri, headers: headers);
+          response = await _http.get(uri, headers: headers).timeout(_requestTimeout);
           break;
         case 'POST':
-          response = await _http.post(uri, headers: headers, body: encodedBody);
+          response = await _http.post(uri, headers: headers, body: encodedBody).timeout(_requestTimeout);
           break;
         case 'PUT':
-          response = await _http.put(uri, headers: headers, body: encodedBody);
+          response = await _http.put(uri, headers: headers, body: encodedBody).timeout(_requestTimeout);
           break;
         case 'DELETE':
-          response = await _http.delete(uri, headers: headers, body: encodedBody);
+          response = await _http.delete(uri, headers: headers, body: encodedBody).timeout(_requestTimeout);
           break;
         default:
           throw ArgumentError('Unsupported HTTP method: $method');
       }
+    } on TimeoutException {
+      throw const ApiException(ApiException.timeoutStatusCode, 'The request timed out.');
+    } on ArgumentError {
+      rethrow;
     } catch (e) {
-      throw ApiException(0, 'Network error: $e');
+      throw ApiException(ApiException.networkErrorStatusCode, 'Network error: $e');
     }
 
     if (response.statusCode == 401 && auth && !isRetry) {
@@ -181,13 +202,17 @@ class ApiClient {
     final uri = _buildUri('/Refresh', null);
     http.Response response;
     try {
-      response = await _http.post(
-        uri,
-        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-        body: jsonEncode({'AccessToken': accessToken, 'RefreshToken': refreshToken}),
-      );
+      response = await _http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            body: jsonEncode({'AccessToken': accessToken, 'RefreshToken': refreshToken}),
+          )
+          .timeout(_requestTimeout);
+    } on TimeoutException {
+      throw const ApiException(ApiException.timeoutStatusCode, 'The request timed out during refresh.');
     } catch (e) {
-      throw ApiException(0, 'Network error during refresh: $e');
+      throw ApiException(ApiException.networkErrorStatusCode, 'Network error during refresh: $e');
     }
 
     if (response.statusCode >= 200 && response.statusCode < 300) {

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/message_thread_controller.dart';
 import '../../providers/server_providers.dart';
 import '../../providers/user_providers.dart';
@@ -98,13 +101,14 @@ class _MessageTileState extends ConsumerState<MessageTile> {
   }
 
   Future<void> _saveEdit() async {
+    final l10n = AppLocalizations.of(context);
     final trimmed = _editController.text.trim();
     if (trimmed.isEmpty) {
-      setState(() => _editError = 'Message cannot be empty.');
+      setState(() => _editError = l10n.messageCannotBeEmpty);
       return;
     }
     if (trimmed.length > _maxContentLength) {
-      setState(() => _editError = 'Messages can be at most $_maxContentLength characters.');
+      setState(() => _editError = l10n.messageTooLongChars(_maxContentLength));
       return;
     }
     if (trimmed == widget.message.content) {
@@ -131,7 +135,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
   Future<void> _copyText() async {
     await Clipboard.setData(ClipboardData(text: widget.message.content ?? ''));
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).copiedToClipboard)));
   }
 
   Future<void> _togglePin() async {
@@ -143,36 +147,39 @@ class _MessageTileState extends ConsumerState<MessageTile> {
       }
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not update pin: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).errorUpdatePinFailed(e.message))));
     }
   }
 
   Future<void> _toggleReaction(String emoji) async {
+    unawaited(HapticFeedback.selectionClick());
     try {
       await _controller.toggleReaction(widget.message.id, emoji);
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not react: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).errorReactFailed(e.message))));
     }
   }
 
   Future<void> _handleDelete() async {
+    final l10n = AppLocalizations.of(context);
     final canDeleteForEveryone = _canDeleteForEveryone;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(canDeleteForEveryone ? 'Delete message?' : 'Hide this message?'),
+        title: Text(canDeleteForEveryone ? l10n.deleteMessageConfirmTitle : l10n.hideMessageConfirmTitle),
         content: Text(
           canDeleteForEveryone
-              ? "This deletes it for everyone in the ${widget.threadNoun}. This can't be undone."
-              : "It'll disappear from your view only - everyone else can still see it. "
-                  "There's no way to unhide it yourself afterward.",
+              ? l10n.deleteMessageConfirmMessage(widget.threadNoun)
+              : l10n.hideMessageConfirmMessage,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.cancelButton)),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(canDeleteForEveryone ? 'Delete Message' : 'Hide Message'),
+            child: Text(canDeleteForEveryone ? l10n.deleteMessageButton : l10n.hideMessageButton),
           ),
         ],
       ),
@@ -185,15 +192,16 @@ class _MessageTileState extends ConsumerState<MessageTile> {
           SnackBar(
             content: Text(
               deletedForEveryone
-                  ? 'This was removed for everyone in the ${widget.threadNoun}, not just hidden for you.'
-                  : "You don't currently have permission to delete this for everyone, so it was only hidden for you.",
+                  ? l10n.deletedForEveryoneNotice(widget.threadNoun)
+                  : l10n.hiddenOnlyForYouNotice,
             ),
           ),
         );
       }
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not remove message: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.errorRemoveMessageFailed(e.message))));
     }
   }
 
@@ -209,6 +217,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
 
   Future<void> _openActionSheet() async {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: colors.surfaceFloating,
@@ -226,15 +235,17 @@ class _MessageTileState extends ConsumerState<MessageTile> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     for (final emoji in _quickReactions)
-                      InkWell(
-                        borderRadius: BorderRadius.circular(ConcordRadii.md),
-                        onTap: () {
-                          Navigator.of(sheetContext).pop();
-                          _toggleReaction(emoji);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(ConcordSpacing.sm),
-                          child: Text(emoji, style: const TextStyle(fontSize: 22)),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(ConcordRadii.md),
+                          onTap: () {
+                            Navigator.of(sheetContext).pop();
+                            _toggleReaction(emoji);
+                          },
+                          child: Center(
+                            child: Text(emoji, style: const TextStyle(fontSize: 22)),
+                          ),
                         ),
                       ),
                   ],
@@ -243,7 +254,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
               const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.reply),
-                title: const Text('Reply'),
+                title: Text(l10n.replyAction),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   widget.onReply(widget.message);
@@ -251,7 +262,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
               ),
               ListTile(
                 leading: const Icon(Icons.forward),
-                title: const Text('Forward'),
+                title: Text(l10n.forwardAction),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   _openForwardSheet();
@@ -260,7 +271,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
               if (widget.isOwn)
                 ListTile(
                   leading: const Icon(Icons.edit_outlined),
-                  title: const Text('Edit Message'),
+                  title: Text(l10n.editMessageAction),
                   onTap: () {
                     Navigator.of(sheetContext).pop();
                     _startEdit();
@@ -269,7 +280,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
               if (widget.message.content != null && widget.message.content!.isNotEmpty)
                 ListTile(
                   leading: const Icon(Icons.copy_outlined),
-                  title: const Text('Copy Text'),
+                  title: Text(l10n.copyTextAction),
                   onTap: () {
                     Navigator.of(sheetContext).pop();
                     _copyText();
@@ -277,7 +288,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
                 ),
               ListTile(
                 leading: Icon(widget.message.pinnedAt != null ? Icons.push_pin : Icons.push_pin_outlined),
-                title: Text(widget.message.pinnedAt != null ? 'Unpin' : 'Pin'),
+                title: Text(widget.message.pinnedAt != null ? l10n.unpinAction : l10n.pinAction),
                 onTap: () {
                   Navigator.of(sheetContext).pop();
                   _togglePin();
@@ -289,7 +300,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
                   color: colors.danger,
                 ),
                 title: Text(
-                  _canDeleteForEveryone ? 'Delete Message' : 'Hide for me',
+                  _canDeleteForEveryone ? l10n.deleteMessageButton : l10n.hideForMeAction,
                   style: TextStyle(color: colors.danger),
                 ),
                 onTap: () {
@@ -307,6 +318,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final message = widget.message;
     final sender = message.sender;
     final senderName = displayNameFor(sender);
@@ -331,7 +343,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
                   : Padding(
                       padding: const EdgeInsets.only(top: 3),
                       child: Text(
-                        formatShortTime(message.created),
+                        formatShortTime(l10n, message.created),
                         style: TextStyle(fontSize: 10, color: colors.fgMuted),
                       ),
                     ),
@@ -356,7 +368,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
                           Tooltip(
                             message: formatAbsoluteTimestamp(message.created),
                             child: Text(
-                              formatGroupTimestamp(message.created),
+                              formatGroupTimestamp(l10n, message.created),
                               style: TextStyle(fontSize: 11, color: colors.fgMuted),
                             ),
                           ),
@@ -387,7 +399,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
           ..._buildContentSpans(content, colors),
           if (widget.message.editedAtUtc != null)
             TextSpan(
-              text: '  (edited)',
+              text: AppLocalizations.of(context).editedSuffix,
               style: TextStyle(fontSize: 10, color: colors.fgMuted),
             ),
         ],
@@ -440,6 +452,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
   }
 
   Widget _buildEditor(ConcordColors colors) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
@@ -474,11 +487,11 @@ class _MessageTileState extends ConsumerState<MessageTile> {
               children: [
                 TextButton(
                   onPressed: _isSavingEdit ? null : _saveEdit,
-                  child: const Text('Save'),
+                  child: Text(l10n.saveButton),
                 ),
                 TextButton(
                   onPressed: _isSavingEdit ? null : _cancelEdit,
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancelButton),
                 ),
               ],
             ),
@@ -524,30 +537,35 @@ class _ReactionPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(ConcordRadii.full),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: reactedByMe ? colors.brandBg : colors.surfaceSidebar,
-          borderRadius: BorderRadius.circular(ConcordRadii.full),
-          border: Border.all(color: reactedByMe ? colors.brand : colors.borderDefault),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 13)),
-            const SizedBox(width: 4),
-            Text(
-              '$count',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: reactedByMe ? colors.brand : colors.fgMuted,
-              ),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(ConcordRadii.full),
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: reactedByMe ? colors.brandBg : colors.surfaceSidebar,
+              borderRadius: BorderRadius.circular(ConcordRadii.full),
+              border: Border.all(color: reactedByMe ? colors.brand : colors.borderDefault),
             ),
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 13)),
+                const SizedBox(width: 4),
+                Text(
+                  '$count',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: reactedByMe ? colors.brand : colors.fgMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -562,6 +580,7 @@ class _ReplyQuote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     if (replyTo == null) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 2),
@@ -569,7 +588,7 @@ class _ReplyQuote extends StatelessWidget {
           children: [
             Icon(Icons.subdirectory_arrow_right, size: 14, color: colors.fgMuted),
             const SizedBox(width: 4),
-            Text('Original message', style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: colors.fgMuted)),
+            Text(l10n.originalMessageLabel, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: colors.fgMuted)),
           ],
         ),
       );
@@ -577,7 +596,7 @@ class _ReplyQuote extends StatelessWidget {
     final senderName = displayNameFor(replyTo!.sender);
     final content = replyTo!.content;
     final preview = content == null || content.isEmpty
-        ? 'Attachment'
+        ? l10n.attachmentLabel
         : (content.length > _replyPreviewMaxLength ? '${content.substring(0, _replyPreviewMaxLength)}…' : content);
 
     return Padding(
@@ -609,8 +628,9 @@ class _ForwardedFromLine extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final profileAsync = ref.watch(userProfileProvider(userId));
-    final name = profileAsync.maybeWhen(data: (profile) => displayNameFor(profile), orElse: () => 'someone');
+    final name = profileAsync.maybeWhen(data: (profile) => displayNameFor(profile), orElse: () => l10n.someoneFallbackLower);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
@@ -618,7 +638,7 @@ class _ForwardedFromLine extends ConsumerWidget {
         children: [
           Icon(Icons.forward, size: 12, color: colors.fgMuted),
           const SizedBox(width: 4),
-          Text('Forwarded from $name', style: TextStyle(fontSize: 11, color: colors.fgMuted)),
+          Text(l10n.forwardedFromLabel(name), style: TextStyle(fontSize: 11, color: colors.fgMuted)),
         ],
       ),
     );

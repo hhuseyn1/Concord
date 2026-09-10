@@ -1,49 +1,64 @@
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 
-String mapLoginError(ApiException error) {
-  if (error.isNetworkError) {
-    return "Can't reach the server. Check your connection.";
+/// Fallback copy shared by the mappers below when the backend didn't send a
+/// usable `Message`. Branches on [ApiException.kind] so a dropped connection
+/// or a request that timed out reads differently from a genuine server-side
+/// failure, instead of one identical sentence for every failure type.
+String _fallbackMessage(AppLocalizations l10n, ApiException error) {
+  if (error.isConnectivityError) {
+    return l10n.errorCouldNotReachServer;
+  }
+  if (error.isServerError) {
+    return l10n.errorServerTrouble;
+  }
+  return l10n.errorSomethingWentWrong;
+}
+
+String mapLoginError(AppLocalizations l10n, ApiException error) {
+  if (error.isConnectivityError) {
+    return l10n.errorCantReachServer;
   }
   if (error.isRateLimited) {
-    return 'Too many attempts. Please wait a moment and try again.';
+    return l10n.errorTooManyAttempts;
   }
   if (error.isLikelyAccountLockout) {
-    return 'Your account is temporarily locked. Try again in a few minutes.';
+    return l10n.errorAccountLocked;
   }
   if (error.isUnauthorized || error.isValidationError) {
-    return error.message.isNotEmpty ? error.message : 'Invalid email or password';
+    return error.message.isNotEmpty ? error.message : l10n.errorInvalidEmailPassword;
   }
-  return error.message.isNotEmpty ? error.message : 'Something went wrong. Please try again.';
+  return error.message.isNotEmpty ? error.message : _fallbackMessage(l10n, error);
 }
 
-String mapTwoFactorLoginError(ApiException error) {
-  if (error.isNetworkError) {
-    return "Can't reach the server. Check your connection.";
+String mapTwoFactorLoginError(AppLocalizations l10n, ApiException error) {
+  if (error.isConnectivityError) {
+    return l10n.errorCantReachServer;
   }
   if (error.isRateLimited) {
-    return 'Too many attempts. Please wait a moment and try again.';
+    return l10n.errorTooManyAttempts;
   }
   if (error.isLikelyAccountLockout) {
-    return 'Your account is temporarily locked. Try again in a few minutes.';
+    return l10n.errorAccountLocked;
   }
   if (error.isUnauthorized) {
-    return 'That sign-in attempt expired. Go back and enter your password again.';
+    return l10n.errorSignInExpired;
   }
   if (error.isValidationError) {
-    return 'That code is not valid. Check your authenticator app, or use a recovery code.';
+    return l10n.errorInvalidCode;
   }
-  return error.message.isNotEmpty ? error.message : 'Something went wrong. Please try again.';
+  return error.message.isNotEmpty ? error.message : _fallbackMessage(l10n, error);
 }
 
-String mapRegisterError(ApiException error) {
-  if (error.isNetworkError) {
-    return "Can't reach the server. Check your connection.";
+String mapRegisterError(AppLocalizations l10n, ApiException error) {
+  if (error.isConnectivityError) {
+    return l10n.errorCantReachServer;
   }
   if (error.isRateLimited) {
-    return 'Too many attempts. Please wait a moment and try again.';
+    return l10n.errorTooManyAttempts;
   }
   if (error.isConflict) {
-    return 'An account with that email already exists.';
+    return error.message.toLowerCase().contains('username') ? l10n.usernameTakenError : l10n.errorAccountExists;
   }
-  return error.message.isNotEmpty ? error.message : 'Something went wrong. Please try again.';
+  return error.message.isNotEmpty ? error.message : _fallbackMessage(l10n, error);
 }

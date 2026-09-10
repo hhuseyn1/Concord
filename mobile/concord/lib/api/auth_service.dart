@@ -54,12 +54,19 @@ class AuthService {
   Future<void> register({
     required String name,
     required String surname,
+    required String username,
     required String email,
     required String password,
   }) async {
     await _client.post(
       '/Register',
-      body: {'Name': name, 'Surname': surname, 'Email': email, 'Password': password},
+      body: {
+        'Name': name,
+        'Surname': surname,
+        'Username': username,
+        'Email': email,
+        'Password': password,
+      },
       auth: false,
     );
   }

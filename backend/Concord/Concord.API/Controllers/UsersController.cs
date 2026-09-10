@@ -61,6 +61,12 @@ public class UsersController(UsersService usersService, PushTokensService pushTo
         return await _usersService.SearchByUsernameAsync(GetUserId(), query);
     }
 
+    [HttpDelete("Me")]
+    public async Task DeleteMyAccountAsync(DeleteAccountRequest request)
+    {
+        await _usersService.RequestAccountDeletionAsync(GetUserId(), request);
+    }
+
     [HttpPost("Me/PushTokens")]
     public async Task RegisterPushTokenAsync(RegisterPushTokenRequest request)
     {

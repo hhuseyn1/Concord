@@ -43,8 +43,12 @@ export async function regenerateRecoveryCodes(password) {
   return request('Me/TwoFactor/Recovery-Codes', { method: 'POST', body: { Password: password } });
 }
 
-export async function register({ Name, Surname, Email, Password }) {
-  const tokens = await request('Register', { method: 'POST', body: { Name, Surname, Email, Password }, auth: false });
+export async function register({ Name, Surname, Username, Email, Password }) {
+  const tokens = await request('Register', {
+    method: 'POST',
+    body: { Name, Surname, Username, Email, Password },
+    auth: false,
+  });
   if (tokens?.AccessToken) {
     setTokens(tokens, { rememberMe: true });
   }

@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api/api_exception.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
+import '../../utils/username_policy.dart';
 import '../../widgets/widgets.dart';
 import 'auth_errors.dart';
 import 'auth_layout.dart';
@@ -19,11 +21,13 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _nameController = TextEditingController();
   final _surnameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   String? _nameError;
   String? _surnameError;
+  String? _usernameError;
   String? _emailError;
   String? _passwordError;
   String? _formError;
@@ -38,49 +42,64 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void dispose() {
     _nameController.dispose();
     _surnameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
     final surname = _surnameController.text.trim();
+    final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     setState(() {
-      _nameError = name.isEmpty ? 'Name is required' : null;
-      _surnameError = surname.isEmpty ? 'Surname is required' : null;
+      _nameError = name.isEmpty ? l10n.validationNameRequired : null;
+      _surnameError = surname.isEmpty ? l10n.validationSurnameRequired : null;
+      _usernameError = username.isEmpty
+          ? l10n.usernameRequiredPeriod
+          : (!usernamePattern.hasMatch(username) ? l10n.usernameInvalidFormat : null);
       _emailError = email.isEmpty
-          ? 'Email is required'
-          : (!email.contains('@') ? 'Enter a valid email address' : null);
+          ? l10n.validationEmailRequired
+          : (!email.contains('@') ? l10n.validationEmailInvalid : null);
       _passwordError = password.isEmpty
-          ? 'Password is required'
-          : (password.length < 8 ? 'Password must be at least 8 characters' : null);
+          ? l10n.validationPasswordRequired
+          : (password.length < 8 ? l10n.validationPasswordMinLength : null);
       _formError = null;
     });
-    if (_nameError != null || _surnameError != null || _emailError != null || _passwordError != null) {
+    if (_nameError != null ||
+        _surnameError != null ||
+        _usernameError != null ||
+        _emailError != null ||
+        _passwordError != null) {
       return;
     }
 
     setState(() => _isSubmitting = true);
     try {
-      await ref
-          .read(authControllerProvider.notifier)
-          .register(name: name, surname: surname, email: email, password: password);
+      await ref.read(authControllerProvider.notifier).register(
+        name: name,
+        surname: surname,
+        username: username,
+        email: email,
+        password: password,
+      );
       setState(() {
         _registered = true;
         _registeredEmail = email;
       });
     } on ApiException catch (error) {
-      setState(() => _formError = mapRegisterError(error));
+      setState(() => _formError = mapRegisterError(l10n, error));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   Future<void> _resend() async {
+    final l10n = AppLocalizations.of(context);
     final email = _registeredEmail;
     if (email == null || _isResending) return;
     setState(() {
@@ -89,9 +108,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
     try {
       await ref.read(authControllerProvider.notifier).resendVerificationEmail(email: email);
-      if (mounted) setState(() => _resendMessage = 'Verification email sent.');
+      if (mounted) setState(() => _resendMessage = l10n.registerResendMessageSent);
     } on ApiException {
-      if (mounted) setState(() => _resendMessage = 'Could not resend right now. Try again shortly.');
+      if (mounted) setState(() => _resendMessage = l10n.registerResendMessageFailed);
     } finally {
       if (mounted) setState(() => _isResending = false);
     }
@@ -100,20 +119,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     if (_registered) {
       return ConcordAuthLayout(
-        title: 'Check your email',
-        subtitle:
-            "We've sent a confirmation link to ${_registeredEmail ?? 'your email'}. "
-            'Click it to activate your account, then log in.',
+        title: l10n.registerCheckEmailTitle,
+        subtitle: l10n.registerCheckEmailSubtitle(_registeredEmail ?? l10n.registerCheckEmailFallbackEmail),
         footer: Wrap(
           alignment: WrapAlignment.center,
           children: [
             GestureDetector(
               onTap: () => context.go('/login'),
               child: Text(
-                'Back to Log In',
+                l10n.backToLoginButton,
                 style: TextStyle(color: colors.brand, fontWeight: FontWeight.w500),
               ),
             ),
@@ -125,7 +143,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: ConcordSpacing.md),
           ],
           ConcordButton(
-            label: _isResending ? 'Sending…' : 'Resend email',
+            label: _isResending ? l10n.registerResendButtonLoading : l10n.registerResendButton,
             size: ConcordButtonSize.lg,
             expand: true,
             loading: _isResending,
@@ -136,16 +154,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
 
     return ConcordAuthLayout(
-      title: 'Create an account',
-      subtitle: 'Join Concord and start chatting.',
+      title: l10n.registerCreateAccountTitle,
+      subtitle: l10n.registerCreateAccountSubtitle,
       footer: Wrap(
         alignment: WrapAlignment.center,
         children: [
-          const Text('Already have an account? '),
+          Text(l10n.registerAlreadyHaveAccount),
           GestureDetector(
             onTap: () => context.go('/login'),
             child: Text(
-              'Log In',
+              l10n.loginLink,
               style: TextStyle(color: colors.brand, fontWeight: FontWeight.w500),
             ),
           ),
@@ -158,8 +176,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Expanded(
               child: ConcordTextField(
                 controller: _nameController,
-                label: 'Name',
-                hint: 'Jane',
+                label: l10n.fieldNameLabel,
+                hint: l10n.fieldNameHint,
                 required: true,
                 errorText: _nameError,
                 textInputAction: TextInputAction.next,
@@ -170,8 +188,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Expanded(
               child: ConcordTextField(
                 controller: _surnameController,
-                label: 'Surname',
-                hint: 'Doe',
+                label: l10n.fieldSurnameLabel,
+                hint: l10n.fieldSurnameHint,
                 required: true,
                 errorText: _surnameError,
                 textInputAction: TextInputAction.next,
@@ -182,9 +200,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         const SizedBox(height: ConcordSpacing.lg),
         ConcordTextField(
+          controller: _usernameController,
+          label: l10n.usernameLabel,
+          hint: l10n.usernameHint,
+          required: true,
+          errorText: _usernameError,
+          textInputAction: TextInputAction.next,
+          autofillHints: const [AutofillHints.username],
+        ),
+        const SizedBox(height: ConcordSpacing.lg),
+        ConcordTextField(
           controller: _emailController,
-          label: 'Email',
-          hint: 'you@example.com',
+          label: l10n.fieldEmailLabel,
+          hint: l10n.fieldEmailHint,
           required: true,
           errorText: _emailError,
           keyboardType: TextInputType.emailAddress,
@@ -194,7 +222,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         const SizedBox(height: ConcordSpacing.lg),
         ConcordTextField(
           controller: _passwordController,
-          label: 'Password',
+          label: l10n.fieldPasswordLabel,
           hint: '••••••••',
           required: true,
           errorText: _passwordError,
@@ -205,7 +233,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         if (_passwordError == null) ...[
           const SizedBox(height: 4),
-          Text('At least 8 characters.', style: TextStyle(fontSize: 12, color: colors.fgMuted)),
+          Text(l10n.passwordMinCharactersHint, style: TextStyle(fontSize: 12, color: colors.fgMuted)),
         ],
         if (_formError != null) ...[
           const SizedBox(height: ConcordSpacing.lg),
@@ -222,7 +250,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ],
         const SizedBox(height: ConcordSpacing.xl - 4),
         ConcordButton(
-          label: _isSubmitting ? 'Creating account…' : 'Create Account',
+          label: _isSubmitting ? l10n.registerSubmitButtonLoading : l10n.registerSubmitButton,
           size: ConcordButtonSize.lg,
           expand: true,
           loading: _isSubmitting,

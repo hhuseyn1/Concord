@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/models/message_like.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../providers/conversation_list_providers.dart';
 import '../../providers/direct_message_providers.dart';
@@ -62,6 +63,7 @@ class _DirectMessageViewState extends ConsumerState<DirectMessageView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final controller = ref.read(directMessagesControllerProvider(widget.conversationId).notifier);
     final state = ref.watch(directMessagesControllerProvider(widget.conversationId));
     final currentUserId = ref.watch(authControllerProvider.select((s) => s.profile?.id));
@@ -87,9 +89,9 @@ class _DirectMessageViewState extends ConsumerState<DirectMessageView> {
             onReply: (message) => setState(() => _replyingTo = message),
             onLoadMore: controller.loadMore,
             onRetryInitialLoad: controller.retryInitialLoad,
-            threadNoun: 'conversation',
-            emptyTitle: 'No messages yet',
-            emptySubtitle: 'Say hi to start the conversation.',
+            threadNoun: l10n.conversationThreadNoun,
+            emptyTitle: l10n.noMessagesYetTitle,
+            emptySubtitle: l10n.sayHiSubtitle,
             otherReadAt: state.otherReadAt,
             sourceConversationId: widget.conversationId,
           ),
@@ -101,7 +103,7 @@ class _DirectMessageViewState extends ConsumerState<DirectMessageView> {
           replyingTo: _replyingTo,
           onCancelReply: () => setState(() => _replyingTo = null),
           onSent: _scrollToBottom,
-          hintText: otherUserName != null ? 'Message @$otherUserName…' : 'Message…',
+          hintText: otherUserName != null ? l10n.messageUserHint(otherUserName) : l10n.messageEllipsisHint,
         ),
       ],
     );

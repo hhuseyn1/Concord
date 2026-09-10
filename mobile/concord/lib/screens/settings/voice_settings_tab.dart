@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../theme/theme.dart';
 
 class VoiceSettingsTab extends StatelessWidget {
@@ -9,11 +10,12 @@ class VoiceSettingsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
 
     return ListView(
       padding: const EdgeInsets.all(ConcordSpacing.lg),
       children: [
-        Text('Voice & Video', style: textTheme.titleMedium),
+        Text(l10n.voiceVideoTitle, style: textTheme.titleMedium),
         const SizedBox(height: ConcordSpacing.md),
         Container(
           padding: const EdgeInsets.all(ConcordSpacing.md),
@@ -28,10 +30,7 @@ class VoiceSettingsTab extends StatelessWidget {
               const SizedBox(width: ConcordSpacing.sm),
               Expanded(
                 child: Text(
-                  "Concord will ask for microphone access the first time you join a call, and camera "
-                  "access the first time you turn your camera on. There's no separate device picker on "
-                  'mobile - audio output (earpiece/speaker/Bluetooth) is controlled by your device, not '
-                  'this app.',
+                  l10n.voiceInfoText,
                   style: textTheme.bodyMedium?.copyWith(color: colors.fgDefault),
                 ),
               ),
@@ -40,8 +39,7 @@ class VoiceSettingsTab extends StatelessWidget {
         ),
         const SizedBox(height: ConcordSpacing.lg),
         Text(
-          'If a call connects with no audio, check your device Settings app for Concord\'s microphone '
-          'permission.',
+          l10n.voiceNoAudioHint,
           style: textTheme.bodySmall?.copyWith(color: colors.fgMuted),
         ),
       ],

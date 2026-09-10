@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../providers/presence_controller.dart';
 import '../../providers/user_providers.dart';
@@ -16,6 +17,7 @@ class UserPanelBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authControllerProvider);
     final profile = authState.profile;
     final myStatus = ref.watch(presenceControllerProvider.select((s) => s.myStatus));
@@ -50,7 +52,7 @@ class UserPanelBar extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  displayName?.isNotEmpty == true ? displayName! : 'Loading…',
+                  displayName?.isNotEmpty == true ? displayName! : l10n.loadingEllipsis,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500, color: colors.fgDefault),
@@ -66,13 +68,13 @@ class UserPanelBar extends ConsumerWidget {
           ),
           ConcordIconButton(
             icon: Icons.settings_outlined,
-            tooltip: 'Settings',
+            tooltip: l10n.settingsTooltip,
             size: ConcordButtonSize.sm,
             onPressed: () => context.push('/settings'),
           ),
           ConcordIconButton(
             icon: Icons.logout,
-            tooltip: 'Log out',
+            tooltip: l10n.logOutTooltip,
             size: ConcordButtonSize.sm,
             onPressed: () => ref.read(authControllerProvider.notifier).logout(),
           ),

@@ -83,4 +83,23 @@ class UsersService {
         .map((e) => PublicProfileResponse.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  /// Soft-deletes the current account (30-day grace period - logging back in
+  /// before then cancels the deletion). Requires the current password to
+  /// confirm. The server revokes every session on success, so the caller
+  /// just needs to clear local auth state (see `AuthController.logout`).
+  Future<void> deleteMe({required String password}) {
+    return _client.delete('/Users/Me', body: {'Password': password});
+  }
+
+  /// This client is Android-only, so `Platform` is always sent as `'Android'` rather than
+  /// mirroring the full `PushPlatform` (Ios/Android/Web) enum server-side - there's nothing here
+  /// that would ever send another value.
+  Future<void> registerPushToken(String token) {
+    return _client.post('/Users/Me/PushTokens', body: {'Token': token, 'Platform': 'Android'});
+  }
+
+  Future<void> deregisterPushToken(String token) {
+    return _client.delete('/Users/Me/PushTokens/${Uri.encodeComponent(token)}');
+  }
 }

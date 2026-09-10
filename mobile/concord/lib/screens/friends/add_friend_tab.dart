@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/friends_providers.dart';
 import '../../theme/theme.dart';
@@ -81,7 +82,8 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
       await _runSearch(_query);
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not send request: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).errorSendRequestFailed(e.message))));
     } finally {
       if (mounted) setState(() => _pendingUserIds.remove(user.id));
     }
@@ -98,7 +100,8 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
       await _runSearch(_query);
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not accept request: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).errorAcceptRequestFailed(e.message))));
     } finally {
       if (mounted) setState(() => _pendingUserIds.remove(user.id));
     }
@@ -115,33 +118,38 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
       await _runSearch(_query);
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not decline request: ${e.message}')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).errorDeclineRequestFailed(e.message))));
     } finally {
       if (mounted) setState(() => _pendingUserIds.remove(user.id));
     }
   }
 
-  Widget _actionsFor(PublicProfileResponse user) {
+  Widget _actionsFor(AppLocalizations l10n, PublicProfileResponse user) {
     final pending = _pendingUserIds.contains(user.id);
 
     switch (user.relationshipStatus) {
       case FriendRelationshipStatus.friends:
-        return const ConcordBadge(label: 'Already friends', variant: ConcordBadgeVariant.neutral);
+        return ConcordBadge(label: l10n.alreadyFriendsBadge, variant: ConcordBadgeVariant.neutral);
       case FriendRelationshipStatus.outgoingRequest:
-        return const ConcordButton(label: 'Request sent', variant: ConcordButtonVariant.secondary, size: ConcordButtonSize.sm);
+        return ConcordButton(
+          label: l10n.requestSentLabel,
+          variant: ConcordButtonVariant.secondary,
+          size: ConcordButtonSize.sm,
+        );
       case FriendRelationshipStatus.incomingRequest:
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             ConcordButton(
-              label: 'Accept',
+              label: l10n.acceptButton,
               size: ConcordButtonSize.sm,
               loading: pending,
               onPressed: pending ? null : () => _acceptRequest(user),
             ),
             const SizedBox(width: ConcordSpacing.xs),
             ConcordButton(
-              label: 'Decline',
+              label: l10n.declineButton,
               variant: ConcordButtonVariant.secondary,
               size: ConcordButtonSize.sm,
               onPressed: pending ? null : () => _declineRequest(user),
@@ -151,7 +159,7 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
       case FriendRelationshipStatus.blocked:
       case FriendRelationshipStatus.none:
         return ConcordButton(
-          label: 'Add',
+          label: l10n.addButton,
           size: ConcordButtonSize.sm,
           loading: pending,
           onPressed: pending ? null : () => _sendRequest(user),
@@ -162,6 +170,7 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final enabled = _query.length >= _minQueryLength;
 
     return ListView(
@@ -169,32 +178,35 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
       children: [
         ConcordTextField(
           controller: _searchController,
-          hint: 'Search by username…',
+          hint: l10n.searchByUsernameHint,
           onChanged: _handleQueryChanged,
         ),
         const SizedBox(height: ConcordSpacing.md),
         if (_query.isNotEmpty && !enabled)
           Text(
-            'Keep typing - at least $_minQueryLength characters.',
+            l10n.keepTypingMessage(_minQueryLength),
             style: TextStyle(fontSize: 13, color: colors.fgMuted),
           ),
         if (_query.isEmpty)
-          const ConcordEmptyState(
+          ConcordEmptyState(
             icon: Icons.person_add_alt_outlined,
-            title: 'Find friends by username',
-            subtitle: "You, existing friends, and blocked users won't show up here - results reflect your "
-                'real relationship with each person.',
+            title: l10n.findFriendsTitle,
+            subtitle: l10n.findFriendsSubtitle,
           ),
         if (enabled && _isSearching) const Center(child: Padding(padding: EdgeInsets.all(ConcordSpacing.lg), child: CircularProgressIndicator())),
         if (enabled && !_isSearching && _searchError != null)
           ConcordEmptyState(
-            title: 'Search failed',
+            title: l10n.searchFailedTitle,
             subtitle: _searchError is ApiException ? (_searchError! as ApiException).message : _searchError.toString(),
           ),
         if (enabled && !_isSearching && _searchError == null && (_results?.isEmpty ?? false))
-          ConcordEmptyState(icon: Icons.search_off, title: 'No users found', subtitle: 'Nobody matches "$_query".'),
+          ConcordEmptyState(
+            icon: Icons.search_off,
+            title: l10n.noUsersFoundTitle,
+            subtitle: l10n.noUsersFoundSubtitle(_query),
+          ),
         if (enabled && !_isSearching && _searchError == null && (_results?.isNotEmpty ?? false))
-          for (final user in _results!) FriendRow(user: user, actions: _actionsFor(user)),
+          for (final user in _results!) FriendRow(user: user, actions: _actionsFor(l10n, user)),
       ],
     );
   }

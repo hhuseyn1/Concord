@@ -108,6 +108,17 @@ public class User : BaseEntity
 
     public DateTime? Disabled { get; set; }
 
+    /// <summary>
+    /// Set when the user requests account deletion. Alongside <see cref="Disabled"/> (set to the
+    /// same timestamp), this hides/blocks the account exactly like an admin-disabled one for the
+    /// duration of the grace period (see <c>GlobalConstants.AccountDeletionGracePeriodDays</c>), except
+    /// that logging back in during the window is still allowed and cancels the deletion (both fields
+    /// are cleared). Once <see cref="CleanupBackgroundService"/> purges the account after the grace
+    /// period, this is cleared back to null while <see cref="Disabled"/> is left set permanently, so
+    /// the account stays blocked forever without re-opening the login carve-out.
+    /// </summary>
+    public DateTime? DeletionRequestedAt { get; set; }
+
     public int FailedLoginAttempts { get; set; }
 
     public DateTime? LockoutEnd { get; set; }

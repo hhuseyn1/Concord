@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/presence_controller.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
 
-const _statusOptions = [
-  (status: PresenceStatus.online, label: 'Online'),
-  (status: PresenceStatus.idle, label: 'Idle'),
-  (status: PresenceStatus.doNotDisturb, label: 'Do Not Disturb'),
-  (status: PresenceStatus.invisible, label: 'Invisible'),
-];
+List<({PresenceStatus status, String label})> _statusOptions(AppLocalizations l10n) => [
+      (status: PresenceStatus.online, label: l10n.statusOnline),
+      (status: PresenceStatus.idle, label: l10n.statusIdle),
+      (status: PresenceStatus.doNotDisturb, label: l10n.statusDoNotDisturb),
+      (status: PresenceStatus.invisible, label: l10n.statusInvisible),
+    ];
 
 Future<void> showStatusPickerSheet(BuildContext context, WidgetRef ref) {
   return showModalBottomSheet<void>(context: context, builder: (context) => const _StatusPickerSheet());
@@ -23,7 +24,9 @@ class _StatusPickerSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final current = ref.watch(presenceControllerProvider.select((s) => s.myStatus));
+    final statusOptions = _statusOptions(l10n);
 
     return SafeArea(
       child: Column(
@@ -37,9 +40,9 @@ class _StatusPickerSheet extends ConsumerWidget {
               ConcordSpacing.lg,
               ConcordSpacing.sm,
             ),
-            child: Text('Set status', style: Theme.of(context).textTheme.titleMedium),
+            child: Text(l10n.setStatusTitle, style: Theme.of(context).textTheme.titleMedium),
           ),
-          for (final option in _statusOptions)
+          for (final option in statusOptions)
             ListTile(
               leading: Container(
                 width: 10,

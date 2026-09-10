@@ -1,5 +1,6 @@
 using Concord.Application.Enums;
 using Concord.Application.Models;
+using Concord.Application.Push;
 using Concord.Domain.Entities;
 using Concord.Domain.Exceptions;
 using Concord.Infrastructure.Context;
@@ -8,11 +9,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concord.Infrastructure.Services;
 
-public class NotificationsService(ApplicationDbContext context)
+public class NotificationsService(ApplicationDbContext context, IPushNotificationSender pushNotificationSender)
 {
     private readonly ApplicationDbContext _context = context;
+    private readonly IPushNotificationSender _pushNotificationSender = pushNotificationSender;
 
-    internal Task NotifyFriendRequestReceivedAsync(Guid recipientUserId, Guid requesterUserId)
+    internal async Task NotifyFriendRequestReceivedAsync(Guid recipientUserId, Guid requesterUserId)
     {
         _context.Notifications.Add(new Notification
         {
@@ -21,10 +23,10 @@ public class NotificationsService(ApplicationDbContext context)
             RelatedUserId = requesterUserId
         });
 
-        return Task.CompletedTask;
+        await SendPushAsync(recipientUserId, requesterUserId, NotificationType.FriendRequestReceived);
     }
 
-    internal Task NotifyFriendRequestAcceptedAsync(Guid recipientUserId, Guid accepterUserId)
+    internal async Task NotifyFriendRequestAcceptedAsync(Guid recipientUserId, Guid accepterUserId)
     {
         _context.Notifications.Add(new Notification
         {
@@ -33,10 +35,10 @@ public class NotificationsService(ApplicationDbContext context)
             RelatedUserId = accepterUserId
         });
 
-        return Task.CompletedTask;
+        await SendPushAsync(recipientUserId, accepterUserId, NotificationType.FriendRequestAccepted);
     }
 
-    internal Task NotifyMissedCallAsync(Guid recipientUserId, Guid callerId)
+    internal async Task NotifyMissedCallAsync(Guid recipientUserId, Guid callerId)
     {
         _context.Notifications.Add(new Notification
         {
@@ -45,10 +47,24 @@ public class NotificationsService(ApplicationDbContext context)
             RelatedUserId = callerId
         });
 
-        return Task.CompletedTask;
+        await SendPushAsync(recipientUserId, callerId, NotificationType.MissedCall);
     }
 
-    internal Task NotifyMentionAsync(Guid recipientUserId, Guid mentionerUserId, Guid? serverId, Guid? channelId, Guid? conversationId, Guid messageId)
+    internal async Task NotifyDirectMessageReceivedAsync(Guid recipientUserId, Guid senderId, Guid conversationId, Guid messageId)
+    {
+        _context.Notifications.Add(new Notification
+        {
+            RecipientUserId = recipientUserId,
+            Type = NotificationType.DirectMessageReceived,
+            RelatedUserId = senderId,
+            ContextConversationId = conversationId,
+            ContextMessageId = messageId
+        });
+
+        await SendPushAsync(recipientUserId, senderId, NotificationType.DirectMessageReceived);
+    }
+
+    internal async Task NotifyMentionAsync(Guid recipientUserId, Guid mentionerUserId, Guid? serverId, Guid? channelId, Guid? conversationId, Guid messageId)
     {
         _context.Notifications.Add(new Notification
         {
@@ -61,14 +77,68 @@ public class NotificationsService(ApplicationDbContext context)
             ContextMessageId = messageId
         });
 
-        return Task.CompletedTask;
+        await SendPushAsync(recipientUserId, mentionerUserId, NotificationType.Mention);
+    }
+
+    /// <summary>
+    /// Resolves the recipient's locale and the related user's display name, then hands off to
+    /// <see cref="IPushNotificationSender"/> - a no-op (<c>NoOpPushNotificationSender</c>) when no
+    /// provider is configured, so this costs two extra reads but never fails the caller's request
+    /// when push isn't set up. There's no client running to localize text once the app is fully
+    /// closed, so (unlike the realtime hub payload, which ships raw type + ids for each client to
+    /// render itself) the push title/body are rendered here, server-side, in the recipient's own
+    /// <see cref="User.Locale"/>.
+    /// </summary>
+    private async Task SendPushAsync(Guid recipientUserId, Guid relatedUserId, NotificationType type)
+    {
+        var recipientLocale = await _context.Users
+            .Where(user => user.Id == recipientUserId)
+            .Select(user => user.Locale)
+            .FirstOrDefaultAsync();
+
+        if (recipientLocale is null) return;
+
+        var relatedUser = await _context.Users
+            .Where(user => user.Id == relatedUserId)
+            .Select(user => new { user.Username, user.Name, user.Surname })
+            .FirstOrDefaultAsync();
+
+        var name = relatedUser?.Username;
+        if (string.IsNullOrWhiteSpace(name)) name = $"{relatedUser?.Name} {relatedUser?.Surname}".Trim();
+        if (string.IsNullOrWhiteSpace(name)) name = "Someone";
+
+        await _pushNotificationSender.SendAsync(recipientUserId, name, BuildPushBody(type, recipientLocale));
+    }
+
+    private static string BuildPushBody(NotificationType type, string locale)
+    {
+        var isAzerbaijani = locale.StartsWith("az", StringComparison.OrdinalIgnoreCase);
+
+        return (type, isAzerbaijani) switch
+        {
+            (NotificationType.FriendRequestReceived, true) => "sizə dostluq sorğusu göndərdi",
+            (NotificationType.FriendRequestReceived, false) => "sent you a friend request",
+            (NotificationType.FriendRequestAccepted, true) => "dostluq sorğunuzu qəbul etdi",
+            (NotificationType.FriendRequestAccepted, false) => "accepted your friend request",
+            (NotificationType.MissedCall, true) => "sizə zəng etdi (buraxılmış zəng)",
+            (NotificationType.MissedCall, false) => "missed your call",
+            (NotificationType.Mention, true) => "sizi qeyd etdi",
+            (NotificationType.Mention, false) => "mentioned you",
+            (NotificationType.DirectMessageReceived, true) => "sizə mesaj göndərdi",
+            (NotificationType.DirectMessageReceived, false) => "sent you a message",
+            (_, true) => "yeni bildiriş",
+            (_, false) => "sent you a notification",
+        };
     }
 
     /// <summary>Fan-out for an <c>@everyone</c> trigger (P3) - one <see cref="Notification"/> row per
     /// current server member, batched via <c>AddRange</c> rather than one insert per member, since a
     /// large server could otherwise mean hundreds of individual round trips. No
     /// <see cref="Concord.Domain.Entities.MessageMention"/> rows are created here; see
-    /// <see cref="Concord.Domain.Entities.Message.MentionsEveryone"/> for why.</summary>
+    /// <see cref="Concord.Domain.Entities.Message.MentionsEveryone"/> for why. Deliberately does not
+    /// call <see cref="SendPushAsync"/>: pushing to every member of a large server for one
+    /// <c>@everyone</c> is the kind of mass, per-member fan-out a push provider (and the members
+    /// receiving it) would treat as spam - the in-app/realtime notification created here is enough.</summary>
     internal Task NotifyMentionsBulkAsync(List<Guid> recipientUserIds, Guid mentionerUserId, Guid serverId, Guid channelId, Guid messageId)
     {
         _context.Notifications.AddRange(recipientUserIds.Select(recipientUserId => new Notification

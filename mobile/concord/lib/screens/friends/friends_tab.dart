@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/conversation_list_providers.dart';
 import '../../providers/friends_providers.dart';
@@ -24,6 +25,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
   bool _blocking = false;
 
   Future<void> _handleMessage(PublicProfileResponse user) async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _startingDmForUserId = user.id);
     try {
       final conversation = await ref.read(directMessagesServiceProvider).createOrGetConversation(user.id);
@@ -36,25 +38,23 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
     } on ApiException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Could not start conversation: ${e.message}')));
+          .showSnackBar(SnackBar(content: Text(l10n.errorStartConversationFailed(e.message))));
     } finally {
       if (mounted) setState(() => _startingDmForUserId = null);
     }
   }
 
   Future<void> _confirmBlock(PublicProfileResponse user) async {
+    final l10n = AppLocalizations.of(context);
     final displayName = displayNameFor(user);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Block this user?'),
-        content: Text(
-          '$displayName will be removed from your friends and won\'t be able to message you or see your '
-          'profile. There\'s no separate "unfriend" - this is the only way to end the friendship.',
-        ),
+        title: Text(l10n.blockConfirmTitle),
+        content: Text(l10n.blockConfirmMessage(displayName)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Block User')),
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.cancelButton)),
+          TextButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.blockUserButton)),
         ],
       ),
     );
@@ -65,10 +65,10 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
       await ref.read(friendsServiceProvider).block(user.id);
       if (!mounted) return;
       invalidateFriendsState(ref);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$displayName was blocked.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.blockedSnackbar(displayName))));
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not block user: ${e.message}')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorBlockUserFailed(e.message))));
     } finally {
       if (mounted) setState(() => _blocking = false);
     }
@@ -77,6 +77,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(friendsListControllerProvider);
     final controller = ref.read(friendsListControllerProvider.notifier);
 
@@ -88,10 +89,10 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
       return Center(
         child: ConcordEmptyState(
           icon: Icons.error_outline,
-          title: "Couldn't load friends",
+          title: l10n.couldNotLoadFriendsTitle,
           subtitle: state.loadError,
           action: ConcordButton(
-            label: 'Try again',
+            label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
             size: ConcordButtonSize.sm,
             onPressed: controller.retryInitialLoad,
@@ -101,11 +102,11 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
     }
 
     if (state.items.isEmpty) {
-      return const Center(
+      return Center(
         child: ConcordEmptyState(
           icon: Icons.people_outline,
-          title: 'No friends yet',
-          subtitle: 'Search for someone in the Add Friend tab to send a request.',
+          title: l10n.noFriendsYetTitle,
+          subtitle: l10n.noFriendsYetSubtitle,
         ),
       );
     }
@@ -119,7 +120,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md),
           child: Text(
-            'ALL FRIENDS - ${friends.length}',
+            '${l10n.allFriendsHeader}${l10n.sectionCountSuffix(friends.length)}',
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
           ),
         ),
@@ -138,13 +139,13 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
                 else
                   ConcordIconButton(
                     icon: Icons.chat_bubble_outline,
-                    tooltip: 'Message',
+                    tooltip: l10n.messageTooltip,
                     size: ConcordButtonSize.sm,
                     onPressed: _startingDmForUserId != null ? null : () => _handleMessage(user),
                   ),
                 ConcordIconButton(
                   icon: Icons.person_remove_outlined,
-                  tooltip: 'Block',
+                  tooltip: l10n.blockTooltip,
                   size: ConcordButtonSize.sm,
                   onPressed: _blocking ? null : () => _confirmBlock(user),
                 ),
@@ -158,7 +159,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
               child: state.isLoadingMore
                   ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                   : ConcordButton(
-                      label: 'Load more',
+                      label: l10n.loadMoreButton,
                       variant: ConcordButtonVariant.secondary,
                       size: ConcordButtonSize.sm,
                       onPressed: controller.loadMore,

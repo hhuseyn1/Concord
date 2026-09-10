@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/server_providers.dart';
 import '../../theme/theme.dart';
@@ -20,16 +21,12 @@ class ChannelListScreen extends ConsumerWidget {
   final String serverId;
 
   Future<void> _confirmLeaveServer(BuildContext context, WidgetRef ref, String serverName) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Leave $serverName?'),
-        content: const Text("This removes you from the server immediately. You'll need a new invite to rejoin later."),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Leave Server')),
-        ],
-      ),
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmDialog(
+      context,
+      title: l10n.leaveServerConfirmTitle(serverName),
+      message: l10n.leaveServerConfirmMessage,
+      confirmLabel: l10n.leaveServerButton,
     );
     if (confirmed != true) return;
     try {
@@ -39,13 +36,14 @@ class ChannelListScreen extends ConsumerWidget {
     } on ApiException catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not leave server: ${e.message}')));
+            .showSnackBar(SnackBar(content: Text(l10n.errorLeaveServerFailed(e.message))));
       }
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final serversAsync = ref.watch(myServersProvider);
     final channelsAsync = ref.watch(channelsProvider(serverId));
     final permissionsAsync = ref.watch(myPermissionsProvider(serverId));
@@ -63,37 +61,42 @@ class ChannelListScreen extends ConsumerWidget {
     return Scaffold(
       endDrawer: const ServerRailDrawer(),
       appBar: AppBar(
-        title: Text(serverName ?? 'Server'),
+        title: Text(serverName ?? l10n.serverFallbackTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.people_outline),
-            tooltip: 'Members',
+            tooltip: l10n.membersTooltip,
             onPressed: () => context.push('/servers/$serverId/members'),
           ),
           if (permissions != null)
             PopupMenuButton<String>(
-              tooltip: 'Server options',
+              tooltip: l10n.serverOptionsTooltip,
               onSelected: (value) {
                 switch (value) {
                   case 'invite':
                     showInviteSheet(context, ref, serverId: serverId);
                   case 'transfer':
-                    showTransferOwnershipSheet(context, ref, serverId: serverId, serverName: serverName ?? 'this server');
+                    showTransferOwnershipSheet(
+                      context,
+                      ref,
+                      serverId: serverId,
+                      serverName: serverName ?? l10n.thisServerFallback,
+                    );
                   case 'leave':
-                    _confirmLeaveServer(context, ref, serverName ?? 'this server');
+                    _confirmLeaveServer(context, ref, serverName ?? l10n.thisServerFallback);
                 }
               },
               itemBuilder: (context) => [
                 if (canManageInvites)
-                  const PopupMenuItem(value: 'invite', child: Text('Invite People')),
-                if (isOwner) const PopupMenuItem(value: 'transfer', child: Text('Transfer Ownership')),
-                if (!isOwner) const PopupMenuItem(value: 'leave', child: Text('Leave Server')),
+                  PopupMenuItem(value: 'invite', child: Text(l10n.invitePeopleMenuItem)),
+                if (isOwner) PopupMenuItem(value: 'transfer', child: Text(l10n.transferOwnershipMenuItem)),
+                if (!isOwner) PopupMenuItem(value: 'leave', child: Text(l10n.leaveServerButton)),
               ],
             ),
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu),
-              tooltip: 'Servers',
+              tooltip: l10n.serversTooltip,
               onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
@@ -107,7 +110,7 @@ class ChannelListScreen extends ConsumerWidget {
               error: (error, stackTrace) => Center(
                 child: ConcordEmptyState(
                   icon: Icons.error_outline,
-                  title: 'Couldn’t load channels',
+                  title: l10n.couldNotLoadChannelsTitle,
                   subtitle: error is ApiException ? error.message : error.toString(),
                 ),
               ),
@@ -116,11 +119,11 @@ class ChannelListScreen extends ConsumerWidget {
                 final voiceChannels = channels.where((c) => c.type == ChannelType.voice).toList();
 
                 if (channels.isEmpty && !canManageChannels) {
-                  return const Center(
+                  return Center(
                     child: ConcordEmptyState(
                       icon: Icons.tag,
-                      title: 'No channels yet',
-                      subtitle: 'Channels created on this server will show up here.',
+                      title: l10n.noChannelsYetTitle,
+                      subtitle: l10n.noChannelsYetSubtitle,
                     ),
                   );
                 }
@@ -129,14 +132,14 @@ class ChannelListScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
                   children: [
                     _ChannelGroup(
-                      label: 'Text',
+                      label: l10n.textChannelsLabel,
                       serverId: serverId,
                       channels: textChannels,
                       canManage: canManageChannels,
                       defaultType: ChannelType.text,
                     ),
                     _ChannelGroup(
-                      label: 'Voice',
+                      label: l10n.voiceChannelsLabel,
                       serverId: serverId,
                       channels: voiceChannels,
                       canManage: canManageChannels,
@@ -170,18 +173,12 @@ class _ChannelGroup extends ConsumerWidget {
   final ChannelType defaultType;
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref, ChannelResponse channel) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Delete #${channel.name}?'),
-        content: const Text(
-          "This removes the channel for everyone in the server immediately. All messages in it will be lost. This can't be undone.",
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Delete Channel')),
-        ],
-      ),
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showConfirmDialog(
+      context,
+      title: l10n.deleteChannelConfirmTitle(channel.name),
+      message: l10n.deleteChannelConfirmMessage,
+      confirmLabel: l10n.deleteChannelButton,
     );
     if (confirmed != true) return;
     try {
@@ -196,13 +193,14 @@ class _ChannelGroup extends ConsumerWidget {
     } on ApiException catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not delete channel: ${e.message}')));
+            .showSnackBar(SnackBar(content: Text(l10n.errorDeleteChannelFailed(e.message))));
       }
     }
   }
 
   Future<void> _openChannelActions(BuildContext context, WidgetRef ref, ChannelResponse channel) async {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     await showModalBottomSheet<void>(
       context: context,
       builder: (sheetContext) => SafeArea(
@@ -211,7 +209,7 @@ class _ChannelGroup extends ConsumerWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('Rename Channel'),
+              title: Text(l10n.renameChannelMenuItem),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 showRenameChannelSheet(context, ref, channel: channel);
@@ -219,7 +217,7 @@ class _ChannelGroup extends ConsumerWidget {
             ),
             ListTile(
               leading: Icon(Icons.delete_outline, color: colors.danger),
-              title: Text('Delete Channel', style: TextStyle(color: colors.danger)),
+              title: Text(l10n.deleteChannelButton, style: TextStyle(color: colors.danger)),
               onTap: () {
                 Navigator.of(sheetContext).pop();
                 _confirmDelete(context, ref, channel);
@@ -234,6 +232,7 @@ class _ChannelGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,7 +249,7 @@ class _ChannelGroup extends ConsumerWidget {
               if (canManage)
                 ConcordIconButton(
                   icon: Icons.add,
-                  tooltip: 'Create $label channel',
+                  tooltip: l10n.createChannelTooltip(label),
                   size: ConcordButtonSize.sm,
                   variant: ConcordButtonVariant.ghost,
                   onPressed: () => showCreateChannelSheet(context, ref, serverId: serverId, defaultType: defaultType),
@@ -262,7 +261,7 @@ class _ChannelGroup extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.lg),
             child: Text(
-              'No ${label.toLowerCase()} channels yet.',
+              l10n.noChannelsOfTypeYet(label.toLowerCase()),
               style: TextStyle(fontSize: 13, color: colors.fgMuted),
             ),
           )
@@ -285,7 +284,7 @@ class _ChannelGroup extends ConsumerWidget {
                   if (canManage)
                     IconButton(
                       icon: const Icon(Icons.more_vert, size: 18),
-                      tooltip: 'Channel options',
+                      tooltip: l10n.channelOptionsTooltip,
                       onPressed: () => _openChannelActions(context, ref, channel),
                     ),
                 ],

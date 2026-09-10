@@ -21,6 +21,7 @@ builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection(nameof(
 builder.Services.Configure<LiveKitSettings>(builder.Configuration.GetSection(nameof(LiveKitSettings)));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 builder.Services.Configure<BlobStorageSettings>(builder.Configuration.GetSection(nameof(BlobStorageSettings)));
+builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection(nameof(FirebaseSettings)));
 
 var authSettings = builder.Configuration.GetSection(nameof(AuthenticationSettings)).Get<AuthenticationSettings>();
 
@@ -36,7 +37,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddInfrastructureServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddRealtimeNotifiers();
 builder.Services.AddHostedService<CleanupBackgroundService>();
 

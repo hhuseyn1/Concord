@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../api/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
@@ -24,6 +25,7 @@ class IncomingCallModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
     final isVideo = type == CallType.video;
 
     return Material(
@@ -42,7 +44,7 @@ class IncomingCallModal extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isVideo ? 'Incoming video call' : 'Incoming voice call',
+                isVideo ? l10n.incomingVideoCallTitle : l10n.incomingVoiceCallTitle,
                 style: textTheme.titleMedium?.copyWith(color: colors.fgHeading),
               ),
               const SizedBox(height: ConcordSpacing.lg),
@@ -54,7 +56,7 @@ class IncomingCallModal extends StatelessWidget {
                   Icon(isVideo ? Icons.videocam_outlined : Icons.call_outlined, size: 16, color: colors.fgMuted),
                   const SizedBox(width: ConcordSpacing.xs),
                   Text(
-                    callerName?.isNotEmpty == true ? callerName! : 'Someone',
+                    callerName?.isNotEmpty == true ? callerName! : l10n.someoneFallback,
                     style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: colors.fgDefault),
                   ),
                 ],
@@ -64,7 +66,7 @@ class IncomingCallModal extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ConcordButton(
-                      label: 'Decline',
+                      label: l10n.declineButton,
                       variant: ConcordButtonVariant.danger,
                       leading: const Icon(Icons.call_end, size: 16),
                       expand: true,
@@ -74,7 +76,7 @@ class IncomingCallModal extends StatelessWidget {
                   const SizedBox(width: ConcordSpacing.md),
                   Expanded(
                     child: ConcordButton(
-                      label: 'Accept',
+                      label: l10n.acceptButton,
                       leading: const Icon(Icons.call, size: 16),
                       expand: true,
                       onPressed: onAccept,

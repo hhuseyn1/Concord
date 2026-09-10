@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
+import '../../utils/username_policy.dart';
 import '../../widgets/widgets.dart';
 
 const _avatarExtensions = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
@@ -18,8 +20,6 @@ const _avatarExtensionToContentType = {
   'webp': 'image/webp',
   'gif': 'image/gif',
 };
-
-final _usernamePattern = RegExp(r'^[a-zA-Z0-9_]{1,32}$');
 
 Future<void> showEditProfileSheet(BuildContext context, WidgetRef ref) {
   final profile = ref.read(authControllerProvider).profile;
@@ -81,18 +81,17 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
     final surname = _surnameController.text.trim();
     final username = _usernameController.text.trim();
 
     setState(() {
-      _nameError = name.isEmpty ? 'Name is required.' : null;
-      _surnameError = surname.isEmpty ? 'Surname is required.' : null;
+      _nameError = name.isEmpty ? l10n.nameRequiredPeriod : null;
+      _surnameError = surname.isEmpty ? l10n.surnameRequiredPeriod : null;
       _usernameError = username.isEmpty
-          ? 'Username is required.'
-          : (!_usernamePattern.hasMatch(username)
-                ? 'Only letters, numbers, and underscores - up to 32 characters.'
-                : null);
+          ? l10n.usernameRequiredPeriod
+          : (!usernamePattern.hasMatch(username) ? l10n.usernameInvalidFormat : null);
       _formError = null;
     });
     if (_nameError != null || _surnameError != null || _usernameError != null) return;
@@ -114,7 +113,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
           avatarUrl = uploaded.url;
         } on ApiException catch (e) {
           if (!mounted) return;
-          setState(() => _formError = 'Could not upload avatar: ${e.message}');
+          setState(() => _formError = l10n.errorUploadAvatarFailed(e.message));
           return;
         }
       }
@@ -126,11 +125,11 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
       if (mounted) Navigator.of(context).pop();
     } on ApiException catch (e) {
       if (e.isConflict) {
-        setState(() => _usernameError = e.message.isNotEmpty ? e.message : 'That username is already taken.');
+        setState(() => _usernameError = e.message.isNotEmpty ? e.message : l10n.usernameTakenError);
       } else if (e.isValidationError) {
-        setState(() => _formError = e.message.isNotEmpty ? e.message : 'Please check the fields and try again.');
+        setState(() => _formError = e.message.isNotEmpty ? e.message : l10n.checkFieldsError);
       } else {
-        setState(() => _formError = e.message.isNotEmpty ? e.message : 'Could not update profile.');
+        setState(() => _formError = e.message.isNotEmpty ? e.message : l10n.updateProfileFailedError);
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -140,6 +139,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final profile = ref.watch(authControllerProvider).profile;
     final currentName = [profile?.name, profile?.surname].where((p) => p != null && p.isNotEmpty).join(' ');
 
@@ -155,7 +155,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Edit Profile', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.editProfileTitle, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: ConcordSpacing.lg),
             Row(
               children: [
@@ -194,10 +194,10 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Avatar', style: Theme.of(context).textTheme.labelLarge),
+                      Text(l10n.avatarLabel, style: Theme.of(context).textTheme.labelLarge),
                       const SizedBox(height: 2),
                       Text(
-                        'PNG, JPEG, WEBP or GIF, up to 5 MB.',
+                        l10n.avatarFormatHint,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.fgMuted),
                       ),
                     ],
@@ -211,7 +211,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
                 Expanded(
                   child: ConcordTextField(
                     controller: _nameController,
-                    label: 'Name',
+                    label: l10n.fieldNameLabel,
                     required: true,
                     errorText: _nameError,
                     enabled: !_saving,
@@ -221,7 +221,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
                 Expanded(
                   child: ConcordTextField(
                     controller: _surnameController,
-                    label: 'Surname',
+                    label: l10n.fieldSurnameLabel,
                     required: true,
                     errorText: _surnameError,
                     enabled: !_saving,
@@ -232,15 +232,15 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
             const SizedBox(height: ConcordSpacing.md),
             ConcordTextField(
               controller: _usernameController,
-              label: 'Username',
+              label: l10n.usernameLabel,
               required: true,
               errorText: _usernameError,
               enabled: !_saving,
-              hint: 'Letters, numbers, and underscores only.',
+              hint: l10n.usernameHint,
             ),
             if (profile?.email != null) ...[
               const SizedBox(height: ConcordSpacing.md),
-              Text('Email', style: Theme.of(context).textTheme.labelLarge),
+              Text(l10n.emailLabel, style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 6),
               Text(
                 profile!.email!,
@@ -248,7 +248,7 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
               ),
               const SizedBox(height: 2),
               Text(
-                "Email can't be changed yet.",
+                l10n.emailCannotChangeNotice,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.fgMuted),
               ),
             ],
@@ -270,12 +270,12 @@ class _EditProfileSheetState extends ConsumerState<_EditProfileSheet> {
               children: [
                 const Spacer(),
                 ConcordButton(
-                  label: 'Cancel',
+                  label: l10n.cancelButton,
                   variant: ConcordButtonVariant.secondary,
                   onPressed: _saving ? null : () => Navigator.of(context).pop(),
                 ),
                 const SizedBox(width: ConcordSpacing.sm),
-                ConcordButton(label: 'Save', loading: _saving, onPressed: _saving ? null : _submit),
+                ConcordButton(label: l10n.saveButton, loading: _saving, onPressed: _saving ? null : _submit),
               ],
             ),
           ],

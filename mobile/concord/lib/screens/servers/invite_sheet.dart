@@ -3,17 +3,28 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-const _expiryOptions = <String, Duration?>{
-  'Never': null,
-  '30 minutes': Duration(minutes: 30),
-  '1 hour': Duration(hours: 1),
-  '1 day': Duration(days: 1),
-  '7 days': Duration(days: 7),
+enum _ExpiryOption { never, thirtyMinutes, oneHour, oneDay, sevenDays }
+
+const _expiryDurations = <_ExpiryOption, Duration?>{
+  _ExpiryOption.never: null,
+  _ExpiryOption.thirtyMinutes: Duration(minutes: 30),
+  _ExpiryOption.oneHour: Duration(hours: 1),
+  _ExpiryOption.oneDay: Duration(days: 1),
+  _ExpiryOption.sevenDays: Duration(days: 7),
 };
+
+String _expiryLabelFor(AppLocalizations l10n, _ExpiryOption option) => switch (option) {
+      _ExpiryOption.never => l10n.expiryNeverOption,
+      _ExpiryOption.thirtyMinutes => l10n.expiryThirtyMinLabel,
+      _ExpiryOption.oneHour => l10n.expiryOneHourLabel,
+      _ExpiryOption.oneDay => l10n.expiryOneDayLabel,
+      _ExpiryOption.sevenDays => l10n.expirySevenDaysLabel,
+    };
 
 Future<void> showInviteSheet(BuildContext context, WidgetRef ref, {required String serverId}) {
   return showModalBottomSheet<void>(
@@ -34,7 +45,7 @@ class _InviteSheet extends ConsumerStatefulWidget {
 
 class _InviteSheetState extends ConsumerState<_InviteSheet> {
   final _maxUsesController = TextEditingController();
-  String _expiryLabel = 'Never';
+  _ExpiryOption _expiry = _ExpiryOption.never;
   bool _generating = false;
   String? _error;
 
@@ -76,12 +87,13 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
   }
 
   Future<void> _generate() async {
+    final l10n = AppLocalizations.of(context);
     final rawMaxUses = _maxUsesController.text.trim();
     int? maxUses;
     if (rawMaxUses.isNotEmpty) {
       maxUses = int.tryParse(rawMaxUses);
       if (maxUses == null || maxUses <= 0) {
-        setState(() => _error = 'Max uses must be a positive number.');
+        setState(() => _error = l10n.maxUsesInvalidMessage);
         return;
       }
     }
@@ -91,7 +103,7 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
       _error = null;
     });
     try {
-      final duration = _expiryOptions[_expiryLabel];
+      final duration = _expiryDurations[_expiry];
       final invite = await ref.read(serversServiceProvider).createInvite(
             widget.serverId,
             expiresAtUtc: duration == null ? null : DateTime.now().toUtc().add(duration),
@@ -101,21 +113,23 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
       setState(() => _invites = [invite, ...?_invites]);
     } on ApiException catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.message.isNotEmpty ? e.message : 'Could not generate an invite.');
+      setState(() => _error = e.message.isNotEmpty ? e.message : l10n.errorGenerateInviteFailed);
     } finally {
       if (mounted) setState(() => _generating = false);
     }
   }
 
   Future<void> _copy(String code) async {
+    final l10n = AppLocalizations.of(context);
     await Clipboard.setData(ClipboardData(text: code));
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invite code copied to clipboard')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.inviteCodeCopiedSnackbar)));
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -129,7 +143,7 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Invite People', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.invitePeopleMenuItem, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: ConcordSpacing.lg),
             Row(
               children: [
@@ -137,14 +151,15 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Expires', style: Theme.of(context).textTheme.labelLarge),
+                      Text(l10n.expiresLabel, style: Theme.of(context).textTheme.labelLarge),
                       const SizedBox(height: 6),
-                      DropdownButton<String>(
+                      DropdownButton<_ExpiryOption>(
                         isExpanded: true,
-                        value: _expiryLabel,
-                        onChanged: _generating ? null : (v) => setState(() => _expiryLabel = v ?? 'Never'),
+                        value: _expiry,
+                        onChanged: _generating ? null : (v) => setState(() => _expiry = v ?? _ExpiryOption.never),
                         items: [
-                          for (final label in _expiryOptions.keys) DropdownMenuItem(value: label, child: Text(label)),
+                          for (final option in _ExpiryOption.values)
+                            DropdownMenuItem(value: option, child: Text(_expiryLabelFor(l10n, option))),
                         ],
                       ),
                     ],
@@ -154,8 +169,8 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
                 Expanded(
                   child: ConcordTextField(
                     controller: _maxUsesController,
-                    label: 'Max uses',
-                    hint: 'Unlimited',
+                    label: l10n.maxUsesLabel,
+                    hint: l10n.unlimitedHint,
                     keyboardType: TextInputType.number,
                     enabled: !_generating,
                   ),
@@ -168,20 +183,20 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
             ],
             const SizedBox(height: ConcordSpacing.md),
             ConcordButton(
-              label: 'Generate invite link',
+              label: l10n.generateInviteLinkButton,
               expand: true,
               loading: _generating,
               onPressed: _generating ? null : _generate,
             ),
             const SizedBox(height: ConcordSpacing.lg),
-            Expanded(child: _buildInviteList(colors)),
+            Expanded(child: _buildInviteList(colors, l10n)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInviteList(ConcordColors colors) {
+  Widget _buildInviteList(ConcordColors colors, AppLocalizations l10n) {
     if (_loadingInvites) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -189,10 +204,10 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
       return Center(
         child: ConcordEmptyState(
           icon: Icons.error_outline,
-          title: "Couldn't load invites",
+          title: l10n.couldNotLoadInvitesTitle,
           subtitle: _loadError,
           action: ConcordButton(
-            label: 'Try again',
+            label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
             size: ConcordButtonSize.sm,
             onPressed: _loadInvites,
@@ -203,7 +218,7 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
     final invites = _invites ?? const [];
     if (invites.isEmpty) {
       return Center(
-        child: Text('No invites generated yet.', style: TextStyle(color: colors.fgMuted)),
+        child: Text(l10n.noInvitesYetText, style: TextStyle(color: colors.fgMuted)),
       );
     }
     return ListView.separated(
@@ -235,14 +250,14 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${_describeUses(invite)} · ${_describeExpiry(invite, isExpired)}',
+                        '${_describeUses(l10n, invite)} · ${_describeExpiry(l10n, invite, isExpired)}',
                         style: TextStyle(fontSize: 12, color: colors.fgMuted),
                       ),
                     ],
                   ),
                 ),
                 ConcordButton(
-                  label: 'Copy',
+                  label: l10n.copyButton,
                   variant: ConcordButtonVariant.secondary,
                   size: ConcordButtonSize.sm,
                   onPressed: usable ? () => _copy(invite.code) : null,
@@ -255,15 +270,15 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
     );
   }
 
-  String _describeUses(InviteResponse invite) {
-    if (invite.maxUses == null) return '${invite.useCount} use${invite.useCount == 1 ? '' : 's'}';
+  String _describeUses(AppLocalizations l10n, InviteResponse invite) {
+    if (invite.maxUses == null) return l10n.inviteUsesCount(invite.useCount);
     final exhausted = invite.useCount >= invite.maxUses!;
-    return '${invite.useCount} / ${invite.maxUses} uses${exhausted ? ' - exhausted' : ''}';
+    return l10n.inviteUsesOfMax(invite.useCount, invite.maxUses!, exhausted ? l10n.inviteExhaustedSuffix : '');
   }
 
-  String _describeExpiry(InviteResponse invite, bool isExpired) {
-    if (invite.expiresAtUtc == null) return 'Never expires';
-    if (isExpired) return 'Expired';
-    return 'Expires ${invite.expiresAtUtc!.toLocal()}';
+  String _describeExpiry(AppLocalizations l10n, InviteResponse invite, bool isExpired) {
+    if (invite.expiresAtUtc == null) return l10n.neverExpiresLabel;
+    if (isExpired) return l10n.expiredLabel;
+    return l10n.expiresOnLabel('${invite.expiresAtUtc!.toLocal()}');
   }
 }

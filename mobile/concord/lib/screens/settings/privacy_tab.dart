@@ -2,28 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
 import '../friends/blocked_tab.dart';
 
-const _friendRequestLabels = {
-  FriendRequestPrivacy.everyone: 'Everyone',
-  FriendRequestPrivacy.friendsOfFriends: 'Friends of friends',
-  FriendRequestPrivacy.nobody: 'Nobody',
-};
+Map<FriendRequestPrivacy, String> _friendRequestLabels(AppLocalizations l10n) => {
+      FriendRequestPrivacy.everyone: l10n.visibilityEveryone,
+      FriendRequestPrivacy.friendsOfFriends: l10n.visibilityFriendsOfFriends,
+      FriendRequestPrivacy.nobody: l10n.visibilityNobody,
+    };
 
-const _directMessageLabels = {
-  DirectMessagePrivacy.everyone: 'Everyone',
-  DirectMessagePrivacy.friendsOnly: 'Friends only',
-  DirectMessagePrivacy.nobody: 'Nobody',
-};
+Map<DirectMessagePrivacy, String> _directMessageLabels(AppLocalizations l10n) => {
+      DirectMessagePrivacy.everyone: l10n.visibilityEveryone,
+      DirectMessagePrivacy.friendsOnly: l10n.visibilityFriendsOnly,
+      DirectMessagePrivacy.nobody: l10n.visibilityNobody,
+    };
 
-const _activityLabels = {
-  ActivityVisibility.everyone: 'Everyone',
-  ActivityVisibility.friendsOnly: 'Friends only',
-  ActivityVisibility.nobody: 'Nobody',
-};
+Map<ActivityVisibility, String> _activityLabels(AppLocalizations l10n) => {
+      ActivityVisibility.everyone: l10n.visibilityEveryone,
+      ActivityVisibility.friendsOnly: l10n.visibilityFriendsOnly,
+      ActivityVisibility.nobody: l10n.visibilityNobody,
+    };
 
 class PrivacyTab extends ConsumerStatefulWidget {
   const PrivacyTab({super.key});
@@ -55,7 +56,7 @@ class _PrivacyTabState extends ConsumerState<PrivacyTab> {
     } on ApiException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not save privacy settings: ${e.message}')));
+            .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).errorSavePrivacyFailed(e.message))));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -66,56 +67,60 @@ class _PrivacyTabState extends ConsumerState<PrivacyTab> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
     final profile = ref.watch(authControllerProvider).profile;
+    final friendRequestLabels = _friendRequestLabels(l10n);
+    final directMessageLabels = _directMessageLabels(l10n);
+    final activityLabels = _activityLabels(l10n);
 
     return ListView(
       padding: const EdgeInsets.all(ConcordSpacing.lg),
       children: [
-        Text('Privacy & Safety', style: textTheme.titleMedium),
+        Text(l10n.privacySafetyTitle, style: textTheme.titleMedium),
         const SizedBox(height: ConcordSpacing.md),
         if (profile == null)
           const Center(child: CircularProgressIndicator())
         else ...[
           _PrivacyRow(
-            label: 'Who can send friend requests',
-            value: _friendRequestLabels[profile.friendRequestPrivacy]!,
+            label: l10n.whoCanSendFriendRequests,
+            value: friendRequestLabels[profile.friendRequestPrivacy]!,
             onTap: _saving
                 ? null
                 : () => _pickOption(
                       context,
-                      _friendRequestLabels,
+                      friendRequestLabels,
                       profile.friendRequestPrivacy,
                       (value) => _update(friendRequestPrivacy: value),
                     ),
           ),
           _PrivacyRow(
-            label: 'Who can direct message you',
-            value: _directMessageLabels[profile.directMessagePrivacy]!,
+            label: l10n.whoCanDirectMessage,
+            value: directMessageLabels[profile.directMessagePrivacy]!,
             onTap: _saving
                 ? null
                 : () => _pickOption(
                       context,
-                      _directMessageLabels,
+                      directMessageLabels,
                       profile.directMessagePrivacy,
                       (value) => _update(directMessagePrivacy: value),
                     ),
           ),
           _PrivacyRow(
-            label: 'Who can see your activity',
-            value: _activityLabels[profile.activityVisibility]!,
+            label: l10n.whoCanSeeActivity,
+            value: activityLabels[profile.activityVisibility]!,
             onTap: _saving
                 ? null
                 : () => _pickOption(
                       context,
-                      _activityLabels,
+                      activityLabels,
                       profile.activityVisibility,
                       (value) => _update(activityVisibility: value),
                     ),
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Read receipts'),
-            subtitle: Text('Let others see when you\'ve read their messages.', style: TextStyle(color: colors.fgMuted)),
+            title: Text(l10n.readReceiptsLabel),
+            subtitle: Text(l10n.readReceiptsSubtitle, style: TextStyle(color: colors.fgMuted)),
             value: profile.readReceiptsEnabled,
             onChanged: _saving ? null : (value) => _update(readReceiptsEnabled: value),
           ),
@@ -123,7 +128,7 @@ class _PrivacyTabState extends ConsumerState<PrivacyTab> {
         const SizedBox(height: ConcordSpacing.xl),
         const Divider(),
         const SizedBox(height: ConcordSpacing.md),
-        Text('Blocked Users', style: textTheme.titleMedium),
+        Text(l10n.blockedUsersTitle, style: textTheme.titleMedium),
         const SizedBox(height: ConcordSpacing.sm),
         const SizedBox(height: 400, child: BlockedTab()),
       ],

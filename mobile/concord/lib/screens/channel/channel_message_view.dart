@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/models/message_like.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../providers/message_providers.dart';
 import '../messaging/message_composer.dart';
@@ -72,7 +73,7 @@ class _ChannelMessageViewState extends ConsumerState<ChannelMessageView> {
           replyingTo: _replyingTo,
           onCancelReply: () => setState(() => _replyingTo = null),
           onSent: _scrollToBottom,
-          hintText: 'Message this channel…',
+          hintText: AppLocalizations.of(context).messageChannelHint,
           serverId: widget.serverId,
         ),
       ],

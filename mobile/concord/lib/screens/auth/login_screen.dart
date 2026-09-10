@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api/api_exception.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
@@ -36,12 +37,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     setState(() {
-      _emailError = email.isEmpty ? 'Email is required' : null;
-      _passwordError = password.isEmpty ? 'Password is required' : null;
+      _emailError = email.isEmpty ? l10n.validationEmailRequired : null;
+      _passwordError = password.isEmpty ? l10n.validationPasswordRequired : null;
       _formError = null;
     });
     if (_emailError != null || _passwordError != null) return;
@@ -53,7 +55,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (error.isTwoFactorRequired) {
         setState(() => _twoFactorToken = error.twoFactorToken);
       } else {
-        setState(() => _formError = mapLoginError(error));
+        setState(() => _formError = mapLoginError(l10n, error));
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -71,18 +73,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     return ConcordAuthLayout(
-      title: 'Welcome back',
-      subtitle: "We're excited to see you again.",
+      title: l10n.loginWelcomeBack,
+      subtitle: l10n.loginSubtitle,
       footer: Wrap(
         alignment: WrapAlignment.center,
         children: [
-          const Text('Need an account? '),
+          Text(l10n.loginNeedAccount),
           GestureDetector(
             onTap: () => context.go('/register'),
             child: Text(
-              'Register',
+              l10n.registerLink,
               style: TextStyle(color: colors.brand, fontWeight: FontWeight.w500),
             ),
           ),
@@ -91,8 +94,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       children: [
         ConcordTextField(
           controller: _emailController,
-          label: 'Email',
-          hint: 'you@example.com',
+          label: l10n.fieldEmailLabel,
+          hint: l10n.fieldEmailHint,
           required: true,
           errorText: _emailError,
           keyboardType: TextInputType.emailAddress,
@@ -102,7 +105,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: ConcordSpacing.lg),
         ConcordTextField(
           controller: _passwordController,
-          label: 'Password',
+          label: l10n.fieldPasswordLabel,
           hint: '••••••••',
           required: true,
           errorText: _passwordError,
@@ -126,7 +129,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ],
         const SizedBox(height: ConcordSpacing.xl - 4),
         ConcordButton(
-          label: _isSubmitting ? 'Logging in…' : 'Log In',
+          label: _isSubmitting ? l10n.loginSubmitButtonLoading : l10n.loginSubmitButton,
           size: ConcordButtonSize.lg,
           expand: true,
           loading: _isSubmitting,

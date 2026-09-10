@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/server_providers.dart';
 import '../../theme/theme.dart';
@@ -44,9 +45,10 @@ class _CreateChannelSheetState extends ConsumerState<_CreateChannelSheet> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
     setState(() {
-      _nameError = name.isEmpty ? 'Channel name is required.' : null;
+      _nameError = name.isEmpty ? l10n.channelNameRequired : null;
       _formError = null;
     });
     if (_nameError != null) return;
@@ -58,9 +60,9 @@ class _CreateChannelSheetState extends ConsumerState<_CreateChannelSheet> {
       if (mounted) Navigator.of(context).pop();
     } on ApiException catch (e) {
       if (e.isValidationError) {
-        setState(() => _nameError = e.message.isNotEmpty ? e.message : 'That channel name is not valid.');
+        setState(() => _nameError = e.message.isNotEmpty ? e.message : l10n.channelNameInvalid);
       } else {
-        setState(() => _formError = e.message.isNotEmpty ? e.message : 'Could not create channel.');
+        setState(() => _formError = e.message.isNotEmpty ? e.message : l10n.errorCreateChannelFailed);
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -70,6 +72,7 @@ class _CreateChannelSheetState extends ConsumerState<_CreateChannelSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -82,15 +85,15 @@ class _CreateChannelSheetState extends ConsumerState<_CreateChannelSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Create Channel', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.createChannelTitle, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: ConcordSpacing.lg),
-          Text('Channel type', style: Theme.of(context).textTheme.labelLarge),
+          Text(l10n.channelTypeLabel, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: ConcordSpacing.sm),
           Row(
             children: [
               Expanded(
                 child: _TypeOption(
-                  label: 'Text',
+                  label: l10n.textChannelsLabel,
                   icon: Icons.tag,
                   selected: _type == ChannelType.text,
                   onTap: _submitting ? null : () => setState(() => _type = ChannelType.text),
@@ -99,7 +102,7 @@ class _CreateChannelSheetState extends ConsumerState<_CreateChannelSheet> {
               const SizedBox(width: ConcordSpacing.sm),
               Expanded(
                 child: _TypeOption(
-                  label: 'Voice',
+                  label: l10n.voiceChannelsLabel,
                   icon: Icons.volume_up_outlined,
                   selected: _type == ChannelType.voice,
                   onTap: _submitting ? null : () => setState(() => _type = ChannelType.voice),
@@ -110,8 +113,8 @@ class _CreateChannelSheetState extends ConsumerState<_CreateChannelSheet> {
           const SizedBox(height: ConcordSpacing.lg),
           ConcordTextField(
             controller: _nameController,
-            label: 'Channel name',
-            hint: _type == ChannelType.voice ? 'general-voice' : 'general',
+            label: l10n.channelNameLabel,
+            hint: _type == ChannelType.voice ? l10n.channelNameHintVoice : l10n.channelNameHintText,
             required: true,
             errorText: _nameError,
             enabled: !_submitting,
@@ -133,7 +136,7 @@ class _CreateChannelSheetState extends ConsumerState<_CreateChannelSheet> {
           ],
           const SizedBox(height: ConcordSpacing.lg),
           ConcordButton(
-            label: _submitting ? 'Creating…' : 'Create Channel',
+            label: _submitting ? l10n.creatingChannelLoading : l10n.createChannelTitle,
             size: ConcordButtonSize.lg,
             loading: _submitting,
             onPressed: _submitting ? null : _submit,

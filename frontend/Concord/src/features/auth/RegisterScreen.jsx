@@ -11,6 +11,8 @@ import { useCapturePendingInviteFromUrl } from '../servers/pendingInvite'
 import { AuthLayout } from './AuthLayout'
 import { mapRegisterError } from './authErrors'
 
+const USERNAME_PATTERN = /^[a-zA-Z0-9_]{1,32}$/
+
 export function RegisterScreen() {
   const [searchParams] = useSearchParams()
   useCapturePendingInviteFromUrl(searchParams)
@@ -23,12 +25,18 @@ export function RegisterScreen() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm({ defaultValues: { name: '', surname: '', email: '', password: '' } })
+  } = useForm({ defaultValues: { name: '', surname: '', username: '', email: '', password: '' } })
 
-  const onSubmit = async ({ name, surname, email, password }) => {
+  const onSubmit = async ({ name, surname, username, email, password }) => {
     setFormError('')
     try {
-      await authService.register({ Name: name, Surname: surname, Email: email, Password: password })
+      await authService.register({
+        Name: name,
+        Surname: surname,
+        Username: username,
+        Email: email,
+        Password: password,
+      })
       setRegisteredEmail(email)
       setRegistered(true)
     } catch (error) {
@@ -105,6 +113,27 @@ export function RegisterScreen() {
             />
           </FormField>
         </div>
+
+        <FormField
+          label="Username"
+          htmlFor="register-username"
+          error={errors.username?.message}
+          hint={!errors.username ? 'Letters, numbers, and underscores only - up to 32 characters. This is how friends find you.' : undefined}
+          required
+        >
+          <Input
+            id="register-username"
+            autoComplete="username"
+            placeholder="janedoe"
+            {...register('username', {
+              required: 'Username is required',
+              pattern: {
+                value: USERNAME_PATTERN,
+                message: 'Only letters, numbers, and underscores - up to 32 characters.',
+              },
+            })}
+          />
+        </FormField>
 
         <FormField label="Email" htmlFor="register-email" error={errors.email?.message} required>
           <Input
