@@ -1,4 +1,4 @@
-import { Bell, Hash, Menu, MessageCircle, Phone, PhoneOff, Pin, Search, Users, Video } from 'lucide-react'
+import { Bell, Hash, Menu, MessageCircle, Phone, PhoneOff, Pin, Search, Users, Video, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
@@ -14,7 +14,7 @@ import { IconButton } from '../ui/IconButton'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover'
 import { Tooltip } from '../ui/Tooltip'
 
-export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar }) {
+export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar, sidebarOpen = false }) {
   const { t } = useTranslation()
   const { serverId, channelId, conversationId } = useParams()
   const { data: channels } = useChannels(serverId)
@@ -43,12 +43,21 @@ export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar }
       <div className="flex min-w-0 items-center gap-2">
         {onToggleSidebar && (
           <IconButton
-            aria-label="Toggle channel sidebar"
+            aria-label={sidebarOpen ? 'Close channel sidebar' : 'Open channel sidebar'}
             variant="ghost"
-            className="-ml-1 sm:hidden"
+            // relative z-50: the mobile sidebar's backdrop is a fixed, full-viewport z-40 overlay,
+            // which would otherwise sit on top of this button (same screen position, no way to tap
+            // it again to close) the moment the drawer opens - keeping this above the overlay's
+            // stacking order is what makes it act as an actual open/close toggle instead of only
+            // ever opening, with "tap the backdrop" as the sole, undiscoverable way to close it.
+            // pointer-events-auto: Radix's modal Dialog (via react-remove-scroll) disables pointer
+            // events on background content while open, which this button - outside the Dialog's own
+            // Portal - would otherwise inherit; Radix's own Overlay sets this same override on itself
+            // for the identical reason.
+            className="relative z-50 pointer-events-auto -ml-1 sm:hidden"
             onClick={onToggleSidebar}
           >
-            <Menu className="size-4" aria-hidden="true" />
+            {sidebarOpen ? <X className="size-4" aria-hidden="true" /> : <Menu className="size-4" aria-hidden="true" />}
           </IconButton>
         )}
         <TitleIcon className="size-5 shrink-0 text-fg-muted" aria-hidden="true" />

@@ -267,6 +267,8 @@
   "statusButton": "Status",
   "scanQrCodeButton": "Scan QR Code to Log In on Web",
   "logOutButton": "Log Out",
+  "logOutConfirmTitle": "Log out?",
+  "logOutConfirmMessage": "You'll need to log back in to use Concord on this device again.",
 
   "signOutDeviceConfirmTitle": "Sign out this device?",
   "signOutDeviceConfirmMessage": "{label} will be signed out immediately.",

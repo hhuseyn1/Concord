@@ -1196,6 +1196,18 @@ abstract class AppLocalizations {
   /// **'Log Out'**
   String get logOutButton;
 
+  /// No description provided for @logOutConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out?'**
+  String get logOutConfirmTitle;
+
+  /// No description provided for @logOutConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll need to log back in to use Concord on this device again.'**
+  String get logOutConfirmMessage;
+
   /// No description provided for @signOutDeviceConfirmTitle.
   ///
   /// In en, this message translates to:

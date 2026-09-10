@@ -623,6 +623,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logOutButton => 'Log Out';
 
   @override
+  String get logOutConfirmTitle => 'Log out?';
+
+  @override
+  String get logOutConfirmMessage =>
+      'You\'ll need to log back in to use Concord on this device again.';
+
+  @override
   String get signOutDeviceConfirmTitle => 'Sign out this device?';
 
   @override

@@ -66,6 +66,8 @@
     "activeSessions": "Aktiv sessiyalar",
     "logoutAllOtherSessions": "Digər bütün sessiyalardan çıxış et",
     "logout": "Çıxış et",
+    "logoutConfirmTitle": "Çıxış etmək istəyirsiniz?",
+    "logoutConfirmDescription": "Bu cihazda Concord-dan yenidən istifadə etmək üçün yenidən daxil olmalı olacaqsınız.",
     "dangerZone": "Təhlükəli zona",
     "deleteAccount": "Hesabı sil",
     "deleteAccountDescription": "Hesabınızı və bütün məlumatlarınızı həmişəlik silin.",
