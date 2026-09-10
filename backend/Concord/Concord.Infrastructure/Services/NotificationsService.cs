@@ -50,7 +50,8 @@ public class NotificationsService(ApplicationDbContext context, IPushNotificatio
         await SendPushAsync(recipientUserId, callerId, NotificationType.MissedCall);
     }
 
-    internal async Task NotifyDirectMessageReceivedAsync(Guid recipientUserId, Guid senderId, Guid conversationId, Guid messageId)
+    internal async Task NotifyDirectMessageReceivedAsync(
+        Guid recipientUserId, Guid senderId, Guid conversationId, Guid messageId, string? messageContent = null)
     {
         _context.Notifications.Add(new Notification
         {
@@ -61,10 +62,12 @@ public class NotificationsService(ApplicationDbContext context, IPushNotificatio
             ContextMessageId = messageId
         });
 
-        await SendPushAsync(recipientUserId, senderId, NotificationType.DirectMessageReceived);
+        await SendPushAsync(recipientUserId, senderId, NotificationType.DirectMessageReceived, messageContent);
     }
 
-    internal async Task NotifyMentionAsync(Guid recipientUserId, Guid mentionerUserId, Guid? serverId, Guid? channelId, Guid? conversationId, Guid messageId)
+    internal async Task NotifyMentionAsync(
+        Guid recipientUserId, Guid mentionerUserId, Guid? serverId, Guid? channelId, Guid? conversationId, Guid messageId,
+        string? messageContent = null)
     {
         _context.Notifications.Add(new Notification
         {
@@ -77,7 +80,7 @@ public class NotificationsService(ApplicationDbContext context, IPushNotificatio
             ContextMessageId = messageId
         });
 
-        await SendPushAsync(recipientUserId, mentionerUserId, NotificationType.Mention);
+        await SendPushAsync(recipientUserId, mentionerUserId, NotificationType.Mention, messageContent);
     }
 
     /// <summary>
@@ -89,7 +92,7 @@ public class NotificationsService(ApplicationDbContext context, IPushNotificatio
     /// render itself) the push title/body are rendered here, server-side, in the recipient's own
     /// <see cref="User.Locale"/>.
     /// </summary>
-    private async Task SendPushAsync(Guid recipientUserId, Guid relatedUserId, NotificationType type)
+    private async Task SendPushAsync(Guid recipientUserId, Guid relatedUserId, NotificationType type, string? messageContent = null)
     {
         var recipientLocale = await _context.Users
             .Where(user => user.Id == recipientUserId)
@@ -107,12 +110,33 @@ public class NotificationsService(ApplicationDbContext context, IPushNotificatio
         if (string.IsNullOrWhiteSpace(name)) name = $"{relatedUser?.Name} {relatedUser?.Surname}".Trim();
         if (string.IsNullOrWhiteSpace(name)) name = "Someone";
 
-        await _pushNotificationSender.SendAsync(recipientUserId, name, BuildPushBody(type, recipientLocale));
+        await _pushNotificationSender.SendAsync(recipientUserId, name, BuildPushBody(type, recipientLocale, messageContent));
     }
 
-    private static string BuildPushBody(NotificationType type, string locale)
+    /// <summary>Notification bodies people actually read a lot (Discord, Telegram, WhatsApp) show the
+    /// message itself under the sender's name rather than a generic "sent you a message" - so for the
+    /// two message-carrying types, the real (truncated) content wins whenever the caller has it.
+    /// <see cref="DirectMessagesService.SendMessageAsync"/>/<see cref="MessagesService"/>'s own
+    /// validation guarantees a message has content or an attachment, never neither, so a null/blank
+    /// <c>messageContent</c> here reliably means "attachment, no text" - not "no message".</summary>
+    private const int MessagePreviewMaxLength = 120;
+
+    private static string BuildPushBody(NotificationType type, string locale, string? messageContent)
     {
         var isAzerbaijani = locale.StartsWith("az", StringComparison.OrdinalIgnoreCase);
+
+        if (type is NotificationType.DirectMessageReceived or NotificationType.Mention)
+        {
+            if (!string.IsNullOrWhiteSpace(messageContent))
+            {
+                var trimmed = messageContent.Trim();
+                return trimmed.Length > MessagePreviewMaxLength
+                    ? string.Concat(trimmed.AsSpan(0, MessagePreviewMaxLength), "…")
+                    : trimmed;
+            }
+
+            return isAzerbaijani ? "📎 Fayl göndərdi" : "📎 Sent an attachment";
+        }
 
         return (type, isAzerbaijani) switch
         {
@@ -122,10 +146,6 @@ public class NotificationsService(ApplicationDbContext context, IPushNotificatio
             (NotificationType.FriendRequestAccepted, false) => "accepted your friend request",
             (NotificationType.MissedCall, true) => "sizə zəng etdi (buraxılmış zəng)",
             (NotificationType.MissedCall, false) => "missed your call",
-            (NotificationType.Mention, true) => "sizi qeyd etdi",
-            (NotificationType.Mention, false) => "mentioned you",
-            (NotificationType.DirectMessageReceived, true) => "sizə mesaj göndərdi",
-            (NotificationType.DirectMessageReceived, false) => "sent you a message",
             (_, true) => "yeni bildiriş",
             (_, false) => "sent you a notification",
         };

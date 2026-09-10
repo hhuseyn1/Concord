@@ -265,7 +265,7 @@ public class DirectMessagesService(
         // pushed a notification for this exact message - a second one here would just be a duplicate.
         if (!mentionedUserIds.Contains(otherUserId))
         {
-            await _notificationsService.NotifyDirectMessageReceivedAsync(otherUserId, currentUserId, conversationId, result.Id);
+            await _notificationsService.NotifyDirectMessageReceivedAsync(otherUserId, currentUserId, conversationId, result.Id, result.Content);
             await _notificationsRealtimeNotifier.NotifyAsync(
                 otherUserId,
                 NotificationType.DirectMessageReceived,
@@ -300,7 +300,7 @@ public class DirectMessagesService(
             MentionedUserId = otherUserId
         });
 
-        await _notificationsService.NotifyMentionAsync(otherUserId, message.SenderId, null, null, conversation.Id, message.Id);
+        await _notificationsService.NotifyMentionAsync(otherUserId, message.SenderId, null, null, conversation.Id, message.Id, content);
 
         await _context.SaveChangesAsync();
 
