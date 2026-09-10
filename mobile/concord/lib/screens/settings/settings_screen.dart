@@ -122,7 +122,7 @@ class SettingsScreen extends ConsumerWidget {
                   label: l10n.logOutButton,
                   variant: ConcordButtonVariant.danger,
                   expand: true,
-                  onPressed: () => ref.read(authControllerProvider.notifier).logout(),
+                  onPressed: () => _confirmLogOut(context, ref, l10n),
                 ),
                 const SizedBox(height: ConcordSpacing.xxl),
                 const DeleteAccountSection(),
@@ -135,4 +135,14 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> _confirmLogOut(BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
+  final confirmed = await showConfirmDialog(
+    context,
+    title: l10n.logOutConfirmTitle,
+    message: l10n.logOutConfirmMessage,
+    confirmLabel: l10n.logOutButton,
+  );
+  if (confirmed == true) await ref.read(authControllerProvider.notifier).logout();
 }

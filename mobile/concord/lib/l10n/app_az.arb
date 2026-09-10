@@ -202,6 +202,8 @@
   "statusButton": "Status",
   "scanQrCodeButton": "Vebdə giriş üçün QR kodu skan edin",
   "logOutButton": "Çıxış et",
+  "logOutConfirmTitle": "Çıxış etmək istəyirsiniz?",
+  "logOutConfirmMessage": "Bu cihazda Concord-dan yenidən istifadə etmək üçün yenidən daxil olmalı olacaqsınız.",
 
   "signOutDeviceConfirmTitle": "Bu cihazdan çıxılsın?",
   "signOutDeviceConfirmMessage": "{label} dərhal sistemdən çıxarılacaq.",

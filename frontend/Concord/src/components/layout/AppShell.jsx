@@ -69,6 +69,7 @@ export function AppShell() {
           onToggleMembers={() => setMembersOpen((open) => !open)}
           membersOpen={membersOpen}
           onToggleSidebar={() => setMobileSidebarOpen((open) => !open)}
+          sidebarOpen={mobileSidebarOpen}
         />
         <MessageAreaShell membersOpen={membersOpen && !isDmRoute} memberPanel={<MemberListPanel />} />
       </div>

@@ -623,6 +623,13 @@ class AppLocalizationsAz extends AppLocalizations {
   String get logOutButton => 'Çıxış et';
 
   @override
+  String get logOutConfirmTitle => 'Çıxış etmək istəyirsiniz?';
+
+  @override
+  String get logOutConfirmMessage =>
+      'Bu cihazda Concord-dan yenidən istifadə etmək üçün yenidən daxil olmalı olacaqsınız.';
+
+  @override
   String get signOutDeviceConfirmTitle => 'Bu cihazdan çıxılsın?';
 
   @override

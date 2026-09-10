@@ -104,7 +104,7 @@ export function LoginScreen() {
             id="login-email"
             type="email"
             autoComplete="email"
-            placeholder="you@example.com"
+            placeholder="siz@numunce.com"
             {...register('email', { required: 'Email is required' })}
           />
         </FormField>

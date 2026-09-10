@@ -11,6 +11,9 @@ import { useAuth } from '../../hooks/useAuth'
 import { usePresence } from '../../hooks/usePresence'
 import { cn } from '../../lib/cn'
 import { Avatar } from '../ui/Avatar'
+import { Button } from '../ui/Button'
+import { Modal } from '../ui/Modal'
+import { Spinner } from '../ui/Spinner'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +41,7 @@ export function UserPanel({ className }) {
   const { status, setStatus } = usePresence()
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [customStatusOpen, setCustomStatusOpen] = useState(false)
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   const statusOptions = STATUS_VALUES.map((option) => ({
     ...option,
@@ -134,7 +138,7 @@ export function UserPanel({ className }) {
                 variant="ghost"
                 size="sm"
                 disabled={isSigningOut}
-                onClick={handleSignOut}
+                onClick={() => setLogoutConfirmOpen(true)}
               >
                 <LogOut className="size-4" aria-hidden="true" />
               </IconButton>
@@ -143,6 +147,30 @@ export function UserPanel({ className }) {
         )}
       </div>
       <CustomStatusModal open={customStatusOpen} onOpenChange={setCustomStatusOpen} />
+      <Modal
+        open={logoutConfirmOpen}
+        onOpenChange={setLogoutConfirmOpen}
+        title={t('settings.logoutConfirmTitle')}
+        description={t('settings.logoutConfirmDescription')}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setLogoutConfirmOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              disabled={isSigningOut}
+              onClick={() => {
+                setLogoutConfirmOpen(false)
+                handleSignOut()
+              }}
+            >
+              {isSigningOut && <Spinner size="sm" />}
+              {t('settings.logout')}
+            </Button>
+          </>
+        }
+      />
     </div>
   )
 }

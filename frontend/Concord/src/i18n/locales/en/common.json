@@ -66,6 +66,8 @@
     "activeSessions": "Active Sessions",
     "logoutAllOtherSessions": "Logout all other sessions",
     "logout": "Sign out",
+    "logoutConfirmTitle": "Sign out?",
+    "logoutConfirmDescription": "You'll need to log back in to use Concord on this device again.",
     "dangerZone": "Danger Zone",
     "deleteAccount": "Delete Account",
     "deleteAccountDescription": "Permanently delete your account and all of your data.",

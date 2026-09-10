@@ -227,18 +227,22 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
           if (_status!.enabled)
             Row(
               children: [
-                ConcordButton(
-                  label: l10n.regenerateRecoveryCodesTitle,
-                  variant: ConcordButtonVariant.secondary,
-                  size: ConcordButtonSize.sm,
-                  onPressed: _openRegenerateDialog,
+                Expanded(
+                  child: ConcordButton(
+                    label: l10n.regenerateRecoveryCodesTitle,
+                    variant: ConcordButtonVariant.secondary,
+                    size: ConcordButtonSize.sm,
+                    onPressed: _openRegenerateDialog,
+                  ),
                 ),
                 const SizedBox(width: ConcordSpacing.sm),
-                ConcordButton(
-                  label: l10n.disableButton,
-                  variant: ConcordButtonVariant.danger,
-                  size: ConcordButtonSize.sm,
-                  onPressed: _openDisableDialog,
+                Expanded(
+                  child: ConcordButton(
+                    label: l10n.disableButton,
+                    variant: ConcordButtonVariant.danger,
+                    size: ConcordButtonSize.sm,
+                    onPressed: _openDisableDialog,
+                  ),
                 ),
               ],
             ),
@@ -309,18 +313,22 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
           const SizedBox(height: ConcordSpacing.md),
           Row(
             children: [
-              ConcordButton(
-                label: l10n.confirmButton,
-                size: ConcordButtonSize.sm,
-                loading: _confirming,
-                onPressed: _confirming ? null : _confirmSetup,
+              Expanded(
+                child: ConcordButton(
+                  label: l10n.confirmButton,
+                  size: ConcordButtonSize.sm,
+                  loading: _confirming,
+                  onPressed: _confirming ? null : _confirmSetup,
+                ),
               ),
               const SizedBox(width: ConcordSpacing.sm),
-              ConcordButton(
-                label: l10n.cancelButton,
-                variant: ConcordButtonVariant.ghost,
-                size: ConcordButtonSize.sm,
-                onPressed: _confirming ? null : _cancelSetup,
+              Expanded(
+                child: ConcordButton(
+                  label: l10n.cancelButton,
+                  variant: ConcordButtonVariant.ghost,
+                  size: ConcordButtonSize.sm,
+                  onPressed: _confirming ? null : _cancelSetup,
+                ),
               ),
             ],
           ),
@@ -404,18 +412,22 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
           const SizedBox(height: ConcordSpacing.md),
           Row(
             children: [
-              ConcordButton(
-                label: _copied ? l10n.copiedLabel : l10n.copyCodesButton,
-                variant: ConcordButtonVariant.secondary,
-                size: ConcordButtonSize.sm,
-                leading: Icon(_copied ? Icons.check : Icons.copy, size: 16),
-                onPressed: _copy,
+              Expanded(
+                child: ConcordButton(
+                  label: _copied ? l10n.copiedLabel : l10n.copyCodesButton,
+                  variant: ConcordButtonVariant.secondary,
+                  size: ConcordButtonSize.sm,
+                  leading: Icon(_copied ? Icons.check : Icons.copy, size: 16),
+                  onPressed: _copy,
+                ),
               ),
               const SizedBox(width: ConcordSpacing.sm),
-              ConcordButton(
-                label: l10n.savedCodesButton,
-                size: ConcordButtonSize.sm,
-                onPressed: widget.onDone,
+              Expanded(
+                child: ConcordButton(
+                  label: l10n.savedCodesButton,
+                  size: ConcordButtonSize.sm,
+                  onPressed: widget.onDone,
+                ),
               ),
             ],
           ),
