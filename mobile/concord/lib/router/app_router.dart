@@ -68,13 +68,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => ResetPasswordScreen(token: state.uri.queryParameters['token']),
       ),
       GoRoute(path: '/invite/:code', builder: (context, state) => const SizedBox.shrink()),
-      GoRoute(
-        path: '/',
-        builder: (context, state) {
-          final status = ref.read(authControllerProvider).status;
-          return status == AuthStatus.unknown ? const SplashScreen() : const HomeScreen();
-        },
-      ),
+      GoRoute(path: '/', builder: (context, state) => const _RootGate()),
       GoRoute(
         path: '/servers/:serverId',
         builder: (context, state) {
@@ -113,6 +107,24 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// The `/` route's builder runs inside [routerProvider]'s own closure, whose `ref` is a
+/// [Provider]-scoped ref captured once when the (long-lived, cached) [GoRouter] is built - reading
+/// [authControllerProvider] there with `ref.read` used to snapshot the status only at that one
+/// moment. Once local tokens resolved to `authenticated` shortly after launch, the top-level
+/// `redirect` saw we were already at `/` and returned null (nothing to redirect), so the stale
+/// snapshot was never replaced and the splash spinner stuck around forever. Routing that decision
+/// through a real widget-tree [ConsumerWidget] with `ref.watch` fixes that: this widget rebuilds
+/// itself whenever auth status changes, independent of whether GoRouter itself re-navigates.
+class _RootGate extends ConsumerWidget {
+  const _RootGate();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final status = ref.watch(authControllerProvider.select((state) => state.status));
+    return status == AuthStatus.unknown ? const SplashScreen() : const HomeScreen();
+  }
+}
 
 class _GoRouterRefreshNotifier extends ChangeNotifier {
   _GoRouterRefreshNotifier(Ref ref) {

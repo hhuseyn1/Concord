@@ -67,10 +67,17 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> register({
     required String name,
     required String surname,
+    required String username,
     required String email,
     required String password,
   }) async {
-    await _authService.register(name: name, surname: surname, email: email, password: password);
+    await _authService.register(
+      name: name,
+      surname: surname,
+      username: username,
+      email: email,
+      password: password,
+    );
   }
 
   Future<void> resendVerificationEmail({required String email}) {

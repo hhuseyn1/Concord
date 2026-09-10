@@ -7,11 +7,16 @@
          with this phase's voice/video calling (`livekit_client`, which
          requires them at manifest level regardless of the runtime
          permission prompt). -->
+    <!-- POST_NOTIFICATIONS is a runtime permission on Android 13+ (API 33+) - without it declared
+         here, permission_handler's Permission.notification check/request in
+         push_notifications_controller.dart has nothing to prompt for, and no push notification
+         (firebase_messaging) can ever be shown regardless of what the app does in Dart. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
     <uses-feature android:name="android.hardware.microphone" android:required="false"/>

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/conversation_list_providers.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
@@ -14,6 +15,7 @@ class ConversationListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final state = ref.watch(conversationsControllerProvider);
     final controller = ref.read(conversationsControllerProvider.notifier);
 
@@ -25,10 +27,10 @@ class ConversationListScreen extends ConsumerWidget {
       return Center(
         child: ConcordEmptyState(
           icon: Icons.error_outline,
-          title: "Couldn't load conversations",
+          title: l10n.couldNotLoadConversationsTitle,
           subtitle: state.loadError,
           action: ConcordButton(
-            label: 'Try again',
+            label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
             size: ConcordButtonSize.sm,
             onPressed: controller.retryInitialLoad,
@@ -38,11 +40,11 @@ class ConversationListScreen extends ConsumerWidget {
     }
 
     if (state.items.isEmpty) {
-      return const Center(
+      return Center(
         child: ConcordEmptyState(
           icon: Icons.mail_outline,
-          title: 'No conversations yet',
-          subtitle: 'Message a friend from the Friends tab to start one.',
+          title: l10n.noConversationsYetTitle,
+          subtitle: l10n.noConversationsYetSubtitle,
         ),
       );
     }
@@ -58,7 +60,7 @@ class ConversationListScreen extends ConsumerWidget {
               child: state.isLoadingMore
                   ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                   : ConcordButton(
-                      label: 'Load more',
+                      label: l10n.loadMoreButton,
                       variant: ConcordButtonVariant.secondary,
                       size: ConcordButtonSize.sm,
                       onPressed: controller.loadMore,
@@ -72,7 +74,7 @@ class ConversationListScreen extends ConsumerWidget {
         final lastMessage = conversation.lastMessage;
         final preview = lastMessage == null
             ? null
-            : ((lastMessage.content?.isNotEmpty ?? false) ? lastMessage.content : 'Sent an attachment');
+            : ((lastMessage.content?.isNotEmpty ?? false) ? lastMessage.content : l10n.sentAttachmentPreview);
 
         return ListTile(
           leading: ConcordAvatar(

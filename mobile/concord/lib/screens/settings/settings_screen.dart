@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import 'active_sessions_section.dart';
 import 'change_password_section.dart';
 import 'custom_status_sheet.dart';
+import 'delete_account_section.dart';
 import 'edit_profile_sheet.dart';
 import 'link_device_screen.dart';
 import 'preferences_section.dart';
@@ -21,6 +23,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
     final profile = ref.watch(authControllerProvider).profile;
 
     final displayName = profile == null
@@ -33,14 +36,14 @@ class SettingsScreen extends ConsumerWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Settings'),
-          bottom: const TabBar(
+          title: Text(l10n.settingsScreenTitle),
+          bottom: TabBar(
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             tabs: [
-              Tab(text: 'My Account'),
-              Tab(text: 'Privacy'),
-              Tab(text: 'Voice'),
+              Tab(text: l10n.myAccountTab),
+              Tab(text: l10n.privacyTabLabel),
+              Tab(text: l10n.voiceTabLabel),
             ],
           ),
         ),
@@ -58,7 +61,7 @@ class SettingsScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            displayName?.isNotEmpty == true ? displayName! : 'Loading…',
+                            displayName?.isNotEmpty == true ? displayName! : l10n.loadingEllipsis,
                             style: textTheme.titleMedium,
                           ),
                           if (profile?.email != null)
@@ -75,14 +78,14 @@ class SettingsScreen extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         ConcordButton(
-                          label: 'Edit Profile',
+                          label: l10n.editProfileButton,
                           variant: ConcordButtonVariant.secondary,
                           size: ConcordButtonSize.sm,
                           onPressed: profile == null ? null : () => showEditProfileSheet(context, ref),
                         ),
                         const SizedBox(height: ConcordSpacing.sm),
                         ConcordButton(
-                          label: 'Status',
+                          label: l10n.statusButton,
                           variant: ConcordButtonVariant.secondary,
                           size: ConcordButtonSize.sm,
                           onPressed: profile == null ? null : () => showCustomStatusSheet(context, ref),
@@ -90,6 +93,15 @@ class SettingsScreen extends ConsumerWidget {
                       ],
                     ),
                   ],
+                ),
+                const SizedBox(height: ConcordSpacing.lg),
+                ConcordButton(
+                  label: l10n.scanQrCodeButton,
+                  leading: const Icon(Icons.qr_code_scanner, size: 18),
+                  expand: true,
+                  onPressed: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute(builder: (context) => const LinkDeviceScreen()),
+                  ),
                 ),
                 const SizedBox(height: ConcordSpacing.xxl),
                 const ChangePasswordSection(),
@@ -105,22 +117,15 @@ class SettingsScreen extends ConsumerWidget {
                 const Divider(),
                 const SizedBox(height: ConcordSpacing.lg),
                 const ActiveSessionsSection(),
-                const SizedBox(height: ConcordSpacing.md),
-                ConcordButton(
-                  label: 'Link a Device',
-                  variant: ConcordButtonVariant.secondary,
-                  size: ConcordButtonSize.sm,
-                  onPressed: () => Navigator.of(context).push<void>(
-                    MaterialPageRoute(builder: (context) => const LinkDeviceScreen()),
-                  ),
-                ),
                 const SizedBox(height: ConcordSpacing.xxl),
                 ConcordButton(
-                  label: 'Log Out',
+                  label: l10n.logOutButton,
                   variant: ConcordButtonVariant.danger,
                   expand: true,
                   onPressed: () => ref.read(authControllerProvider.notifier).logout(),
                 ),
+                const SizedBox(height: ConcordSpacing.xxl),
+                const DeleteAccountSection(),
               ],
             ),
             const PrivacyTab(),

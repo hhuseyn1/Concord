@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/server_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
@@ -14,6 +15,7 @@ class ServerRailDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final serversAsync = ref.watch(myServersProvider);
     final currentServerId = GoRouterState.of(context).pathParameters['serverId'];
 
@@ -25,7 +27,7 @@ class ServerRailDrawer extends ConsumerWidget {
           children: [
             const SizedBox(height: ConcordSpacing.sm),
             _RailTile(
-              tooltip: 'Home (Messages & Friends)',
+              tooltip: l10n.homeTooltip,
               selected: currentServerId == null,
               onTap: () {
                 Navigator.of(context).pop();
@@ -45,7 +47,7 @@ class ServerRailDrawer extends ConsumerWidget {
                 error: (error, stackTrace) => Padding(
                   padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.sm),
                   child: Text(
-                    'Couldn’t load servers',
+                    l10n.couldNotLoadServersText,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 11, color: colors.fgMuted),
                   ),
@@ -74,7 +76,7 @@ class ServerRailDrawer extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.md),
               child: ConcordIconButton(
                 icon: Icons.add,
-                tooltip: 'Add or join a server',
+                tooltip: l10n.addOrJoinServerTooltip,
                 variant: ConcordButtonVariant.secondary,
                 size: ConcordButtonSize.lg,
                 onPressed: () {

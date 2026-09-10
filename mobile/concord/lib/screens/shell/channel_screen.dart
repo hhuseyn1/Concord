@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/server_providers.dart';
 import '../channel/channel_message_view.dart';
 import '../voice/voice_channel_view.dart';
@@ -29,7 +30,9 @@ class ChannelScreen extends ConsumerWidget {
           children: [
             Icon(isVoice ? Icons.volume_up_outlined : Icons.tag, size: 18),
             const SizedBox(width: 6),
-            Flexible(child: Text(channel?.name ?? 'Channel', overflow: TextOverflow.ellipsis)),
+            Flexible(
+              child: Text(channel?.name ?? AppLocalizations.of(context).channelFallbackTitle, overflow: TextOverflow.ellipsis),
+            ),
           ],
         ),
       ),

@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/server_member_list_providers.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-const _timeoutPresets = <int, String>{
-  5: '5 minutes',
-  60: '1 hour',
-  24 * 60: '1 day',
-  7 * 24 * 60: '7 days',
-};
+Map<int, String> _timeoutPresets(AppLocalizations l10n) => {
+      5: l10n.timeoutFiveMin,
+      60: l10n.expiryOneHourLabel,
+      24 * 60: l10n.expiryOneDayLabel,
+      7 * 24 * 60: l10n.expirySevenDaysLabel,
+    };
 
 Future<void> showMemberModerationSheet(
   BuildContext context,
@@ -67,22 +68,23 @@ class _MemberModerationSheetState extends State<_MemberModerationSheet> {
     widget.ref.read(serverMemberListControllerProvider(widget.serverId).notifier).removeWhere(match);
   }
 
-  void _showErrorNow(String action, ApiException e) {
+  void _showErrorNow(AppLocalizations l10n, String action, ApiException e) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Could not $action: ${e.message.isNotEmpty ? e.message : 'unknown error'}')),
+      SnackBar(content: Text(l10n.errorModerationFailed(action, e.message.isNotEmpty ? e.message : l10n.unknownErrorLabel))),
     );
   }
 
-  void _showErrorLater(String action, ApiException e) {
+  void _showErrorLater(AppLocalizations l10n, String action, ApiException e) {
     final rootContext = widget.rootContext;
     if (!rootContext.mounted) return;
     ScaffoldMessenger.of(rootContext).showSnackBar(
-      SnackBar(content: Text('Could not $action: ${e.message.isNotEmpty ? e.message : 'unknown error'}')),
+      SnackBar(content: Text(l10n.errorModerationFailed(action, e.message.isNotEmpty ? e.message : l10n.unknownErrorLabel))),
     );
   }
 
   Future<void> _toggleMute() async {
+    final l10n = AppLocalizations.of(context);
     final userId = widget.member.user.id;
     final wasMuted = widget.member.isMuted;
     setState(() => _busy = true);
@@ -94,13 +96,14 @@ class _MemberModerationSheetState extends State<_MemberModerationSheet> {
       _patch((m) => m.user.id == userId, (m) => m.copyWith(isMuted: result.isMuted));
       if (mounted) Navigator.of(context).pop();
     } on ApiException catch (e) {
-      _showErrorNow(wasMuted ? 'unmute this member' : 'mute this member', e);
+      _showErrorNow(l10n, wasMuted ? l10n.actionUnmuteMember : l10n.actionMuteMember, e);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _removeTimeout() async {
+    final l10n = AppLocalizations.of(context);
     final userId = widget.member.user.id;
     setState(() => _busy = true);
     try {
@@ -111,13 +114,14 @@ class _MemberModerationSheetState extends State<_MemberModerationSheet> {
       );
       if (mounted) Navigator.of(context).pop();
     } on ApiException catch (e) {
-      _showErrorNow('remove this timeout', e);
+      _showErrorNow(l10n, l10n.actionRemoveTimeout, e);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _openTimeoutSheet() async {
+    final l10n = AppLocalizations.of(context);
     Navigator.of(context).pop();
     final rootContext = widget.rootContext;
     if (!rootContext.mounted) return;
@@ -137,22 +141,23 @@ class _MemberModerationSheetState extends State<_MemberModerationSheet> {
           );
       _patch((m) => m.user.id == userId, (m) => m.copyWith(timedOutUntil: response.timedOutUntil));
     } on ApiException catch (e) {
-      _showErrorLater('time out this member', e);
+      _showErrorLater(l10n, l10n.actionTimeoutMember, e);
     }
   }
 
   Future<void> _confirmKick() async {
+    final l10n = AppLocalizations.of(context);
     Navigator.of(context).pop();
     final rootContext = widget.rootContext;
     if (!rootContext.mounted) return;
     final confirmed = await showDialog<bool>(
       context: rootContext,
       builder: (context) => AlertDialog(
-        title: Text('Kick $_displayName?'),
-        content: Text('$_displayName will be removed from the server. They can rejoin with a valid invite.'),
+        title: Text(l10n.kickConfirmTitle(_displayName)),
+        content: Text(l10n.kickConfirmMessage(_displayName)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Kick')),
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(l10n.cancelButton)),
+          TextButton(onPressed: () => Navigator.of(context).pop(true), child: Text(l10n.kickAction)),
         ],
       ),
     );
@@ -162,11 +167,12 @@ class _MemberModerationSheetState extends State<_MemberModerationSheet> {
       await widget.ref.read(serversServiceProvider).kickMember(widget.serverId, userId);
       _remove((m) => m.user.id == userId);
     } on ApiException catch (e) {
-      _showErrorLater('kick this member', e);
+      _showErrorLater(l10n, l10n.actionKickMember, e);
     }
   }
 
   Future<void> _openBanSheet() async {
+    final l10n = AppLocalizations.of(context);
     Navigator.of(context).pop();
     final rootContext = widget.rootContext;
     if (!rootContext.mounted) return;
@@ -183,13 +189,14 @@ class _MemberModerationSheetState extends State<_MemberModerationSheet> {
           .banMember(widget.serverId, userId, reason: result.isEmpty ? null : result);
       _remove((m) => m.user.id == userId);
     } on ApiException catch (e) {
-      _showErrorLater('ban this member', e);
+      _showErrorLater(l10n, l10n.actionBanMember, e);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final permissions = widget.permissions;
     final isMuted = widget.member.isMuted;
     final isTimedOut = widget.member.isTimedOut;
@@ -206,14 +213,14 @@ class _MemberModerationSheetState extends State<_MemberModerationSheet> {
           if (permissions.hasMuteMembers)
             ListTile(
               leading: Icon(isMuted ? Icons.volume_up_outlined : Icons.mic_off_outlined),
-              title: Text(isMuted ? 'Unmute' : 'Mute'),
+              title: Text(isMuted ? l10n.unmuteAction : l10n.muteAction),
               enabled: !_busy,
               onTap: _busy ? null : _toggleMute,
             ),
           if (permissions.hasModerateMembers)
             ListTile(
               leading: const Icon(Icons.schedule_outlined),
-              title: Text(isTimedOut ? 'Remove Timeout' : 'Timeout'),
+              title: Text(isTimedOut ? l10n.removeTimeoutAction : l10n.timeoutAction),
               enabled: !_busy,
               onTap: _busy ? null : (isTimedOut ? _removeTimeout : _openTimeoutSheet),
             ),
@@ -221,14 +228,14 @@ class _MemberModerationSheetState extends State<_MemberModerationSheet> {
           if (permissions.hasKickMembers)
             ListTile(
               leading: Icon(Icons.person_remove_outlined, color: colors.danger),
-              title: Text('Kick', style: TextStyle(color: colors.danger)),
+              title: Text(l10n.kickAction, style: TextStyle(color: colors.danger)),
               enabled: !_busy,
               onTap: _busy ? null : _confirmKick,
             ),
           if (permissions.hasBanMembers)
             ListTile(
               leading: Icon(Icons.block, color: colors.danger),
-              title: Text('Ban', style: TextStyle(color: colors.danger)),
+              title: Text(l10n.banAction, style: TextStyle(color: colors.danger)),
               enabled: !_busy,
               onTap: _busy ? null : _openBanSheet,
             ),
@@ -266,6 +273,8 @@ class _TimeoutSheetState extends State<_TimeoutSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final timeoutPresets = _timeoutPresets(l10n);
     return Padding(
       padding: EdgeInsets.only(
         left: ConcordSpacing.lg,
@@ -277,20 +286,20 @@ class _TimeoutSheetState extends State<_TimeoutSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Time out ${widget.displayName}?', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.timeoutConfirmTitle(widget.displayName), style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            "They'll temporarily lose the ability to send messages and speak in voice channels.",
+            l10n.timeoutConfirmMessage,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: ConcordSpacing.lg),
-          Text('Duration', style: Theme.of(context).textTheme.labelLarge),
+          Text(l10n.durationLabel, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: ConcordSpacing.sm),
           Wrap(
             spacing: ConcordSpacing.sm,
             runSpacing: ConcordSpacing.sm,
             children: [
-              for (final entry in _timeoutPresets.entries)
+              for (final entry in timeoutPresets.entries)
                 ChoiceChip(
                   label: Text(entry.value),
                   selected: _durationMinutes == entry.key,
@@ -301,21 +310,21 @@ class _TimeoutSheetState extends State<_TimeoutSheet> {
           const SizedBox(height: ConcordSpacing.lg),
           ConcordTextField(
             controller: _reasonController,
-            label: 'Reason',
-            hint: 'Optional',
+            label: l10n.reasonLabel,
+            hint: l10n.optionalHint,
           ),
           const SizedBox(height: ConcordSpacing.lg),
           Row(
             children: [
               const Spacer(),
               ConcordButton(
-                label: 'Cancel',
+                label: l10n.cancelButton,
                 variant: ConcordButtonVariant.secondary,
                 onPressed: () => Navigator.of(context).pop(),
               ),
               const SizedBox(width: ConcordSpacing.sm),
               ConcordButton(
-                label: 'Timeout',
+                label: l10n.timeoutAction,
                 onPressed: () => Navigator.of(context).pop(
                   _TimeoutChoice(
                     _durationMinutes,
@@ -351,6 +360,7 @@ class _BanSheetState extends State<_BanSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         left: ConcordSpacing.lg,
@@ -362,26 +372,26 @@ class _BanSheetState extends State<_BanSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Ban ${widget.displayName}?', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.banConfirmTitle(widget.displayName), style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),
           Text(
-            "This removes them from the server and blocks them from rejoining through any invite.",
+            l10n.banConfirmMessage,
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: ConcordSpacing.lg),
-          ConcordTextField(controller: _reasonController, label: 'Reason', hint: 'Optional'),
+          ConcordTextField(controller: _reasonController, label: l10n.reasonLabel, hint: l10n.optionalHint),
           const SizedBox(height: ConcordSpacing.lg),
           Row(
             children: [
               const Spacer(),
               ConcordButton(
-                label: 'Cancel',
+                label: l10n.cancelButton,
                 variant: ConcordButtonVariant.secondary,
                 onPressed: () => Navigator.of(context).pop(),
               ),
               const SizedBox(width: ConcordSpacing.sm),
               ConcordButton(
-                label: 'Ban',
+                label: l10n.banAction,
                 variant: ConcordButtonVariant.danger,
                 onPressed: () => Navigator.of(context).pop(_reasonController.text.trim()),
               ),

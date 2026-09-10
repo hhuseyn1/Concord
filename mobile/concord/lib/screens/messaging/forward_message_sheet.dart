@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/conversation_list_providers.dart';
 import '../../providers/message_thread_controller.dart';
 import '../../providers/server_providers.dart';
@@ -63,6 +64,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
 
   Future<void> _forwardTo({String? channelId, String? conversationId}) async {
     if (_forwarding) return;
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _forwarding = true;
       _error = null;
@@ -75,12 +77,12 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
       );
       if (!mounted) return;
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Message forwarded.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.messageForwardedSnackbar)));
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() {
         _forwarding = false;
-        _error = e.message.isNotEmpty ? e.message : 'Could not forward that message.';
+        _error = e.message.isNotEmpty ? e.message : l10n.errorForwardMessageFailed;
       });
     }
   }
@@ -88,6 +90,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final query = _searchController.text.trim().toLowerCase();
     final serversAsync = ref.watch(myServersProvider);
     final conversationsState = ref.watch(conversationsControllerProvider);
@@ -110,16 +113,16 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Forward Message', style: Theme.of(context).textTheme.titleMedium),
+            Text(l10n.forwardMessageTitle, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 4),
             Text(
-              'Choose a channel or a direct message to forward this to.',
+              l10n.forwardMessageSubtitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.fgMuted),
             ),
             const SizedBox(height: ConcordSpacing.md),
             ConcordTextField(
               controller: _searchController,
-              hint: 'Search channels or people…',
+              hint: l10n.forwardSearchHint,
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: ConcordSpacing.sm),
@@ -138,7 +141,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.xs),
                         child: Text(
-                          'CHANNELS',
+                          l10n.channelsSectionHeader,
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -156,7 +159,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
                               child: Text(
-                                servers.isEmpty ? "You're not in any servers." : 'No matching servers.',
+                                servers.isEmpty ? l10n.notInAnyServersText : l10n.noMatchingServersText,
                                 style: TextStyle(fontSize: 13, color: colors.fgMuted),
                               ),
                             );
@@ -179,14 +182,14 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                         ),
                         error: (error, stackTrace) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
-                          child: Text("Couldn't load your servers.", style: TextStyle(fontSize: 13, color: colors.danger)),
+                          child: Text(l10n.couldNotLoadYourServersText, style: TextStyle(fontSize: 13, color: colors.danger)),
                         ),
                       ),
                       const SizedBox(height: ConcordSpacing.md),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.xs),
                         child: Text(
-                          'DIRECT MESSAGES',
+                          l10n.directMessagesSectionHeader,
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -198,7 +201,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                       if (filteredConversations.isEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
-                          child: Text('No matching conversations.', style: TextStyle(fontSize: 13, color: colors.fgMuted)),
+                          child: Text(l10n.noMatchingConversationsText, style: TextStyle(fontSize: 13, color: colors.fgMuted)),
                         )
                       else
                         for (final conversation in filteredConversations)
@@ -241,6 +244,7 @@ class _ServerChannelsExpansion extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
@@ -261,7 +265,7 @@ class _ServerChannelsExpansion extends ConsumerWidget {
                   if (textChannels.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
-                      child: Text('No matching channels.', style: TextStyle(fontSize: 12, color: colors.fgMuted)),
+                      child: Text(l10n.noMatchingChannelsText, style: TextStyle(fontSize: 12, color: colors.fgMuted)),
                     );
                   }
                   return Column(
@@ -283,7 +287,7 @@ class _ServerChannelsExpansion extends ConsumerWidget {
                 ),
                 error: (error, stackTrace) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
-                  child: Text("Couldn't load channels.", style: TextStyle(fontSize: 12, color: colors.danger)),
+                  child: Text(l10n.couldNotLoadChannelsPeriod, style: TextStyle(fontSize: 12, color: colors.danger)),
                 ),
               );
             },

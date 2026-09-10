@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
 
 class ConcordTextField extends StatefulWidget {
@@ -45,6 +46,7 @@ class _ConcordTextFieldState extends State<ConcordTextField> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
     final invalid = widget.errorText != null && widget.errorText!.isNotEmpty;
 
     return Column(
@@ -86,7 +88,7 @@ class _ConcordTextFieldState extends State<ConcordTextField> {
                       size: 18,
                       color: colors.fgMuted,
                     ),
-                    tooltip: _visible ? 'Hide password' : 'Show password',
+                    tooltip: _visible ? l10n.hidePasswordTooltip : l10n.showPasswordTooltip,
                     onPressed: () => setState(() => _visible = !_visible),
                   )
                 : null,

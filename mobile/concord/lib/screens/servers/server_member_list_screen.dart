@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/paged_list_controller.dart';
 import '../../providers/server_member_list_providers.dart';
 import '../../theme/theme.dart';
@@ -17,15 +18,17 @@ class ServerMemberListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(serverMemberListControllerProvider(serverId));
     final controller = ref.read(serverMemberListControllerProvider(serverId).notifier);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Members')),
-      body: _buildBody(context, state, controller),
+      appBar: AppBar(title: Text(l10n.membersTitle)),
+      body: _buildBody(context, l10n, state, controller),
     );
   }
 
   Widget _buildBody(
     BuildContext context,
+    AppLocalizations l10n,
     PagedListState<ServerMemberSummary> state,
     PagedListController<ServerMemberSummary> controller,
   ) {
@@ -37,10 +40,10 @@ class ServerMemberListScreen extends ConsumerWidget {
       return Center(
         child: ConcordEmptyState(
           icon: Icons.error_outline,
-          title: "Couldn't load members",
+          title: l10n.couldNotLoadMembersTitle,
           subtitle: state.loadError,
           action: ConcordButton(
-            label: 'Try again',
+            label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
             size: ConcordButtonSize.sm,
             onPressed: controller.retryInitialLoad,
@@ -50,17 +53,17 @@ class ServerMemberListScreen extends ConsumerWidget {
     }
 
     if (state.items.isEmpty) {
-      return const Center(
+      return Center(
         child: ConcordEmptyState(
           icon: Icons.people_outline,
-          title: 'No members',
-          subtitle: 'This server has no members yet.',
+          title: l10n.noMembersTitle,
+          subtitle: l10n.noMembersSubtitle,
         ),
       );
     }
 
     final colors = Theme.of(context).extension<ConcordColors>()!;
-    final groups = _groupByPresence(state.items);
+    final groups = _groupByPresence(l10n, state.items);
 
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
@@ -69,7 +72,7 @@ class ServerMemberListScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(ConcordSpacing.md, ConcordSpacing.md, ConcordSpacing.md, ConcordSpacing.xs),
             child: Text(
-              '${group.label.toUpperCase()} - ${group.members.length}',
+              l10n.memberGroupHeader(group.label.toUpperCase(), group.members.length),
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
             ),
           ),
@@ -82,7 +85,7 @@ class ServerMemberListScreen extends ConsumerWidget {
               child: state.isLoadingMore
                   ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                   : ConcordButton(
-                      label: 'Load more',
+                      label: l10n.loadMoreButton,
                       variant: ConcordButtonVariant.secondary,
                       size: ConcordButtonSize.sm,
                       onPressed: controller.loadMore,
@@ -92,7 +95,7 @@ class ServerMemberListScreen extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md, vertical: ConcordSpacing.xs),
           child: Text(
-            '${state.items.length} member${state.items.length == 1 ? '' : 's'}',
+            l10n.memberCountLabel(state.items.length),
             style: TextStyle(fontSize: 12, color: colors.fgMuted),
           ),
         ),
@@ -100,7 +103,7 @@ class ServerMemberListScreen extends ConsumerWidget {
     );
   }
 
-  List<_MemberGroup> _groupByPresence(List<ServerMemberSummary> members) {
+  List<_MemberGroup> _groupByPresence(AppLocalizations l10n, List<ServerMemberSummary> members) {
     final online = <ServerMemberSummary>[];
     final idle = <ServerMemberSummary>[];
     final offline = <ServerMemberSummary>[];
@@ -117,9 +120,9 @@ class ServerMemberListScreen extends ConsumerWidget {
       }
     }
     return [
-      if (online.isNotEmpty) _MemberGroup('Online', online),
-      if (idle.isNotEmpty) _MemberGroup('Idle', idle),
-      if (offline.isNotEmpty) _MemberGroup('Offline', offline),
+      if (online.isNotEmpty) _MemberGroup(l10n.statusOnline, online),
+      if (idle.isNotEmpty) _MemberGroup(l10n.statusIdle, idle),
+      if (offline.isNotEmpty) _MemberGroup(l10n.statusOffline, offline),
     ];
   }
 }

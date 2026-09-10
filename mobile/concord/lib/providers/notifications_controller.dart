@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../api/api.dart';
@@ -155,6 +156,15 @@ class NotificationsController extends StateNotifier<NotificationsState> {
       _ref.invalidate(friendsListControllerProvider);
       _ref.invalidate(blockedListControllerProvider);
     }
+
+    // Mirrors the web client's toast/sound behavior: this hub push is the only signal a message or
+    // friend request arrived while the app is open (there's no OS-level push yet), so a muted sound
+    // cue plus a light buzz is the whole notice the user gets - skip both only if they've muted
+    // notifications outright.
+    final profile = _ref.read(authControllerProvider).profile;
+    if (profile?.notificationsMuted ?? false) return;
+    if (profile?.notificationsSoundEnabled ?? false) unawaited(SystemSound.play(SystemSoundType.alert));
+    unawaited(HapticFeedback.mediumImpact());
   }
 
   Future<void> _teardownForSignOut() async {

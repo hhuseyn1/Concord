@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/server_providers.dart';
 import '../../theme/theme.dart';
@@ -36,8 +37,9 @@ class _RenameChannelSheetState extends ConsumerState<_RenameChannelSheet> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
-    setState(() => _nameError = name.isEmpty ? 'Channel name is required.' : null);
+    setState(() => _nameError = name.isEmpty ? l10n.channelNameRequired : null);
     if (_nameError != null) return;
     if (name == widget.channel.name) {
       Navigator.of(context).pop();
@@ -52,7 +54,7 @@ class _RenameChannelSheetState extends ConsumerState<_RenameChannelSheet> {
       ref.invalidate(channelsProvider(widget.channel.serverId));
       if (mounted) Navigator.of(context).pop();
     } on ApiException catch (e) {
-      setState(() => _nameError = e.message.isNotEmpty ? e.message : 'Could not rename channel.');
+      setState(() => _nameError = e.message.isNotEmpty ? e.message : l10n.errorRenameChannelFailed);
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -60,6 +62,7 @@ class _RenameChannelSheetState extends ConsumerState<_RenameChannelSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.only(
         left: ConcordSpacing.lg,
@@ -71,11 +74,11 @@ class _RenameChannelSheetState extends ConsumerState<_RenameChannelSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Rename #${widget.channel.name}', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.renameChannelTitle(widget.channel.name), style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: ConcordSpacing.lg),
           ConcordTextField(
             controller: _nameController,
-            label: 'Channel name',
+            label: l10n.channelNameLabel,
             required: true,
             errorText: _nameError,
             enabled: !_submitting,
@@ -87,12 +90,12 @@ class _RenameChannelSheetState extends ConsumerState<_RenameChannelSheet> {
             children: [
               const Spacer(),
               ConcordButton(
-                label: 'Cancel',
+                label: l10n.cancelButton,
                 variant: ConcordButtonVariant.secondary,
                 onPressed: _submitting ? null : () => Navigator.of(context).pop(),
               ),
               const SizedBox(width: ConcordSpacing.sm),
-              ConcordButton(label: 'Save', loading: _submitting, onPressed: _submitting ? null : _submit),
+              ConcordButton(label: l10n.saveButton, loading: _submitting, onPressed: _submitting ? null : _submit),
             ],
           ),
         ],

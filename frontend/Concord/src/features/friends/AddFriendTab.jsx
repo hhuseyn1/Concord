@@ -92,9 +92,9 @@ export function AddFriendTab() {
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by username…"
+          placeholder="Enter their exact username…"
           className="pl-9"
-          aria-label="Search for a user by username"
+          aria-label="Search for a user by their exact username"
         />
       </div>
 
@@ -106,7 +106,7 @@ export function AddFriendTab() {
         <EmptyState
           icon={UserPlus}
           title="Find friends by username"
-          description="You, existing friends, and blocked users won't show up here - search results reflect your real relationship with each person."
+          description="You'll need their exact username - this isn't a browsable directory. You, existing friends, and blocked users won't show up here."
         />
       )}
 

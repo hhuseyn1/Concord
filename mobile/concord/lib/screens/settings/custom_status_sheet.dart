@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-const _expiryLabels = {
-  CustomStatusExpiryPreset.never: "Don't clear",
-  CustomStatusExpiryPreset.thirtyMinutes: '30 minutes',
-  CustomStatusExpiryPreset.oneHour: '1 hour',
-  CustomStatusExpiryPreset.fourHours: '4 hours',
-  CustomStatusExpiryPreset.today: 'Today',
-};
+Map<CustomStatusExpiryPreset, String> _expiryLabels(AppLocalizations l10n) => {
+      CustomStatusExpiryPreset.never: l10n.expiryNeverLabel,
+      CustomStatusExpiryPreset.thirtyMinutes: l10n.expiryThirtyMinLabel,
+      CustomStatusExpiryPreset.oneHour: l10n.expiryOneHourLabel,
+      CustomStatusExpiryPreset.fourHours: l10n.expiryFourHoursLabel,
+      CustomStatusExpiryPreset.today: l10n.expiryTodayLabel,
+    };
 
 Future<void> showCustomStatusSheet(BuildContext context, WidgetRef ref) {
   final profile = ref.read(authControllerProvider).profile;
@@ -72,6 +73,8 @@ class _CustomStatusSheetState extends ConsumerState<_CustomStatusSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
+    final expiryLabels = _expiryLabels(l10n);
     final hasExisting = widget.initialText.isNotEmpty;
 
     return Padding(
@@ -85,7 +88,7 @@ class _CustomStatusSheetState extends ConsumerState<_CustomStatusSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Set a custom status', style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.setCustomStatusTitle, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: ConcordSpacing.lg),
           Row(
             children: [
@@ -95,7 +98,7 @@ class _CustomStatusSheetState extends ConsumerState<_CustomStatusSheet> {
               ),
               const SizedBox(width: ConcordSpacing.sm),
               Expanded(
-                child: ConcordTextField(controller: _textController, hint: "What's on your mind?"),
+                child: ConcordTextField(controller: _textController, hint: l10n.customStatusTextHint),
               ),
             ],
           ),
@@ -103,13 +106,13 @@ class _CustomStatusSheetState extends ConsumerState<_CustomStatusSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Clear after', style: TextStyle(color: colors.fgMuted)),
+              Text(l10n.clearAfterLabel, style: TextStyle(color: colors.fgMuted)),
               DropdownButton<CustomStatusExpiryPreset>(
                 value: _expiry,
                 onChanged: (value) => setState(() => _expiry = value ?? CustomStatusExpiryPreset.never),
                 items: [
                   for (final preset in CustomStatusExpiryPreset.values)
-                    DropdownMenuItem(value: preset, child: Text(_expiryLabels[preset]!)),
+                    DropdownMenuItem(value: preset, child: Text(expiryLabels[preset]!)),
                 ],
               ),
             ],
@@ -123,19 +126,19 @@ class _CustomStatusSheetState extends ConsumerState<_CustomStatusSheet> {
             children: [
               if (hasExisting)
                 ConcordButton(
-                  label: 'Clear',
+                  label: l10n.clearButton,
                   variant: ConcordButtonVariant.ghost,
                   onPressed: _saving ? null : () => _save(),
                 ),
               const Spacer(),
               ConcordButton(
-                label: 'Cancel',
+                label: l10n.cancelButton,
                 variant: ConcordButtonVariant.secondary,
                 onPressed: _saving ? null : () => Navigator.of(context).pop(),
               ),
               const SizedBox(width: ConcordSpacing.sm),
               ConcordButton(
-                label: 'Save',
+                label: l10n.saveButton,
                 loading: _saving,
                 onPressed: _saving
                     ? null

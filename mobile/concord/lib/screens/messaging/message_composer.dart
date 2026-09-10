@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/api_providers.dart';
 import '../../providers/draft_store.dart';
 import '../../providers/message_thread_controller.dart';
@@ -64,7 +65,7 @@ class MessageComposer extends ConsumerStatefulWidget {
     required this.replyingTo,
     required this.onCancelReply,
     required this.onSent,
-    this.hintText = 'Message this channel…',
+    this.hintText,
     this.serverId,
   });
 
@@ -74,7 +75,7 @@ class MessageComposer extends ConsumerStatefulWidget {
   final MessageLike? replyingTo;
   final VoidCallback onCancelReply;
   final VoidCallback onSent;
-  final String hintText;
+  final String? hintText;
 
   final String? serverId;
 
@@ -201,7 +202,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
       if (!mounted) return;
       setState(() {
         _attachment = null;
-        _sendError = 'Could not attach file: ${e.message}';
+        _sendError = AppLocalizations.of(context).errorAttachFileFailed(e.message);
       });
     }
   }
@@ -220,6 +221,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
 
   Future<void> _handleSend() async {
     if (!_canSend) return;
+    unawaited(HapticFeedback.lightImpact());
     final trimmed = _controller.text.trim();
     setState(() {
       _isSending = true;
@@ -282,6 +284,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final overLimit = _controller.text.length > _maxContentLength;
     final mentionCandidates = _mentionCandidates();
 
@@ -308,7 +311,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
               children: [
                 IconButton(
                   icon: Icon(Icons.attach_file, size: 20, color: colors.fgMuted),
-                  tooltip: 'Attach a file',
+                  tooltip: l10n.attachFileTooltip,
                   onPressed: _isSending ? null : _pickAttachment,
                 ),
                 Expanded(
@@ -323,7 +326,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                       textInputAction: TextInputAction.newline,
                       style: TextStyle(fontSize: 15, color: colors.fgDefault),
                       decoration: InputDecoration(
-                        hintText: widget.hintText,
+                        hintText: widget.hintText ?? l10n.messageChannelHint,
                         hintStyle: TextStyle(color: colors.fgMuted),
                         border: InputBorder.none,
                         filled: false,
@@ -341,7 +344,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                           child: CircularProgressIndicator(strokeWidth: 2, color: colors.brand),
                         )
                       : Icon(Icons.send, size: 20, color: _canSend ? colors.brand : colors.fgMuted),
-                  tooltip: 'Send',
+                  tooltip: l10n.sendTooltip,
                   onPressed: _canSend ? _handleSend : null,
                 ),
               ],
@@ -355,14 +358,14 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                 Expanded(
                   child: _rateLimited
                       ? Text(
-                          "You're sending messages too fast. Wait a moment and try again.",
+                          l10n.rateLimitedMessage,
                           style: TextStyle(fontSize: 12, color: colors.warning),
                         )
                       : (_sendError != null
                           ? Text(_sendError!, style: TextStyle(fontSize: 12, color: colors.danger))
                           : (overLimit
                               ? Text(
-                                  'Message is too long - trim it to $_maxContentLength characters or fewer to send.',
+                                  l10n.messageTooLong(_maxContentLength),
                                   style: TextStyle(fontSize: 12, color: colors.danger),
                                 )
                               : const SizedBox.shrink())),
@@ -390,6 +393,7 @@ class _ReplyBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final senderName = displayNameFor(message.sender);
 
     return Container(
@@ -409,7 +413,7 @@ class _ReplyBanner extends StatelessWidget {
               TextSpan(
                 style: TextStyle(fontSize: 13, color: colors.fgMuted),
                 children: [
-                  const TextSpan(text: 'Replying to '),
+                  TextSpan(text: l10n.replyingToPrefix),
                   TextSpan(text: senderName, style: TextStyle(color: colors.fgDefault, fontWeight: FontWeight.w500)),
                 ],
               ),
@@ -418,9 +422,9 @@ class _ReplyBanner extends StatelessWidget {
           ),
           IconButton(
             icon: Icon(Icons.close, size: 16, color: colors.fgMuted),
-            tooltip: 'Cancel reply',
+            tooltip: l10n.cancelReplyTooltip,
             onPressed: onCancel,
-            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
           ),
         ],
       ),
@@ -437,6 +441,7 @@ class _AttachmentChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final uploading = attachment.status == _AttachmentStatus.uploading;
 
     return Container(
@@ -466,14 +471,14 @@ class _AttachmentChip extends StatelessWidget {
             ),
           ),
           Text(
-            uploading ? 'Uploading…' : 'Ready to send',
+            uploading ? l10n.uploadingEllipsis : l10n.readyToSendLabel,
             style: TextStyle(fontSize: 11, color: colors.fgMuted),
           ),
           IconButton(
             icon: Icon(Icons.close, size: 16, color: colors.fgMuted),
-            tooltip: 'Remove attachment',
+            tooltip: l10n.removeAttachmentTooltip,
             onPressed: onRemove,
-            visualDensity: VisualDensity.compact,
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
           ),
         ],
       ),

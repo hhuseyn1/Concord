@@ -1,13 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../api/models/enums.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/voice_call_controller.dart';
 import '../../providers/voice_call_state.dart';
 import '../../theme/theme.dart';
+import '../../utils/permission_rationale.dart';
 import '../../widgets/widgets.dart';
 import '../voice/voice_call_controls.dart';
 import 'direct_message_view.dart';
+
+Future<void> _startCallWithPermission(
+  BuildContext context,
+  VoiceCallController controller,
+  String conversationId,
+  CallType type,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final micGranted = await requestPermissionWithRationale(
+    context,
+    permission: Permission.microphone,
+    title: l10n.microphoneAccessTitle,
+    rationale: l10n.microphoneAccessRationale,
+  );
+  if (!micGranted) return;
+  if (type == CallType.video) {
+    if (!context.mounted) return;
+    final cameraGranted = await requestPermissionWithRationale(
+      context,
+      permission: Permission.camera,
+      title: l10n.cameraAccessTitle,
+      rationale: l10n.cameraAccessRationaleVideoCalls,
+    );
+    if (!cameraGranted) return;
+  }
+  await controller.startDmCall(conversationId, type);
+}
+
+Future<void> _toggleVideoWithPermission(BuildContext context, VoiceCallController controller, bool isVideoEnabled) async {
+  if (isVideoEnabled) {
+    await controller.toggleVideo();
+    return;
+  }
+  final l10n = AppLocalizations.of(context);
+  final granted = await requestPermissionWithRationale(
+    context,
+    permission: Permission.camera,
+    title: l10n.cameraAccessTitle,
+    rationale: l10n.cameraAccessRationaleVideoCalls,
+  );
+  if (granted) await controller.toggleVideo();
+}
 
 class DirectMessageRouteArgs {
   const DirectMessageRouteArgs({this.otherUserName, this.otherUserAvatarUrl});
@@ -25,6 +70,7 @@ class DirectMessageScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final name = args?.otherUserName;
     final callState = ref.watch(voiceCallControllerProvider);
     final callController = ref.read(voiceCallControllerProvider.notifier);
@@ -42,7 +88,7 @@ class DirectMessageScreen extends ConsumerWidget {
             const SizedBox(width: ConcordSpacing.sm),
             Flexible(
               child: Text(
-                name ?? 'Direct Message',
+                name ?? l10n.directMessageFallbackTitle,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: colors.fgDefault),
               ),
@@ -54,13 +100,17 @@ class DirectMessageScreen extends ConsumerWidget {
             : [
                 IconButton(
                   icon: const Icon(Icons.call_outlined),
-                  tooltip: 'Start voice call',
-                  onPressed: canStartCall ? () => callController.startDmCall(conversationId, CallType.voice) : null,
+                  tooltip: l10n.startVoiceCallTooltip,
+                  onPressed: canStartCall
+                      ? () => _startCallWithPermission(context, callController, conversationId, CallType.voice)
+                      : null,
                 ),
                 IconButton(
                   icon: const Icon(Icons.videocam_outlined),
-                  tooltip: 'Start video call',
-                  onPressed: canStartCall ? () => callController.startDmCall(conversationId, CallType.video) : null,
+                  tooltip: l10n.startVideoCallTooltip,
+                  onPressed: canStartCall
+                      ? () => _startCallWithPermission(context, callController, conversationId, CallType.video)
+                      : null,
                 ),
               ],
       ),
@@ -73,9 +123,9 @@ class DirectMessageScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md, vertical: ConcordSpacing.sm),
               child: Row(
                 children: [
-                  const Expanded(child: Text('Calling…')),
+                  Expanded(child: Text(l10n.callingEllipsis)),
                   ConcordButton(
-                    label: 'Cancel',
+                    label: l10n.cancelButton,
                     variant: ConcordButtonVariant.danger,
                     size: ConcordButtonSize.sm,
                     onPressed: callController.cancelOutgoingCall,
@@ -95,7 +145,7 @@ class DirectMessageScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    callState.isReconnecting ? 'Reconnecting…' : 'In call',
+                    callState.isReconnecting ? l10n.reconnectingEllipsis : l10n.inCallLabel,
                     style: TextStyle(color: callState.isReconnecting ? colors.warning : colors.fgMuted),
                   ),
                   VoiceCallControls(
@@ -104,7 +154,7 @@ class DirectMessageScreen extends ConsumerWidget {
                     isVideoEnabled: callState.isVideoEnabled,
                     onToggleMute: callController.toggleMute,
                     onToggleDeafen: callController.toggleDeafen,
-                    onToggleVideo: callController.toggleVideo,
+                    onToggleVideo: () => _toggleVideoWithPermission(context, callController, callState.isVideoEnabled),
                     onLeave: callController.leaveCall,
                   ),
                 ],

@@ -69,7 +69,8 @@ enum NotificationType {
   missedCall,
   mention,
   friendRequestDeclined,
-  friendRequestCancelled;
+  friendRequestCancelled,
+  directMessageReceived;
 
   int toWire() => index;
 

@@ -20,12 +20,23 @@ class VoiceCallOverlay extends ConsumerWidget {
         child,
         if (incomingCall != null)
           Positioned.fill(
-            child: IncomingCallModal(
-              callerName: incomingCall.callerName,
-              callerAvatarUrl: incomingCall.callerAvatarUrl,
-              type: incomingCall.type,
-              onAccept: controller.acceptIncomingCall,
-              onDecline: controller.declineIncomingCall,
+            child: PopScope(
+              // This overlay sits outside the route tree (stacked over the whole app in
+              // main.dart), so it isn't a route/dialog Android's back button already knows how to
+              // dismiss - without this, back would fall through to whatever screen is underneath,
+              // leaving the incoming-call card stuck on top with no way to close it.
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) {
+                if (didPop) return;
+                controller.declineIncomingCall();
+              },
+              child: IncomingCallModal(
+                callerName: incomingCall.callerName,
+                callerAvatarUrl: incomingCall.callerAvatarUrl,
+                type: incomingCall.type,
+                onAccept: controller.acceptIncomingCall,
+                onDecline: controller.declineIncomingCall,
+              ),
             ),
           ),
       ],

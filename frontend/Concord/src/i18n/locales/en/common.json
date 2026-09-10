@@ -45,7 +45,8 @@
     "friendRequestReceived": "sent you a friend request",
     "friendRequestAccepted": "accepted your friend request",
     "missedCallFrom": "missed call from",
-    "mentionedYou": "mentioned you"
+    "mentionedYou": "mentioned you",
+    "sentYouAMessage": "sent you a message"
   },
   "settings": {
     "title": "Settings",
@@ -64,7 +65,16 @@
     "language": "Language",
     "activeSessions": "Active Sessions",
     "logoutAllOtherSessions": "Logout all other sessions",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "deleteAccountDescription": "Permanently delete your account and all of your data.",
+    "deleteAccountTitle": "Delete your account?",
+    "deleteAccountConsequences": "You'll be logged out of every device immediately. Your account will be deactivated for 30 days - if you log back in during that time, the deletion is cancelled and your account is restored. After 30 days, it's permanently deleted and can't be recovered.",
+    "deleteAccountPasswordLabel": "Enter your password to confirm",
+    "deleteAccountAction": "Delete My Account",
+    "deleteAccountSuccessToastTitle": "Your account has been deleted.",
+    "deleteAccountSuccessToastDescription": "Log back in within 30 days to cancel the deletion."
   },
   "sessions": {
     "thisDevice": "This device",

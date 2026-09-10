@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../theme/theme.dart';
@@ -28,6 +30,11 @@ class ConcordIconButton extends StatelessWidget {
     ConcordButtonSize.lg => 44,
   };
 
+  /// Material's minimum recommended tap target. `sm`/`md` keep their smaller
+  /// visual size but get their hit-test region expanded up to this; `lg` is
+  /// already 44 so this is a no-op for it.
+  double get _tapDimension => math.max(_dimension, 44);
+
   double get _iconSize => switch (size) {
     ConcordButtonSize.sm => 16,
     ConcordButtonSize.md => 18,
@@ -56,15 +63,26 @@ class ConcordIconButton extends StatelessWidget {
         label: tooltip,
         button: true,
         child: SizedBox(
-          width: _dimension,
-          height: _dimension,
+          width: _tapDimension,
+          height: _tapDimension,
           child: Material(
-            color: disabled ? background.withValues(alpha: 0.5) : background,
-            borderRadius: BorderRadius.circular(ConcordRadii.md),
+            color: Colors.transparent,
             child: InkWell(
               onTap: onPressed,
               borderRadius: BorderRadius.circular(ConcordRadii.md),
-              child: Icon(icon, size: _iconSize, color: foreground),
+              child: Center(
+                child: SizedBox(
+                  width: _dimension,
+                  height: _dimension,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: disabled ? background.withValues(alpha: 0.5) : background,
+                      borderRadius: BorderRadius.circular(ConcordRadii.md),
+                    ),
+                    child: Center(child: Icon(icon, size: _iconSize, color: foreground)),
+                  ),
+                ),
+              ),
             ),
           ),
         ),

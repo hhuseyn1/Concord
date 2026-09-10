@@ -20,6 +20,7 @@ const TYPE_DESCRIPTION = {
   FriendRequestAccepted: 'accepted your friend request',
   MissedCall: 'missed your call',
   Mention: 'mentioned you',
+  DirectMessageReceived: 'sent you a message',
 }
 
 const FRIEND_REQUEST_TYPES = new Set(['FriendRequestReceived', 'FriendRequestAccepted'])
@@ -60,7 +61,10 @@ export function NotificationRow({ notification, onNavigate }) {
     if (isFriendRequestType) {
       onNavigate?.()
       navigate('/cabinet', { state: { tab: 'pending' } })
-    } else if (notification.Type === 'Mention' && notification.ContextMessageId) {
+    } else if (
+      (notification.Type === 'Mention' || notification.Type === 'DirectMessageReceived') &&
+      notification.ContextMessageId
+    ) {
       onNavigate?.()
       const path = notification.ContextChannelId
         ? `/cabinet/servers/${notification.ContextServerId}/channels/${notification.ContextChannelId}`

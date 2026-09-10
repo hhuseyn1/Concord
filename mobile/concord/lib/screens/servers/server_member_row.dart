@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/auth_controller.dart';
 import '../../providers/server_providers.dart';
 import '../../providers/user_providers.dart';
@@ -18,6 +19,7 @@ class ServerMemberRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
     final displayName = displayNameFor(member.user);
 
     final currentUserId = ref.watch(authControllerProvider).profile?.id;
@@ -53,21 +55,21 @@ class ServerMemberRow extends ConsumerWidget {
           if (member.isMuted) ...[
             const SizedBox(width: ConcordSpacing.xs),
             Tooltip(
-              message: 'Muted',
+              message: l10n.mutedTooltip,
               child: Icon(Icons.mic_off_outlined, size: 15, color: colors.fgMuted),
             ),
           ],
           if (member.isTimedOut) ...[
             const SizedBox(width: ConcordSpacing.xs),
             Tooltip(
-              message: 'Timed out until ${member.timedOutUntil}',
+              message: l10n.timedOutUntilTooltip('${member.timedOutUntil}'),
               child: Icon(Icons.schedule_outlined, size: 15, color: colors.fgMuted),
             ),
           ],
           if (canModerate)
             IconButton(
               icon: const Icon(Icons.more_vert, size: 18),
-              tooltip: 'Moderate $displayName',
+              tooltip: l10n.moderateMemberTooltip(displayName),
               onPressed: () => showMemberModerationSheet(
                 context,
                 ref,

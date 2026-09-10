@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Ta
 import { AccountSettingsForm } from './AccountSettingsForm'
 import { ActiveSessionsSection } from './ActiveSessionsSection'
 import { ChangePasswordForm } from './ChangePasswordForm'
+import { DeleteAccountSection } from './DeleteAccountSection'
 import { PreferencesSection } from './PreferencesSection'
 import { PrivacySettingsSection } from './PrivacySettingsSection'
 import { ServersSettingsTab } from './ServersSettingsTab'
@@ -48,6 +49,9 @@ export function SettingsScreen() {
             </div>
             <div className="max-w-md border-t border-border-subtle pt-6">
               <ShortcutsSection />
+            </div>
+            <div className="max-w-md border-t border-border-subtle pt-6">
+              <DeleteAccountSection />
             </div>
           </div>
         </TabsContent>

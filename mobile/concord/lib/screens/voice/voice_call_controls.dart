@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
@@ -25,33 +26,34 @@ class VoiceCallControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         ConcordIconButton(
           icon: isMuted ? Icons.mic_off : Icons.mic,
-          tooltip: isMuted ? 'Unmute microphone' : 'Mute microphone',
+          tooltip: isMuted ? l10n.unmuteMicTooltip : l10n.muteMicTooltip,
           variant: isMuted ? ConcordButtonVariant.danger : ConcordButtonVariant.secondary,
           onPressed: onToggleMute,
         ),
         const SizedBox(width: ConcordSpacing.sm),
         ConcordIconButton(
           icon: isDeafened ? Icons.headset_off : Icons.headset,
-          tooltip: isDeafened ? 'Undeafen' : 'Deafen',
+          tooltip: isDeafened ? l10n.undeafenTooltip : l10n.deafenTooltip,
           variant: isDeafened ? ConcordButtonVariant.danger : ConcordButtonVariant.secondary,
           onPressed: onToggleDeafen,
         ),
         const SizedBox(width: ConcordSpacing.sm),
         ConcordIconButton(
           icon: isVideoEnabled ? Icons.videocam : Icons.videocam_off,
-          tooltip: isVideoEnabled ? 'Turn off camera' : 'Turn on camera',
+          tooltip: isVideoEnabled ? l10n.turnOffCameraTooltip : l10n.turnOnCameraTooltip,
           variant: isVideoEnabled ? ConcordButtonVariant.primary : ConcordButtonVariant.secondary,
           onPressed: onToggleVideo,
         ),
         const SizedBox(width: ConcordSpacing.sm),
         ConcordIconButton(
           icon: Icons.call_end,
-          tooltip: 'Leave call',
+          tooltip: l10n.leaveCallTooltip,
           variant: ConcordButtonVariant.danger,
           onPressed: onLeave,
         ),

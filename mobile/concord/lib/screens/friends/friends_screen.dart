@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../theme/theme.dart';
 import 'add_friend_tab.dart';
 import 'blocked_tab.dart';
@@ -25,6 +26,7 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -34,11 +36,11 @@ class _FriendsScreenState extends State<FriendsScreen> with SingleTickerProvider
             controller: _tabController,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
-            tabs: const [
-              Tab(text: 'Friends'),
-              Tab(text: 'Pending'),
-              Tab(text: 'Blocked'),
-              Tab(text: 'Add Friend'),
+            tabs: [
+              Tab(text: l10n.friendsTab),
+              Tab(text: l10n.pendingTabLabel),
+              Tab(text: l10n.blockedTabLabel),
+              Tab(text: l10n.addFriendTabLabel),
             ],
           ),
         ),

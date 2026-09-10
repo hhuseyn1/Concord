@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Concord.Application.Enums;
 using Concord.Application.Models;
 using Concord.Domain.Entities;
@@ -9,14 +8,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concord.Infrastructure.Services;
 
-public class UsersService(ApplicationDbContext context, FilesService filesService, PresenceService presenceService, FriendsService friendsService)
+public class UsersService(
+    ApplicationDbContext context,
+    FilesService filesService,
+    PresenceService presenceService,
+    FriendsService friendsService,
+    AuthenticationService authenticationService)
 {
     private readonly ApplicationDbContext _context = context;
     private readonly FilesService _filesService = filesService;
     private readonly PresenceService _presenceService = presenceService;
     private readonly FriendsService _friendsService = friendsService;
-
-    private static Regex UsernameRegex() => new("^[a-zA-Z0-9_]{1,32}$");
+    private readonly AuthenticationService _authenticationService = authenticationService;
 
     public async Task<MyProfileResponse> GetMyProfileAsync(Guid currentUserId)
     {
@@ -48,7 +51,7 @@ public class UsersService(ApplicationDbContext context, FilesService filesServic
         if (string.IsNullOrWhiteSpace(request.Username))
             throw new ParameterValidationException(nameof(request.Username));
 
-        if (!UsernameRegex().IsMatch(request.Username))
+        if (!UsernamePolicy.IsValid(request.Username))
             throw new ParameterValidationException(nameof(request.Username));
 
         if (!string.IsNullOrWhiteSpace(request.AvatarUrl) && !_filesService.IsOwnUploadUrl(request.AvatarUrl))
@@ -106,11 +109,17 @@ public class UsersService(ApplicationDbContext context, FilesService filesServic
         if (string.IsNullOrWhiteSpace(query) || query.Length < 2)
             throw new ParameterValidationException(nameof(query));
 
+        // Exact match only (case-insensitive), not a substring search: a partial query like "hus"
+        // used to return every username containing it, which let anyone browse/harvest the user list
+        // a few letters at a time instead of looking someone up by the handle they were given. Since
+        // Username is unique, this can only ever match zero or one account.
+        var normalizedQuery = query.Trim().ToLower();
+
         var users = await _context.Users
             .Where(user => !user.Disabled.HasValue &&
                            user.Id != currentUserId &&
                            user.Username != null &&
-                           EF.Functions.ILike(user.Username, $"%{query}%"))
+                           user.Username.ToLower() == normalizedQuery)
             .Take(20)
             .ToListAsync();
 
@@ -266,6 +275,37 @@ public class UsersService(ApplicationDbContext context, FilesService filesServic
                 .AddHours(-GlobalConstants.TimeZoneOffsetHours),
             _ => null
         };
+    }
+
+    /// <summary>
+    /// Self-service account deletion: deactivates the account immediately (hidden/blocked everywhere
+    /// <see cref="Domain.Entities.User.Disabled"/> is checked, exactly like an admin ban) and revokes
+    /// every session, but leaves <see cref="Domain.Entities.User.DeletionRequestedAt"/> set so
+    /// logging back in during the grace period cancels it (see <c>AuthenticationService</c>'s login
+    /// paths). <c>CleanupBackgroundService</c> anonymizes the row for good once the grace period
+    /// (<see cref="GlobalConstants.AccountDeletionGracePeriodDays"/>) elapses without a login.
+    /// </summary>
+    public async Task RequestAccountDeletionAsync(Guid currentUserId, DeleteAccountRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Password))
+            throw new ParameterValidationException(nameof(request.Password));
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(user => user.Id == currentUserId);
+
+        if (user is null || string.IsNullOrWhiteSpace(user.Password))
+            throw new UserNotFoundException(currentUserId);
+
+        if (!PasswordHasher.VerifyHashedPassword(user.Password, request.Password!))
+            throw new InvalidCurrentPasswordException();
+
+        var deletionRequestedAt = DateTime.UtcNow;
+
+        user.Disabled = deletionRequestedAt;
+        user.DeletionRequestedAt = deletionRequestedAt;
+
+        await _context.SaveChangesAsync();
+        await _authenticationService.LogoutAllAsync(currentUserId);
     }
 
     private async Task ValidateUsernameUniqueAsync(Guid currentUserId, string username)

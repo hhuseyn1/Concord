@@ -1,3 +1,4 @@
+using Concord.Application.Models;
 using Concord.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,10 +87,34 @@ public class CleanupBackgroundService(
                     .SetProperty(member => member.TimeoutReason, (string?)null),
                 cancellationToken);
 
+        // Self-service account deletion (see UsersService.RequestAccountDeletionAsync): the grace
+        // period has lapsed with no cancelling login, so the account is anonymized for good. This is
+        // deliberately an update, not a delete - other users' messages/memberships likely carry
+        // non-nullable FKs to this UserId, and hard-deleting the row would cascade or violate
+        // referential integrity. Disabled is left set (permanently blocks/hides the account
+        // everywhere that already checks it) but DeletionRequestedAt is cleared, so
+        // AuthenticationService.IsBlockedFromLoggingIn no longer treats it as cancellable.
+        var deletionCutoff = now.AddDays(-GlobalConstants.AccountDeletionGracePeriodDays);
+
+        var purgedUsers = await context.Users
+            .Where(user => user.DeletionRequestedAt != null && user.DeletionRequestedAt < deletionCutoff)
+            .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(user => user.Email, (string?)null)
+                    .SetProperty(user => user.PhoneNumber, (string?)null)
+                    .SetProperty(user => user.Username, (string?)null)
+                    .SetProperty(user => user.AvatarUrl, (string?)null)
+                    .SetProperty(user => user.Password, (string?)null)
+                    .SetProperty(user => user.TwoFactorSecret, (string?)null)
+                    .SetProperty(user => user.TwoFactorEnabled, false)
+                    .SetProperty(user => user.Name, "Deleted")
+                    .SetProperty(user => user.Surname, "User")
+                    .SetProperty(user => user.DeletionRequestedAt, (DateTime?)null),
+                cancellationToken);
+
         _logger.LogInformation(
             "Cleanup sweep: purged {QrLoginSessions} QR login session(s), {PasswordResetTokens} password reset token(s), " +
-            "{EmailVerificationTokens} email verification token(s), {Sessions} session(s), {ServerBans} expired server ban(s); " +
-            "cleared {Timeouts} lapsed member timeout(s)",
-            purgedQrLoginSessions, purgedPasswordResetTokens, purgedEmailVerificationTokens, purgedSessions, purgedServerBans, clearedTimeouts);
+            "{EmailVerificationTokens} email verification token(s), {Sessions} session(s), {ServerBans} expired server ban(s), " +
+            "{Users} deleted user(s) past their grace period; cleared {Timeouts} lapsed member timeout(s)",
+            purgedQrLoginSessions, purgedPasswordResetTokens, purgedEmailVerificationTokens, purgedSessions, purgedServerBans, purgedUsers, clearedTimeouts);
     }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
 
+import '../../l10n/app_localizations.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
@@ -26,6 +27,7 @@ class ParticipantTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
     final lkParticipant = room?.getParticipantByIdentity(userId);
 
     final isMuted = lkParticipant?.isMuted ?? false;
@@ -61,7 +63,7 @@ class ParticipantTile extends StatelessWidget {
                       borderRadius: BorderRadius.circular(ConcordRadii.sm),
                     ),
                     child: Text(
-                      isLocal ? '${displayName ?? 'You'} (you)' : (displayName ?? 'Member'),
+                      isLocal ? l10n.participantYouSuffix(displayName ?? l10n.youFallback) : (displayName ?? l10n.memberFallback),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: textTheme.bodySmall?.copyWith(color: Colors.white),
