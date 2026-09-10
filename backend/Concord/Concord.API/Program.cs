@@ -41,9 +41,25 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddRealtimeNotifiers();
 builder.Services.AddHostedService<CleanupBackgroundService>();
 
+// ContentRootPath ("/home/site/wwwroot" on Azure App Service Linux) is exactly what every deploy
+// replaces wholesale - keys written there at runtime (e.g. by AddDataProtection itself) survive a
+// container *restart* (which is what the removed comment on TwoFactorSecret was reasoning about),
+// but not an actual deploy, which wipes and recreates wwwroot from the new build output. That
+// silently invalidates every previously-encrypted TwoFactorSecret on each deploy - decryption then
+// throws, and TryConsumeTotp's catch block reports it as an ordinary "incorrect code", giving no
+// hint that the real cause is an infrastructure key-rotation, not a mistyped code.
+//
+// "%HOME%/ASP.NET/DataProtection-Keys" is Microsoft's documented fix for this on App Service: HOME
+// (/home on Linux, set by the platform) is backed by the same persistent Azure Files share as
+// wwwroot, but sits outside it, so deployments never touch it. Scoped to Production only, like
+// AddKeyVault() above, so local dev keeps using the plain ContentRootPath location unchanged.
+var keysDirectory = builder.Environment.IsProduction() && Environment.GetEnvironmentVariable("HOME") is { Length: > 0 } home
+    ? Path.Combine(home, "ASP.NET", "DataProtection-Keys")
+    : Path.Combine(builder.Environment.ContentRootPath, "keys");
+
 builder.Services.AddDataProtection()
     .SetApplicationName("Concord")
-    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "keys")));
+    .PersistKeysToFileSystem(new DirectoryInfo(keysDirectory));
 
 builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
