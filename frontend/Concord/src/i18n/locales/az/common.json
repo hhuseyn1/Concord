@@ -102,6 +102,8 @@
     "title": "Xüsusi Status",
     "placeholder": "Nə baş verir?",
     "emojiPlaceholder": "😀",
+    "emojiLabel": "Status emojisi",
+    "textLabel": "Status mesajı",
     "clear": "Statusu təmizlə",
     "save": "Yadda saxla",
     "create": "Yarat",

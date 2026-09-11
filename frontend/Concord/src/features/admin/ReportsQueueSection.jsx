@@ -101,12 +101,12 @@ export function ReportsQueueSection() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-border-default bg-surface-sidebar text-xs text-fg-muted uppercase">
               <tr>
-                <th className="px-3 py-2 font-semibold">{t('admin.reportColumnReporter')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.reportColumnTarget')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.reportColumnReason')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.reportColumnStatus')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.reportColumnCreated')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.reportColumnActions')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnReporter')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnTarget')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnReason')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnStatus')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnCreated')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnActions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-default">

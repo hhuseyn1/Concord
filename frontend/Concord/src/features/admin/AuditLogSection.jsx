@@ -43,7 +43,7 @@ function MetadataCell({ metadata }) {
       <button
         type="button"
         onClick={() => setExpanded((current) => !current)}
-        className="flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+        className="flex items-center gap-1 rounded-sm text-xs font-medium text-brand hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
       >
         {expanded ? <ChevronUp className="size-3.5" aria-hidden="true" /> : <ChevronDown className="size-3.5" aria-hidden="true" />}
         {expanded ? t('admin.auditHideMetadata') : t('admin.auditShowMetadata')}
@@ -131,11 +131,11 @@ export function AuditLogSection() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-border-default bg-surface-sidebar text-xs text-fg-muted uppercase">
               <tr>
-                <th className="px-3 py-2 font-semibold">{t('admin.auditColumnActor')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.auditColumnAction')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.auditColumnTarget')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.auditColumnTime')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.auditColumnMetadata')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnActor')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnAction')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnTarget')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnTime')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnMetadata')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-default">

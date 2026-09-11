@@ -1,7 +1,13 @@
 import { Bell, MessageCircle, Smartphone, Users } from 'lucide-react'
 import { Reveal } from './Reveal'
 
+// Unset (the default) keeps the existing disabled "Coming soon" state - set this once a build
+// is actually ready to hand out, pointed at wherever it's hosted (a static file under `public/`,
+// a GitHub release, a CDN, whatever's easiest to update independently of a frontend deploy).
+const ANDROID_APK_URL = import.meta.env.VITE_ANDROID_APK_URL
+
 export function MobileAppSection() {
+  const apkUrl = ANDROID_APK_URL
   return (
     <section className="bg-surface-sidebar py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
@@ -13,19 +19,33 @@ export function MobileAppSection() {
           </p>
 
           <div className="mt-8">
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="The Android app isn't published yet - check back soon."
-              className="inline-flex cursor-not-allowed items-center gap-3 rounded-md border border-border-default bg-surface-base px-5 py-3 text-left opacity-70"
-            >
-              <Smartphone className="size-6 shrink-0 text-fg-muted" aria-hidden="true" />
-              <span>
-                <span className="block text-sm font-semibold text-fg-default">Download Android App</span>
-                <span className="block text-xs text-fg-muted">Coming soon</span>
-              </span>
-            </button>
+            {apkUrl ? (
+              <a
+                href={apkUrl}
+                download
+                className="inline-flex items-center gap-3 rounded-md border border-border-default bg-surface-base px-5 py-3 text-left transition-colors duration-150 hover:border-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              >
+                <Smartphone className="size-6 shrink-0 text-fg-muted" aria-hidden="true" />
+                <span>
+                  <span className="block text-sm font-semibold text-fg-default">Download Android App</span>
+                  <span className="block text-xs text-fg-muted">APK, Android 8.0+</span>
+                </span>
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="The Android app isn't published yet - check back soon."
+                className="inline-flex cursor-not-allowed items-center gap-3 rounded-md border border-border-default bg-surface-base px-5 py-3 text-left opacity-70"
+              >
+                <Smartphone className="size-6 shrink-0 text-fg-muted" aria-hidden="true" />
+                <span>
+                  <span className="block text-sm font-semibold text-fg-default">Download Android App</span>
+                  <span className="block text-xs text-fg-muted">Coming soon</span>
+                </span>
+              </button>
+            )}
           </div>
         </Reveal>
 

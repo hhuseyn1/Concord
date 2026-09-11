@@ -42,7 +42,7 @@ export function AddFriendTab() {
     const pending = isPending(user.Id)
 
     if (user.RelationshipStatus === 'Friends') {
-      return <Badge variant="secondary">{t('friends.alreadyFriends')}</Badge>
+      return <Badge variant="neutral">{t('friends.alreadyFriends')}</Badge>
     }
 
     if (user.RelationshipStatus === 'OutgoingRequest') {

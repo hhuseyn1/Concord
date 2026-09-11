@@ -1,7 +1,7 @@
-import { Bell, Hash, Menu, MessageCircle, Phone, PhoneOff, Pin, Search, Users, Video, X } from 'lucide-react'
+import { Bell, Hash, Menu, MessageCircle, Phone, PhoneOff, Pin, Search, Settings, ShieldCheck, Users, Video, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router-dom'
+import { useMatch, useParams } from 'react-router-dom'
 import { useChannels } from '../../features/channels/channelsQueries'
 import { DirectMessageSearchPanel } from '../../features/directMessages/DirectMessageSearchPanel'
 import { NotificationPanel } from '../../features/notifications/NotificationPanel'
@@ -17,6 +17,8 @@ import { Tooltip } from '../ui/Tooltip'
 export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar, sidebarOpen = false }) {
   const { t } = useTranslation()
   const { serverId, channelId, conversationId } = useParams()
+  const isSettingsRoute = useMatch('/cabinet/settings')
+  const isAdminRoute = useMatch('/cabinet/admin')
   const { data: channels } = useChannels(serverId)
   const channel = channelId ? channels?.find((item) => item.Id === channelId) : undefined
   const { unreadCount } = useNotifications()
@@ -26,14 +28,26 @@ export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar, 
   const otherUserDisplayName = useOtherUserDisplayName(conversationId)
   const { activeCall, outgoingCall, startDmCall, cancelOutgoingCall } = useVoiceCall()
 
-  const title = channelId
-    ? (channel?.Name ?? 'Loading…')
-    : conversationId
-      ? (otherUserDisplayName ?? 'Loading…')
-      : serverId
-        ? `Server ${serverId}`
-        : 'Friends'
-  const TitleIcon = channelId ? Hash : conversationId ? MessageCircle : Users
+  const title = isSettingsRoute
+    ? t('settings.title')
+    : isAdminRoute
+      ? t('admin.dashboardLink')
+      : channelId
+        ? (channel?.Name ?? 'Loading…')
+        : conversationId
+          ? (otherUserDisplayName ?? 'Loading…')
+          : serverId
+            ? `Server ${serverId}`
+            : 'Friends'
+  const TitleIcon = isSettingsRoute
+    ? Settings
+    : isAdminRoute
+      ? ShieldCheck
+      : channelId
+        ? Hash
+        : conversationId
+          ? MessageCircle
+          : Users
 
   const isRingingThisConversation = outgoingCall?.conversationId === conversationId
   const isBusy = Boolean(activeCall) || Boolean(outgoingCall)
@@ -131,15 +145,21 @@ export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar, 
             </PopoverContent>
           </Popover>
         )}
-        <Tooltip content="Member list" side="bottom">
-          <IconButton
-            aria-label="Toggle member list"
-            variant={membersOpen ? 'secondary' : 'ghost'}
-            onClick={onToggleMembers}
-          >
-            <Users className="size-4" aria-hidden="true" />
-          </IconButton>
-        </Tooltip>
+        {channelId && (
+          <Tooltip content="Member list" side="bottom">
+            <IconButton
+              aria-label="Toggle member list"
+              variant={membersOpen ? 'secondary' : 'ghost'}
+              // Below `md`, `AppShell` renders the member list as a Dialog drawer whose fixed,
+              // full-viewport overlay would otherwise sit on top of this same-position button -
+              // same fix as the sidebar toggle button above, for the same reason.
+              className="relative z-50 pointer-events-auto"
+              onClick={onToggleMembers}
+            >
+              <Users className="size-4" aria-hidden="true" />
+            </IconButton>
+          </Tooltip>
+        )}
         <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
           <Tooltip content="Notifications" side="bottom">
             <PopoverTrigger asChild>

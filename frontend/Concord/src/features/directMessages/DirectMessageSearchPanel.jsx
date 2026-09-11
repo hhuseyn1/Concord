@@ -39,7 +39,7 @@ export function DirectMessageSearchPanel({ conversationId, onNavigateToResult })
   }
 
   return (
-    <div className="flex w-80 flex-col">
+    <div className="flex w-80 max-w-[calc(100vw-2rem)] flex-col">
       <div className="border-b border-border-subtle p-3">
         <Input
           autoFocus

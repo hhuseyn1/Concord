@@ -15,6 +15,9 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from '../../components/ui/ContextMenu'
 import { useAuth } from '../../hooks/useAuth'
@@ -233,13 +236,13 @@ export function MessageItem({
             <ProfilePopover userId={sender?.Id} side="bottom" align="start">
               <button
                 type="button"
-                className="rounded-sm text-sm font-medium text-fg-default hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                className="min-w-0 truncate rounded-sm text-sm font-medium text-fg-default hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 {senderName}
               </button>
             </ProfilePopover>
             <Tooltip content={formatAbsoluteTimestamp(message.Created)}>
-              <span className="text-xs text-fg-muted">{formatGroupTimestamp(message.Created)}</span>
+              <span className="shrink-0 text-xs text-fg-muted">{formatGroupTimestamp(message.Created)}</span>
             </Tooltip>
           </div>
         )}
@@ -371,7 +374,7 @@ export function MessageItem({
       </div>
 
       {!isEditing && !selectionMode && (
-        <div className="absolute top-2 right-3 flex items-center gap-0.5 rounded-md border border-border-default bg-surface-floating p-0.5 opacity-0 shadow-sm pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto">
+        <div className="absolute top-2 right-3 flex items-center gap-0.5 rounded-md border border-border-default bg-surface-floating p-0.5 opacity-0 shadow-sm pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto">
           {onToggleReaction && (
             <Popover>
               <Tooltip content="Add reaction">
@@ -464,6 +467,26 @@ export function MessageItem({
               <Reply className="size-4" aria-hidden="true" />
               Reply
             </ContextMenuItem>
+          )}
+          {!selectionMode && onToggleReaction && (
+            <ContextMenuSub>
+              <ContextMenuSubTrigger>
+                <SmilePlus className="size-4" aria-hidden="true" />
+                Add Reaction
+              </ContextMenuSubTrigger>
+              <ContextMenuSubContent className="flex w-auto flex-wrap gap-0.5 p-1.5">
+                {QUICK_REACTIONS.map((emoji) => (
+                  <ContextMenuItem
+                    key={emoji}
+                    onSelect={() => onToggleReaction(message.Id, emoji)}
+                    aria-label={`React with ${emoji}`}
+                    className="justify-center px-2 py-1.5 text-lg"
+                  >
+                    {emoji}
+                  </ContextMenuItem>
+                ))}
+              </ContextMenuSubContent>
+            </ContextMenuSub>
           )}
           {!selectionMode && onEnterSelectionMode && (
             <ContextMenuItem onSelect={() => onEnterSelectionMode(message.Id)}>

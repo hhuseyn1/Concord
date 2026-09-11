@@ -138,8 +138,8 @@ export function RolesModal({ server, open, onOpenChange }) {
       description={t('roles.subtitle', { server: server?.Name || 'Server' })}
       size="xl"
     >
-      <div className="flex min-h-[22rem] gap-4">
-        <div className="flex w-52 shrink-0 flex-col gap-2 border-r border-border-default pr-4">
+      <div className="flex min-h-[22rem] flex-col gap-4 sm:flex-row">
+        <div className="flex shrink-0 flex-col gap-2 border-b border-border-default pb-4 sm:w-52 sm:border-r sm:border-b-0 sm:pr-4 sm:pb-0">
           {canManage && !creating && (
             <Button variant="secondary" size="sm" onClick={() => setCreating(true)}>
               <Plus className="size-4" aria-hidden="true" />
@@ -166,7 +166,7 @@ export function RolesModal({ server, open, onOpenChange }) {
             </div>
           )}
 
-          <ScrollArea className="min-h-0 flex-1">
+          <ScrollArea className="max-h-40 min-h-0 sm:max-h-none sm:flex-1">
             <div className="flex flex-col gap-1 pr-2">
               {isLoading &&
                 Array.from({ length: 3 }, (_, index) => <Skeleton key={index} className="h-8 w-full rounded-md" />)}
@@ -176,7 +176,7 @@ export function RolesModal({ server, open, onOpenChange }) {
                   key={role.Id}
                   type="button"
                   onClick={() => selectRole(role)}
-                  className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors duration-150 ${
+                  className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                     role.Id === selectedRoleId
                       ? 'bg-fg-default/10 text-fg-default'
                       : 'text-fg-muted hover:bg-fg-default/5 hover:text-fg-default'

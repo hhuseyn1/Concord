@@ -128,11 +128,11 @@ export function AdminUsersTable() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-border-default bg-surface-sidebar text-xs text-fg-muted uppercase">
               <tr>
-                <th className="px-3 py-2 font-semibold">{t('admin.columnUser')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.columnEmail')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.columnRole')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.columnStatus')}</th>
-                <th className="px-3 py-2 font-semibold">{t('admin.columnActions')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.columnUser')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.columnEmail')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.columnRole')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.columnStatus')}</th>
+                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.columnActions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-default">

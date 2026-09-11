@@ -71,7 +71,7 @@ export function CreateServerForm({ onDone }) {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="group flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-dashed border-border-default bg-surface-sidebar transition-colors duration-150 hover:border-brand"
+          className="group flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-dashed border-border-default bg-surface-sidebar transition-colors duration-150 hover:border-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
           aria-label="Upload a server icon"
         >
           {iconPreview ? (
