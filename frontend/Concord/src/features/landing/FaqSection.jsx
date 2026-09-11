@@ -36,13 +36,16 @@ const FAQS = [
   },
 ]
 
-function FaqItem({ question, answer, isOpen, onToggle }) {
+function FaqItem({ id, question, answer, isOpen, onToggle }) {
+  const panelId = `${id}-panel`
   return (
     <div className="border-b border-border-default">
       <button
         type="button"
+        id={id}
         onClick={onToggle}
         aria-expanded={isOpen}
+        aria-controls={panelId}
         className="flex w-full items-center justify-between gap-4 py-5 text-left"
       >
         <span className="text-base font-medium text-fg-heading">{question}</span>
@@ -52,6 +55,9 @@ function FaqItem({ question, answer, isOpen, onToggle }) {
         />
       </button>
       <div
+        id={panelId}
+        role="region"
+        aria-labelledby={id}
         className={cn(
           'grid transition-all duration-200 [transition-timing-function:var(--ease-standard)]',
           isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
@@ -78,6 +84,7 @@ export function FaqSection() {
           {FAQS.map((faq, index) => (
             <FaqItem
               key={faq.question}
+              id={`faq-item-${index}`}
               question={faq.question}
               answer={faq.answer}
               isOpen={openIndex === index}

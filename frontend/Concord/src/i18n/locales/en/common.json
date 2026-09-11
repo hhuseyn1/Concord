@@ -102,6 +102,8 @@
     "title": "Custom Status",
     "placeholder": "What's happening?",
     "emojiPlaceholder": "😀",
+    "emojiLabel": "Status emoji",
+    "textLabel": "Status message",
     "clear": "Clear status",
     "save": "Save",
     "create": "Create",

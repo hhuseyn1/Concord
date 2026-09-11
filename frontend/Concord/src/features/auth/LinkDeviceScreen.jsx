@@ -88,7 +88,14 @@ export function LinkDeviceScreen() {
     <AuthLayout title={t('qrLogin.approveTitle')} subtitle={t('qrLogin.approveSubtitle')}>
       <div className="flex flex-col gap-4">
         {!request && (
-          <>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(event) => {
+              event.preventDefault()
+              lookup(code)
+            }}
+            noValidate
+          >
             <FormField label={t('qrLogin.codeLabel')} error={error} htmlFor="link-code">
               <Input
                 id="link-code"
@@ -99,11 +106,11 @@ export function LinkDeviceScreen() {
                 autoFocus
               />
             </FormField>
-            <Button onClick={() => lookup(code)} disabled={loading || code.trim().length === 0}>
+            <Button type="submit" disabled={loading || code.trim().length === 0}>
               {loading && <Spinner size="sm" />}
               {t('qrLogin.continue')}
             </Button>
-          </>
+          </form>
         )}
 
         {loading && request === null && codeFromUrl && <Skeleton className="h-32 w-full rounded-md" />}

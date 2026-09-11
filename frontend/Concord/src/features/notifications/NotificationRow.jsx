@@ -117,6 +117,7 @@ export function NotificationRow({ notification, onNavigate }) {
       onKeyDown={handleRowKeyDown}
       className={cn(
         'flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors duration-150 hover:bg-fg-default/5',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
         !notification.IsRead && 'bg-brand-bg',
       )}
     >

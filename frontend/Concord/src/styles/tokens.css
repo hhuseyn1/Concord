@@ -163,6 +163,10 @@
   --animate-toast-out: toast-out var(--duration-fast) var(--ease-standard);
   --animate-drawer-in: drawer-in var(--duration-base) var(--ease-emphasized);
   --animate-drawer-out: drawer-out var(--duration-fast) var(--ease-standard);
+  /* Mirror of the pair above for a drawer docked to the right edge (e.g. the mobile member-list
+   * panel) instead of the left (the mobile channel sidebar). */
+  --animate-drawer-in-right: drawer-in-right var(--duration-base) var(--ease-emphasized);
+  --animate-drawer-out-right: drawer-out-right var(--duration-fast) var(--ease-standard);
   /* Mic/deafen/camera/screen-share toggle "pop" - re-triggered per click via a `key` change on the
    * icon (see `VoiceCallControls.jsx`), not a `data-[state]` attribute like the overlays above, since
    * this fires on every toggle rather than once per mount. */
@@ -216,6 +220,16 @@
 @keyframes drawer-out {
   to {
     translate: -100% 0;
+  }
+}
+@keyframes drawer-in-right {
+  from {
+    translate: 100% 0;
+  }
+}
+@keyframes drawer-out-right {
+  to {
+    translate: 100% 0;
   }
 }
 @keyframes icon-toggle {

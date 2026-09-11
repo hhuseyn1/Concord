@@ -43,7 +43,7 @@ export function PinnedMessagesPanel({ serverId, channelId, conversationId, onNav
   const messages = data ?? []
 
   return (
-    <div className="flex w-80 flex-col">
+    <div className="flex w-80 max-w-[calc(100vw-2rem)] flex-col">
       <div className="border-b border-border-subtle px-3 py-2">
         <p className="text-sm font-semibold text-fg-heading">{t('messages.pinnedMessages')}</p>
       </div>
@@ -96,7 +96,7 @@ export function PinnedMessagesPanel({ serverId, channelId, conversationId, onNav
                       aria-label={t('messages.unpin')}
                       size="sm"
                       variant="ghost"
-                      className="opacity-0 group-hover:opacity-100"
+                      className="opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
                       onClick={() => handleUnpin(message.Id)}
                     >
                       <PinOff className="size-3.5" aria-hidden="true" />

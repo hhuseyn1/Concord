@@ -180,7 +180,7 @@ export function MemberListPanel() {
                         )}
                       </button>
                     </ProfilePopover>
-                    <div className="absolute top-1/2 right-1 hidden -translate-y-1/2 group-hover:flex">
+                    <div className="absolute top-1/2 right-1 hidden -translate-y-1/2 group-hover:flex group-focus-within:flex">
                       <MemberModerationMenu
                         serverId={serverId}
                         member={member}

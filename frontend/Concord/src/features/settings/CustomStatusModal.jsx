@@ -83,6 +83,7 @@ export function CustomStatusModal({ open, onOpenChange }) {
               value={emoji}
               onChange={(event) => setEmoji(event.target.value)}
               placeholder={t('customStatus.emojiPlaceholder')}
+              aria-label={t('customStatus.emojiLabel')}
               maxLength={16}
               className="text-center"
             />
@@ -93,6 +94,7 @@ export function CustomStatusModal({ open, onOpenChange }) {
               value={text}
               onChange={(event) => setText(event.target.value)}
               placeholder={t('customStatus.placeholder')}
+              aria-label={t('customStatus.textLabel')}
               maxLength={128}
             />
           </FormField>

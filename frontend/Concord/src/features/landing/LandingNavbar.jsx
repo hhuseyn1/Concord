@@ -46,6 +46,7 @@ export function LandingNavbar() {
           type="button"
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
+          aria-controls="landing-mobile-nav"
           onClick={() => setMobileOpen((open) => !open)}
           className="flex size-9 items-center justify-center rounded-md text-fg-default hover:bg-fg-default/10 md:hidden"
         >
@@ -55,6 +56,7 @@ export function LandingNavbar() {
 
       {mobileOpen && (
         <nav
+          id="landing-mobile-nav"
           aria-label="Primary"
           className="flex flex-col gap-1 border-t border-border-subtle bg-surface-base px-4 py-3 md:hidden"
         >

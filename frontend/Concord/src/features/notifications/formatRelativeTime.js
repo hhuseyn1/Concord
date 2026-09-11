@@ -12,6 +12,10 @@ const UNITS = [
 export function formatRelativeTime(dateString) {
   const seconds = Math.round((new Date(dateString).getTime() - Date.now()) / 1000)
 
+  // A missing/malformed timestamp from the network shouldn't crash the whole route -
+  // Intl.RelativeTimeFormat.format() throws a RangeError on a non-finite value.
+  if (!Number.isFinite(seconds)) return ''
+
   if (Math.abs(seconds) < 30) return 'just now'
 
   for (const [unit, unitSeconds] of UNITS) {

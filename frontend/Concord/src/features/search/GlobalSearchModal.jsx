@@ -101,7 +101,7 @@ export function GlobalSearchModal({ open, onOpenChange }) {
                     key={result.MessageId}
                     type="button"
                     onClick={() => handleResultClick(result)}
-                    className="flex items-start gap-2 rounded-md px-2 py-1.5 text-left transition-colors duration-150 hover:bg-fg-default/5"
+                    className="flex items-start gap-2 rounded-md px-2 py-1.5 text-left transition-colors duration-150 hover:bg-fg-default/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     <Avatar src={result.Sender?.AvatarUrl ?? undefined} name={senderName} size="sm" />
                     <div className="min-w-0 flex-1">

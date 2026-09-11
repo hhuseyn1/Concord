@@ -1,13 +1,31 @@
 import * as RadixTabs from '@radix-ui/react-tabs'
+import { useRef } from 'react'
 import { cn } from '../../lib/cn'
 
 export const Tabs = RadixTabs.Root
 
 export function TabsList({ className, ...props }) {
+  const listRef = useRef(null)
+
+  // A plain mouse wheel only ever produces vertical deltaY, so an overflow-x:auto strip like
+  // this one is otherwise unreachable without a trackpad/touch gesture. Redirect a vertical
+  // wheel scroll into horizontal - but only once the strip actually overflows, and only when
+  // the gesture itself is vertical (deltaX already dominant means it's a real horizontal
+  // trackpad/shift+wheel swipe, which should pass through untouched).
+  const handleWheel = (event) => {
+    const el = listRef.current
+    if (!el || el.scrollWidth <= el.clientWidth) return
+    if (Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return
+    event.preventDefault()
+    el.scrollLeft += event.deltaY
+  }
+
   return (
     <RadixTabs.List
+      ref={listRef}
+      onWheel={handleWheel}
       className={cn(
-        'inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-md bg-surface-sidebar p-1',
+        'inline-flex max-w-full items-center gap-1 overflow-x-auto overscroll-x-contain rounded-md bg-surface-sidebar p-1',
         className,
       )}
       {...props}
@@ -19,7 +37,7 @@ export function TabsTrigger({ className, ...props }) {
   return (
     <RadixTabs.Trigger
       className={cn(
-        'rounded-sm px-3 py-1.5 text-sm font-medium text-fg-muted outline-none transition-colors duration-150',
+        'shrink-0 rounded-sm px-3 py-1.5 text-sm font-medium whitespace-nowrap text-fg-muted outline-none transition-colors duration-150',
         'hover:text-fg-default',
         'focus-visible:ring-2 focus-visible:ring-brand',
         'data-[state=active]:bg-surface-floating data-[state=active]:text-fg-default data-[state=active]:shadow-sm',

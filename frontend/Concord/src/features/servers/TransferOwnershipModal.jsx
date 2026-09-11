@@ -128,6 +128,7 @@ export function TransferOwnershipModal({ server, open, onOpenChange }) {
                   onClick={() => setSelectedId(member.User?.Id)}
                   className={cn(
                     'flex items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors duration-150',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
                     isSelected ? 'bg-brand-bg' : 'hover:bg-fg-default/5',
                   )}
                 >

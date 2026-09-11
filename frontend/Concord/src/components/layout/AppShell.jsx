@@ -17,6 +17,13 @@ import { TopBar } from './TopBar'
 export function AppShell() {
   const [membersOpen, setMembersOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  // Below `md` (768px) the member list has no inline home (`MessageAreaShell`'s aside is
+  // `hidden md:flex`), so `membersOpen` there opens this drawer instead - mirrors the
+  // `mobileSidebarOpen` pattern just above. Tracked separately from the sidebar's `sm` (640px)
+  // breakpoint since the two panels use different cutoffs.
+  const [isDesktopMembers, setIsDesktopMembers] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches,
+  )
   const location = useLocation()
   const navigate = useNavigate()
   const { serverId } = useParams()
@@ -37,11 +44,21 @@ export function AppShell() {
     query.addEventListener('change', handleChange)
     return () => query.removeEventListener('change', handleChange)
   }, [])
+
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 768px)')
+    const handleChange = (event) => setIsDesktopMembers(event.matches)
+    query.addEventListener('change', handleChange)
+    return () => query.removeEventListener('change', handleChange)
+  }, [])
   const isDmRoute = useMatch('/cabinet/dm/:conversationId')
   const [prevPathname, setPrevPathname] = useState(location.pathname)
   if (location.pathname !== prevPathname) {
     setPrevPathname(location.pathname)
     setMobileSidebarOpen(false)
+    // Only the mobile drawer should close on navigation - on desktop the member list is an
+    // inline panel that Discord-like UX keeps open across channel switches.
+    if (!isDesktopMembers) setMembersOpen(false)
   }
 
   return (
@@ -73,6 +90,21 @@ export function AppShell() {
         />
         <MessageAreaShell membersOpen={membersOpen && !isDmRoute} memberPanel={<MemberListPanel />} />
       </div>
+
+      {!isDesktopMembers && (
+        <Dialog.Root open={membersOpen && !isDmRoute} onOpenChange={setMembersOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60 motion-safe:data-[state=open]:animate-overlay-in motion-safe:data-[state=closed]:animate-overlay-out" />
+            <Dialog.Content
+              aria-describedby={undefined}
+              className="fixed inset-y-0 right-0 z-40 flex w-60 max-w-[80vw] flex-col border-l border-border-default bg-surface-sidebar outline-none motion-safe:data-[state=open]:animate-drawer-in-right motion-safe:data-[state=closed]:animate-drawer-out-right"
+            >
+              <Dialog.Title className="sr-only">Members</Dialog.Title>
+              <MemberListPanel />
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      )}
 
       <GlobalSearchModal open={isSearchOpen} onOpenChange={setSearchOpen} />
     </div>

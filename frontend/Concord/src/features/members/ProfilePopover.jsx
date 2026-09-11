@@ -10,7 +10,7 @@ export function ProfilePopover({ userId, children, side = 'right', align = 'star
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent side={side} align={align} className="w-80 p-0">
+      <PopoverContent side={side} align={align} className="w-80 max-w-[calc(100vw-2rem)] p-0">
         <ProfileCard userId={userId} />
       </PopoverContent>
     </Popover>
