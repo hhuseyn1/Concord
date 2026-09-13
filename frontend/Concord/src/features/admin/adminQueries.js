@@ -3,11 +3,13 @@ import * as adminService from '../../api/adminService'
 import { authKeys } from '../../app/authKeys'
 
 const USERS_PAGE_SIZE = 20
+const SUBSCRIPTIONS_PAGE_SIZE = 20
 
 export const adminKeys = {
   all: ['admin'],
   overview: () => [...adminKeys.all, 'overview'],
   users: (search) => [...adminKeys.all, 'users', search ?? ''],
+  subscriptions: (status) => [...adminKeys.all, 'subscriptions', status ?? ''],
 }
 
 export function useAdminOverview() {
@@ -21,6 +23,14 @@ export function useAdminUsers(page, search) {
   return useQuery({
     queryKey: [...adminKeys.users(search), page],
     queryFn: () => adminService.getUsers(page, USERS_PAGE_SIZE, search),
+    placeholderData: (previousData) => previousData,
+  })
+}
+
+export function useAdminSubscriptions(page, status) {
+  return useQuery({
+    queryKey: [...adminKeys.subscriptions(status), page],
+    queryFn: () => adminService.getSubscriptions(page, SUBSCRIPTIONS_PAGE_SIZE, status),
     placeholderData: (previousData) => previousData,
   })
 }

@@ -28,6 +28,12 @@ export const DirectMessageView = lazy(() =>
 export const SettingsScreen = lazy(() =>
   import('../features/settings/SettingsScreen').then((m) => ({ default: m.SettingsScreen })),
 )
+export const CheckoutSuccessScreen = lazy(() =>
+  import('../features/billing/CheckoutSuccessScreen').then((m) => ({ default: m.CheckoutSuccessScreen })),
+)
+export const CheckoutCancelScreen = lazy(() =>
+  import('../features/billing/CheckoutCancelScreen').then((m) => ({ default: m.CheckoutCancelScreen })),
+)
 export const AdminDashboardScreen = lazy(() =>
   import('../features/admin/AdminDashboardScreen').then((m) => ({ default: m.AdminDashboardScreen })),
 )

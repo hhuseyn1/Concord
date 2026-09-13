@@ -33,7 +33,7 @@ export function useResolveReportMutation() {
 export function useDismissReportMutation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (reportId) => reportsService.dismissReport(reportId),
+    mutationFn: ({ reportId, reason }) => reportsService.dismissReport(reportId, reason),
     onSettled: () => queryClient.invalidateQueries({ queryKey: reportsKeys.all }),
   })
 }

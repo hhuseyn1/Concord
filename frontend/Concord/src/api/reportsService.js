@@ -13,6 +13,6 @@ export async function resolveReport(reportId) {
   return request(`Admin/Reports/${reportId}:Resolve`, { method: 'POST' });
 }
 
-export async function dismissReport(reportId) {
-  return request(`Admin/Reports/${reportId}:Dismiss`, { method: 'POST' });
+export async function dismissReport(reportId, reason) {
+  return request(`Admin/Reports/${reportId}:Dismiss`, { method: 'POST', body: { Reason: reason || null } });
 }

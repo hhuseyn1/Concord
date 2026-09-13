@@ -55,6 +55,11 @@ export async function register({ Name, Surname, Username, Email, Password }) {
   return tokens;
 }
 
+export async function checkUsernameAvailable(username) {
+  const result = await request('Register/Username-available', { query: { username }, auth: false });
+  return Boolean(result?.Available);
+}
+
 export async function requestPasswordReset(email) {
   await request('Forgot-password', { method: 'POST', body: { Email: email }, auth: false });
 }

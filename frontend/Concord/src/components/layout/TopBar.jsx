@@ -1,4 +1,4 @@
-import { Bell, Hash, Menu, MessageCircle, Phone, PhoneOff, Pin, Search, Settings, ShieldCheck, Users, Video, X } from 'lucide-react'
+import { Bell, Hash, Menu, MessageCircle, Phone, PhoneOff, Pin, Search, Settings, Users, Video, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMatch, useParams } from 'react-router-dom'
@@ -18,7 +18,6 @@ export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar, 
   const { t } = useTranslation()
   const { serverId, channelId, conversationId } = useParams()
   const isSettingsRoute = useMatch('/cabinet/settings')
-  const isAdminRoute = useMatch('/cabinet/admin')
   const { data: channels } = useChannels(serverId)
   const channel = channelId ? channels?.find((item) => item.Id === channelId) : undefined
   const { unreadCount } = useNotifications()
@@ -30,24 +29,20 @@ export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar, 
 
   const title = isSettingsRoute
     ? t('settings.title')
-    : isAdminRoute
-      ? t('admin.dashboardLink')
-      : channelId
-        ? (channel?.Name ?? 'Loading…')
-        : conversationId
-          ? (otherUserDisplayName ?? 'Loading…')
-          : serverId
-            ? `Server ${serverId}`
-            : 'Friends'
+    : channelId
+      ? (channel?.Name ?? 'Loading…')
+      : conversationId
+        ? (otherUserDisplayName ?? 'Loading…')
+        : serverId
+          ? `Server ${serverId}`
+          : 'Friends'
   const TitleIcon = isSettingsRoute
     ? Settings
-    : isAdminRoute
-      ? ShieldCheck
-      : channelId
-        ? Hash
-        : conversationId
-          ? MessageCircle
-          : Users
+    : channelId
+      ? Hash
+      : conversationId
+        ? MessageCircle
+        : Users
 
   const isRingingThisConversation = outgoingCall?.conversationId === conversationId
   const isBusy = Boolean(activeCall) || Boolean(outgoingCall)

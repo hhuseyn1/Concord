@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react'
+import { Check, Flag, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Avatar } from '../../components/ui/Avatar'
 import { Button } from '../../components/ui/Button'
@@ -23,6 +23,10 @@ const TYPE_DESCRIPTION = {
   DirectMessageReceived: 'sent you a message',
 }
 
+const NO_RELATED_USER_DESCRIPTION = {
+  ReportDismissed: 'Your report was reviewed',
+}
+
 const FRIEND_REQUEST_TYPES = new Set(['FriendRequestReceived', 'FriendRequestAccepted'])
 const JUMP_AFTER_NAVIGATE_DELAY_MS = 400
 
@@ -36,7 +40,10 @@ export function NotificationRow({ notification, onNavigate }) {
   const relatedUser = notification.RelatedUser
   const displayName =
     relatedUser?.Username || [relatedUser?.Name, relatedUser?.Surname].filter(Boolean).join(' ') || 'Someone'
-  const description = TYPE_DESCRIPTION[notification.Type] ?? 'sent you a notification'
+  const isSystemNotification = Boolean(NO_RELATED_USER_DESCRIPTION[notification.Type])
+  const description = isSystemNotification
+    ? NO_RELATED_USER_DESCRIPTION[notification.Type]
+    : (TYPE_DESCRIPTION[notification.Type] ?? 'sent you a notification')
   const isFriendRequestType = FRIEND_REQUEST_TYPES.has(notification.Type)
 
   const matchingRequest =
@@ -128,6 +135,10 @@ export function NotificationRow({ notification, onNavigate }) {
               <Avatar src={relatedUser?.AvatarUrl ?? undefined} name={displayName} size="md" />
             </button>
           </ProfilePopover>
+        ) : isSystemNotification ? (
+          <span className="flex size-10 items-center justify-center rounded-full bg-surface-rail text-fg-muted">
+            <Flag className="size-4" aria-hidden="true" />
+          </span>
         ) : (
           <Avatar name={displayName} size="md" />
         )}
@@ -135,8 +146,15 @@ export function NotificationRow({ notification, onNavigate }) {
 
       <div className="min-w-0 flex-1">
         <p className="text-sm text-fg-default">
-          <span className="font-medium">{displayName}</span> {description}
+          {isSystemNotification ? description : (
+            <>
+              <span className="font-medium">{displayName}</span> {description}
+            </>
+          )}
         </p>
+        {isSystemNotification && notification.Reason && (
+          <p className="mt-0.5 text-xs text-fg-muted">{notification.Reason}</p>
+        )}
         <p className="mt-0.5 text-xs text-fg-muted">{formatRelativeTime(notification.Created)}</p>
 
         {matchingRequest && (

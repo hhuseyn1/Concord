@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs'
 import { AccountSettingsForm } from './AccountSettingsForm'
 import { ActiveSessionsSection } from './ActiveSessionsSection'
+import { BillingSettingsSection } from './BillingSettingsSection'
 import { ChangePasswordForm } from './ChangePasswordForm'
 import { DeleteAccountSection } from './DeleteAccountSection'
 import { PreferencesSection } from './PreferencesSection'
@@ -12,9 +14,19 @@ import { ShortcutsSection } from './ShortcutsSection'
 import { TwoFactorSection } from './TwoFactorSection'
 import { VoiceVideoSettingsSection } from './VoiceVideoSettingsSection'
 
+const TAB_VALUES = ['account', 'privacy', 'voice', 'servers', 'billing']
+const DEFAULT_TAB = 'account'
+
 export function SettingsScreen() {
   const { t } = useTranslation()
-  const [tab, setTab] = useState('account')
+  const [searchParams] = useSearchParams()
+  // Only used to pick the initial tab (e.g. a Stripe Customer Portal return URL linking
+  // straight to `?tab=billing`) - the tab state itself isn't kept in sync with the URL after
+  // that, so switching tabs manually doesn't rewrite the address bar.
+  const [tab, setTab] = useState(() => {
+    const requested = searchParams.get('tab')
+    return TAB_VALUES.includes(requested) ? requested : DEFAULT_TAB
+  })
 
   return (
     <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6">
@@ -29,6 +41,7 @@ export function SettingsScreen() {
           <TabsTrigger value="privacy">{t('privacy.title')}</TabsTrigger>
           <TabsTrigger value="voice">{t('voice.title')}</TabsTrigger>
           <TabsTrigger value="servers">{t('settings.servers')}</TabsTrigger>
+          <TabsTrigger value="billing">{t('billing.title')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="account">
@@ -63,6 +76,9 @@ export function SettingsScreen() {
         </TabsContent>
         <TabsContent value="servers">
           <ServersSettingsTab />
+        </TabsContent>
+        <TabsContent value="billing">
+          <BillingSettingsSection />
         </TabsContent>
       </Tabs>
     </div>

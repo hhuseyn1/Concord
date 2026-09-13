@@ -27,6 +27,10 @@ const TOAST_DESCRIPTION_KEY = {
   DirectMessageReceived: 'notifications.sentYouAMessage',
 }
 
+const NO_RELATED_USER_TOAST_TITLE_KEY = {
+  ReportDismissed: 'notifications.reportDismissed',
+}
+
 const JUMP_AFTER_NAVIGATE_DELAY_MS = 400
 
 function navigationForType(event) {
@@ -68,6 +72,26 @@ export function NotificationsProvider({ children }) {
       }
 
       if (mutedRef.current || !event?.type) return
+
+      const noRelatedUserTitleKey = NO_RELATED_USER_TOAST_TITLE_KEY[event.type]
+      if (noRelatedUserTitleKey) {
+        const title = i18n.t(noRelatedUserTitleKey)
+        const description = event.reason || undefined
+
+        if (soundEnabledRef.current) playNotificationSound()
+        startTitleBlink(title)
+
+        toast({
+          variant: 'info',
+          title,
+          description,
+          dedupeKey: `${event.type}:${event.created}`,
+        })
+
+        showDesktopNotification({ title, body: description })
+        return
+      }
+
       const descriptionKey = TOAST_DESCRIPTION_KEY[event.type]
       if (!descriptionKey) return
 

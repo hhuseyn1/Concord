@@ -115,7 +115,7 @@ export function UserPanel({ className }) {
                 </DropdownMenuItem>
                 {user?.Role === 'Admin' && (
                   <DropdownMenuItem asChild>
-                    <Link to="/cabinet/admin">
+                    <Link to="/admin">
                       <ShieldCheck className="size-4" aria-hidden="true" />
                       {t('admin.dashboardLink')}
                     </Link>

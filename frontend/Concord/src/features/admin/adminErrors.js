@@ -33,3 +33,7 @@ export function mapAdminLoadError(error) {
 export function mapAuditLogLoadError(error) {
   return genericMessage(error)
 }
+
+export function mapSubscriptionsLoadError(error) {
+  return genericMessage(error)
+}
