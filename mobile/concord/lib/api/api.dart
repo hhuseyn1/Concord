@@ -4,6 +4,7 @@ export 'api_client.dart';
 export 'api_config.dart';
 export 'api_exception.dart';
 export 'auth_service.dart';
+export 'billing_service.dart';
 export 'channels_service.dart';
 export 'direct_calls_service.dart';
 export 'direct_messages_service.dart';

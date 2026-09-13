@@ -6,6 +6,7 @@ import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import 'active_sessions_section.dart';
+import 'billing_section.dart';
 import 'change_password_section.dart';
 import 'custom_status_sheet.dart';
 import 'delete_account_section.dart';
@@ -33,7 +34,7 @@ class SettingsScreen extends ConsumerWidget {
               : [profile.name, profile.surname].where((part) => part != null && part.isNotEmpty).join(' '));
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l10n.settingsScreenTitle),
@@ -44,6 +45,7 @@ class SettingsScreen extends ConsumerWidget {
               Tab(text: l10n.myAccountTab),
               Tab(text: l10n.privacyTabLabel),
               Tab(text: l10n.voiceTabLabel),
+              Tab(text: l10n.billingTabLabel),
             ],
           ),
         ),
@@ -130,6 +132,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const PrivacyTab(),
             const VoiceSettingsTab(),
+            const BillingSection(),
           ],
         ),
       ),

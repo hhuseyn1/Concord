@@ -1172,6 +1172,12 @@ abstract class AppLocalizations {
   /// **'Voice'**
   String get voiceTabLabel;
 
+  /// No description provided for @billingTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Billing'**
+  String get billingTabLabel;
+
   /// No description provided for @editProfileButton.
   ///
   /// In en, this message translates to:
@@ -1291,6 +1297,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign out this device'**
   String get signOutDeviceTooltip;
+
+  /// No description provided for @billingLoadErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your subscription'**
+  String get billingLoadErrorTitle;
+
+  /// No description provided for @billingPremiumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Concord Premium'**
+  String get billingPremiumTitle;
+
+  /// No description provided for @billingPremiumDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium for a monthly subscription that unlocks extra perks across Concord.'**
+  String get billingPremiumDescription;
+
+  /// No description provided for @billingBenefitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What you get with Premium'**
+  String get billingBenefitsTitle;
+
+  /// No description provided for @billingBenefitHdVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Crystal-clear, HD-quality voice in every call'**
+  String get billingBenefitHdVoice;
+
+  /// No description provided for @billingBenefitVoiceCapacity.
+  ///
+  /// In en, this message translates to:
+  /// **'Higher participant limits in voice channels'**
+  String get billingBenefitVoiceCapacity;
+
+  /// No description provided for @billingBenefitUploadLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Bigger file upload limits when sharing in chat'**
+  String get billingBenefitUploadLimit;
+
+  /// No description provided for @billingBenefitMessageLength.
+  ///
+  /// In en, this message translates to:
+  /// **'A longer character limit for your messages'**
+  String get billingBenefitMessageLength;
+
+  /// No description provided for @billingCanceledNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Your previous subscription has ended. Resubscribe anytime to pick up where you left off.'**
+  String get billingCanceledNotice;
+
+  /// No description provided for @billingSubscribeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get billingSubscribeButton;
+
+  /// No description provided for @billingManageSubscriptionButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage subscription'**
+  String get billingManageSubscriptionButton;
+
+  /// No description provided for @billingActiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re subscribed'**
+  String get billingActiveTitle;
+
+  /// No description provided for @billingActiveBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get billingActiveBadge;
+
+  /// No description provided for @billingEndingBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Ending soon'**
+  String get billingEndingBadge;
+
+  /// No description provided for @billingPastDueBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed'**
+  String get billingPastDueBadge;
+
+  /// No description provided for @billingRenewsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Renews on {date}'**
+  String billingRenewsOn(String date);
+
+  /// No description provided for @billingEndsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium access ends on {date}'**
+  String billingEndsOn(String date);
+
+  /// No description provided for @billingPerksReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Premium perks'**
+  String get billingPerksReminderTitle;
+
+  /// No description provided for @billingPastDueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your last payment failed'**
+  String get billingPastDueTitle;
+
+  /// No description provided for @billingPastDueDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your payment method to keep your Premium perks.'**
+  String get billingPastDueDescription;
+
+  /// No description provided for @billingLaunchFailedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the checkout page. Make sure you have a browser installed and try again.'**
+  String get billingLaunchFailedError;
 
   /// No description provided for @currentPasswordRequired.
   ///

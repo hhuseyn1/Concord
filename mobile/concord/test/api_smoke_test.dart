@@ -243,6 +243,7 @@ void main() {
       expect(FilesService(client), isNotNull);
       expect(NotificationsService(client), isNotNull);
       expect(VoiceService(client), isNotNull);
+      expect(BillingService(client), isNotNull);
     });
 
     test('hub wrappers construct without connecting', () {
@@ -320,6 +321,65 @@ void main() {
     expect(read.conversationId, 'c1');
     expect(read.userId, 'u1');
     expect(read.readAt, DateTime.parse('2026-01-01T00:00:00Z'));
+  });
+
+  group('Billing response models (CheckoutSessionResponse/PortalSessionResponse/SubscriptionResponse)', () {
+    test('CheckoutSessionResponse.fromJson parses Url', () {
+      final response = CheckoutSessionResponse.fromJson({'Url': 'https://checkout.stripe.com/pay/abc'});
+      expect(response.url, 'https://checkout.stripe.com/pay/abc');
+    });
+
+    test('PortalSessionResponse.fromJson parses Url', () {
+      final response = PortalSessionResponse.fromJson({'Url': 'https://billing.stripe.com/session/abc'});
+      expect(response.url, 'https://billing.stripe.com/session/abc');
+    });
+
+    test('SubscriptionResponse.fromJson parses an active, renewing subscription', () {
+      final response = SubscriptionResponse.fromJson({
+        'Status': 'Active',
+        'CurrentPeriodEnd': '2026-10-13T06:05:54Z',
+        'CancelAtPeriodEnd': false,
+      });
+      expect(response.status, SubscriptionStatus.active);
+      expect(response.currentPeriodEnd, DateTime.parse('2026-10-13T06:05:54Z'));
+      expect(response.cancelAtPeriodEnd, isFalse);
+    });
+
+    test('SubscriptionResponse.fromJson parses an active subscription ending at period end', () {
+      final response = SubscriptionResponse.fromJson({
+        'Status': 'Active',
+        'CurrentPeriodEnd': '2026-10-13T06:05:54Z',
+        'CancelAtPeriodEnd': true,
+      });
+      expect(response.status, SubscriptionStatus.active);
+      expect(response.cancelAtPeriodEnd, isTrue);
+    });
+
+    test('SubscriptionResponse.fromJson parses PastDue and Canceled statuses', () {
+      final pastDue = SubscriptionResponse.fromJson({
+        'Status': 'PastDue',
+        'CurrentPeriodEnd': null,
+        'CancelAtPeriodEnd': false,
+      });
+      expect(pastDue.status, SubscriptionStatus.pastDue);
+
+      final canceled = SubscriptionResponse.fromJson({
+        'Status': 'Canceled',
+        'CurrentPeriodEnd': null,
+        'CancelAtPeriodEnd': false,
+      });
+      expect(canceled.status, SubscriptionStatus.canceled);
+    });
+
+    test('SubscriptionResponse.fromJson parses None (never subscribed) with a null CurrentPeriodEnd', () {
+      final response = SubscriptionResponse.fromJson({
+        'Status': 'None',
+        'CurrentPeriodEnd': null,
+        'CancelAtPeriodEnd': false,
+      });
+      expect(response.status, SubscriptionStatus.none);
+      expect(response.currentPeriodEnd, isNull);
+    });
   });
 
   test('ApiConfig has no trailing slash and builds expected URLs', () {
