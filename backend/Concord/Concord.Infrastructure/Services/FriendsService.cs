@@ -47,7 +47,7 @@ public class FriendsService(
 
             await _context.SaveChangesAsync();
 
-            await _notificationsRealtimeNotifier.NotifyAsync(targetUserId, NotificationType.FriendRequestAccepted, currentUserId);
+            await _notificationsRealtimeNotifier.NotifyAsync(targetUserId, NotificationType.FriendRequestAccepted, currentUserId, reason: null);
 
             return new SendRequestResponse
             {
@@ -79,7 +79,7 @@ public class FriendsService(
 
         await _context.SaveChangesAsync();
 
-        await _notificationsRealtimeNotifier.NotifyAsync(targetUserId, NotificationType.FriendRequestReceived, currentUserId);
+        await _notificationsRealtimeNotifier.NotifyAsync(targetUserId, NotificationType.FriendRequestReceived, currentUserId, reason: null);
 
         return new SendRequestResponse
         {
@@ -98,7 +98,7 @@ public class FriendsService(
 
         await _context.SaveChangesAsync();
 
-        await _notificationsRealtimeNotifier.NotifyAsync(request.RequesterId, NotificationType.FriendRequestAccepted, currentUserId);
+        await _notificationsRealtimeNotifier.NotifyAsync(request.RequesterId, NotificationType.FriendRequestAccepted, currentUserId, reason: null);
 
         return request.RequesterId;
     }
@@ -115,7 +115,7 @@ public class FriendsService(
         // Not persisted as a Notification row (no NotifyFriendRequestDeclinedAsync call) - purely an
         // ephemeral live-update signal so the requester's Outgoing tab stops showing a request that no
         // longer exists, same client-side handling as FriendRequestReceived/Accepted.
-        await _notificationsRealtimeNotifier.NotifyAsync(requesterId, NotificationType.FriendRequestDeclined, currentUserId);
+        await _notificationsRealtimeNotifier.NotifyAsync(requesterId, NotificationType.FriendRequestDeclined, currentUserId, reason: null);
     }
 
     public async Task CancelRequestAsync(Guid currentUserId, Guid requestId)
@@ -134,7 +134,7 @@ public class FriendsService(
 
         // Ephemeral only, same rationale as DeclineRequestAsync above - lets the addressee's Incoming
         // tab stop showing a request that's just been withdrawn.
-        await _notificationsRealtimeNotifier.NotifyAsync(addresseeId, NotificationType.FriendRequestCancelled, currentUserId);
+        await _notificationsRealtimeNotifier.NotifyAsync(addresseeId, NotificationType.FriendRequestCancelled, currentUserId, reason: null);
     }
 
     public async Task BlockUserAsync(Guid currentUserId, Guid targetUserId)

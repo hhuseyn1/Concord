@@ -41,6 +41,15 @@ public class AuthenticationController(
         return await _authenticationService.RegisterAsync(request);
     }
 
+    /// <summary>Unauthenticated live-availability check for the registration form; no
+    /// <c>[Authorize]</c>/<c>[AllowAnonymous]</c> needed since this controller has no class-level
+    /// gate and inherits whatever global rate limiting already applies.</summary>
+    [HttpGet("Register/Username-available")]
+    public async Task<UsernameAvailabilityResponse> CheckUsernameAvailableAsync([FromQuery] string username)
+    {
+        return await _authenticationService.CheckUsernameAvailableAsync(username);
+    }
+
     [HttpPost("{userId}:Reset-password")]
     [Authorize(Roles = "Admin")]
     public async Task ResetPasswordAsync(Guid userId, [FromBody] ResetPasswordRequest request)

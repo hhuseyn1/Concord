@@ -16,6 +16,7 @@ public static class NotificationExtensions
         ContextServerId = notification.ContextServerId,
         ContextChannelId = notification.ContextChannelId,
         ContextConversationId = notification.ContextConversationId,
-        ContextMessageId = notification.ContextMessageId
+        ContextMessageId = notification.ContextMessageId,
+        Reason = notification.Reason
     };
 }

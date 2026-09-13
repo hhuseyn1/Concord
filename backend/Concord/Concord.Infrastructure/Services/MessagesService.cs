@@ -92,7 +92,8 @@ public class MessagesService(
                 currentUserId,
                 contextServerId: serverId,
                 contextChannelId: channelId,
-                contextMessageId: result.Id);
+                contextMessageId: result.Id,
+                reason: null);
         }
 
         return result;

@@ -12,11 +12,12 @@ public class SignalRNotificationsNotifier(IHubContext<NotificationsHub> hubConte
     public async Task NotifyAsync(
         Guid targetUserId,
         NotificationType type,
-        Guid relatedUserId,
+        Guid? relatedUserId,
         Guid? contextServerId = null,
         Guid? contextChannelId = null,
         Guid? contextConversationId = null,
-        Guid? contextMessageId = null)
+        Guid? contextMessageId = null,
+        string? reason = null)
     {
         await _hubContext.Clients.User(targetUserId.ToString()).SendAsync("NotificationCreated", new
         {
@@ -26,7 +27,8 @@ public class SignalRNotificationsNotifier(IHubContext<NotificationsHub> hubConte
             contextServerId,
             contextChannelId,
             contextConversationId,
-            contextMessageId
+            contextMessageId,
+            reason
         });
     }
 }

@@ -5,6 +5,7 @@ using Concord.Domain.Enums;
 using Concord.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Concord.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260913055712_AddSubscription")]
+    partial class AddSubscription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,7 +27,7 @@ namespace Concord.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "channel_type", new[] { "text", "voice" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "friend_request_status", new[] { "accepted", "pending" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "notification_type", new[] { "direct_message_received", "friend_request_accepted", "friend_request_cancelled", "friend_request_declined", "friend_request_received", "mention", "missed_call", "report_dismissed" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "notification_type", new[] { "direct_message_received", "friend_request_accepted", "friend_request_cancelled", "friend_request_declined", "friend_request_received", "mention", "missed_call" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "presence_status", new[] { "do_not_disturb", "idle", "invisible", "offline", "online" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "qr_login_status", new[] { "approved", "consumed", "denied", "pending" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "roles", new[] { "admin", "user" });
@@ -681,10 +684,6 @@ namespace Concord.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ReadAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Reason")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
 
                     b.Property<Guid>("RecipientUserId")
                         .HasColumnType("uuid");

@@ -119,7 +119,7 @@ public class DirectCallsService(
         await _realtimeNotifier.CallEndedAsync(result.InitiatorId, result.CalleeId, result);
 
         if (result.Status == CallStatus.Missed)
-            await _notificationsRealtimeNotifier.NotifyAsync(result.CalleeId, NotificationType.MissedCall, result.InitiatorId);
+            await _notificationsRealtimeNotifier.NotifyAsync(result.CalleeId, NotificationType.MissedCall, result.InitiatorId, reason: null);
 
         return result;
     }

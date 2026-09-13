@@ -11,5 +11,6 @@ public enum NotificationType
     Mention,
     FriendRequestDeclined,
     FriendRequestCancelled,
-    DirectMessageReceived
+    DirectMessageReceived,
+    ReportDismissed
 }

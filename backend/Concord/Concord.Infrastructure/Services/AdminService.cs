@@ -1,4 +1,5 @@
 using Concord.Application.Auditing;
+using Concord.Application.Enums;
 using Concord.Application.Models;
 using Concord.Domain.Enums;
 using Concord.Domain.Exceptions;
@@ -193,6 +194,39 @@ public class AdminService(ApplicationDbContext context, IAuditLogService auditLo
         return new PagedResult<AuditLogResponse>
         {
             Items = logs.Select(entry => entry.Log.MapToResponse(entry.Actor)).ToList(),
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
+
+    /// <summary>
+    /// Read side of billing (P4) - an audit view of subscription history, not a deduplicated "who is
+    /// currently subscribed" list, so every <see cref="Domain.Entities.Subscription"/> row is returned
+    /// (past/canceled included). See <see cref="GetUsersAsync"/> for the per-user view instead.
+    /// </summary>
+    public async Task<PagedResult<AdminSubscriptionSummary>> GetSubscriptionsAsync(int page, int pageSize, SubscriptionStatus? status)
+    {
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, GlobalConstants.MaxPageSize);
+
+        var query = _context.Subscriptions.AsQueryable();
+
+        if (status.HasValue)
+            query = query.Where(subscription => subscription.Status == status.Value);
+
+        var totalCount = await query.CountAsync();
+
+        var subscriptions = await query
+            .OrderByDescending(subscription => subscription.Created)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Join(_context.Users, subscription => subscription.UserId, user => user.Id, (subscription, user) => new { Subscription = subscription, User = user })
+            .ToListAsync();
+
+        return new PagedResult<AdminSubscriptionSummary>
+        {
+            Items = subscriptions.Select(entry => entry.Subscription.MapToAdminSummary(entry.User)).ToList(),
             Page = page,
             PageSize = pageSize,
             TotalCount = totalCount

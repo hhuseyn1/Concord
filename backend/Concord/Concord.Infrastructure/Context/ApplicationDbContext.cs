@@ -39,6 +39,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Report> Reports { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
     public DbSet<PushToken> PushTokens { get; set; }
+    public DbSet<Subscription> Subscriptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -78,6 +79,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         ConfigureReport(modelBuilder.Entity<Report>());
         ConfigureAuditLog(modelBuilder.Entity<AuditLog>());
         ConfigurePushToken(modelBuilder.Entity<PushToken>());
+        ConfigureSubscription(modelBuilder.Entity<Subscription>());
     }
     
     private static void ConfigureSession(EntityTypeBuilder<Session> builder)
@@ -565,6 +567,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(notification => notification.Created).HasDefaultValueSql("now()");
 
+        // Matches ModerationService's/ReportsService's ban/timeout/report reason ceiling.
+        builder.Property(notification => notification.Reason).HasMaxLength(500);
+
         builder.HasOne<User>().WithMany().HasForeignKey(notification => notification.RecipientUserId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<User>().WithMany().HasForeignKey(notification => notification.RelatedUserId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<Server>().WithMany().HasForeignKey(notification => notification.ContextServerId).OnDelete(DeleteBehavior.SetNull);
@@ -685,5 +690,28 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasForeignKey(token => token.UserId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
+    }
+
+    private static void ConfigureSubscription(EntityTypeBuilder<Subscription> builder)
+    {
+        builder.ToTable("Subscription");
+
+        builder.HasKey(subscription => subscription.Id);
+
+        builder.Property(subscription => subscription.Created).HasDefaultValueSql("now()");
+
+        builder.Property(subscription => subscription.StripeCustomerId).IsRequired();
+        builder.Property(subscription => subscription.StripeSubscriptionId).IsRequired();
+
+        // Idempotency backstop against concurrent webhook races - see BillingService's upsert.
+        builder.HasIndex(subscription => subscription.StripeSubscriptionId).IsUnique();
+
+        // Not unique - a user accumulates multiple historical rows across resubscribe cycles.
+        builder.HasIndex(subscription => subscription.UserId);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(subscription => subscription.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

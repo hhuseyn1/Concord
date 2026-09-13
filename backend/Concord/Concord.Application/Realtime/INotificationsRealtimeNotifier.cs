@@ -7,9 +7,10 @@ public interface INotificationsRealtimeNotifier
     Task NotifyAsync(
         Guid targetUserId,
         NotificationType type,
-        Guid relatedUserId,
+        Guid? relatedUserId,
         Guid? contextServerId = null,
         Guid? contextChannelId = null,
         Guid? contextConversationId = null,
-        Guid? contextMessageId = null);
+        Guid? contextMessageId = null,
+        string? reason = null);
 }

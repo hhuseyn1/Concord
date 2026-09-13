@@ -1,3 +1,4 @@
+using Concord.Application.Enums;
 using Concord.Application.Models;
 using Concord.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -45,6 +46,15 @@ public class AdminController(AdminService adminService) : BaseApiController
     public async Task SetUserRoleAsync(Guid userId, SetUserRoleRequest request)
     {
         await _adminService.SetUserRoleAsync(GetUserId(), userId, request.Role);
+    }
+
+    [HttpGet("Subscriptions")]
+    public async Task<PagedResult<AdminSubscriptionSummary>> GetSubscriptionsAsync(
+        [FromQuery] int page,
+        [FromQuery] int pageSize,
+        [FromQuery] SubscriptionStatus? status)
+    {
+        return await _adminService.GetSubscriptionsAsync(page, pageSize, status);
     }
 
     [HttpGet("AuditLog")]

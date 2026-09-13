@@ -42,8 +42,8 @@ public class ReportsController(ReportsService reportsService) : BaseApiControlle
 
     [HttpPost("Admin/Reports/{reportId:guid}:Dismiss")]
     [Authorize(Roles = "Admin")]
-    public async Task DismissReportAsync(Guid reportId)
+    public async Task DismissReportAsync(Guid reportId, [FromBody] DismissReportRequest? request)
     {
-        await _reportsService.DismissReportAsync(GetUserId(), reportId);
+        await _reportsService.DismissReportAsync(GetUserId(), reportId, request?.Reason);
     }
 }
