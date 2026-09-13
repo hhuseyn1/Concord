@@ -611,6 +611,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceTabLabel => 'Voice';
 
   @override
+  String get billingTabLabel => 'Billing';
+
+  @override
   String get editProfileButton => 'Edit Profile';
 
   @override
@@ -679,6 +682,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signOutDeviceTooltip => 'Sign out this device';
+
+  @override
+  String get billingLoadErrorTitle => 'Couldn\'t load your subscription';
+
+  @override
+  String get billingPremiumTitle => 'Concord Premium';
+
+  @override
+  String get billingPremiumDescription =>
+      'Upgrade to Premium for a monthly subscription that unlocks extra perks across Concord.';
+
+  @override
+  String get billingBenefitsTitle => 'What you get with Premium';
+
+  @override
+  String get billingBenefitHdVoice =>
+      'Crystal-clear, HD-quality voice in every call';
+
+  @override
+  String get billingBenefitVoiceCapacity =>
+      'Higher participant limits in voice channels';
+
+  @override
+  String get billingBenefitUploadLimit =>
+      'Bigger file upload limits when sharing in chat';
+
+  @override
+  String get billingBenefitMessageLength =>
+      'A longer character limit for your messages';
+
+  @override
+  String get billingCanceledNotice =>
+      'Your previous subscription has ended. Resubscribe anytime to pick up where you left off.';
+
+  @override
+  String get billingSubscribeButton => 'Subscribe';
+
+  @override
+  String get billingManageSubscriptionButton => 'Manage subscription';
+
+  @override
+  String get billingActiveTitle => 'You\'re subscribed';
+
+  @override
+  String get billingActiveBadge => 'Active';
+
+  @override
+  String get billingEndingBadge => 'Ending soon';
+
+  @override
+  String get billingPastDueBadge => 'Payment failed';
+
+  @override
+  String billingRenewsOn(String date) {
+    return 'Renews on $date';
+  }
+
+  @override
+  String billingEndsOn(String date) {
+    return 'Premium access ends on $date';
+  }
+
+  @override
+  String get billingPerksReminderTitle => 'Your Premium perks';
+
+  @override
+  String get billingPastDueTitle => 'Your last payment failed';
+
+  @override
+  String get billingPastDueDescription =>
+      'Update your payment method to keep your Premium perks.';
+
+  @override
+  String get billingLaunchFailedError =>
+      'Couldn\'t open the checkout page. Make sure you have a browser installed and try again.';
 
   @override
   String get currentPasswordRequired => 'Current password is required.';

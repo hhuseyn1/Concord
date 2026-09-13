@@ -255,6 +255,29 @@ enum CustomStatusExpiryPreset {
   }
 }
 
+/// The wire values used by `Billing/Subscription` ("None"/"Active"/"PastDue"/"Canceled") -
+/// REST-only (no hub ever sends this), but `fromWire` still tolerates an ordinal just in case,
+/// matching every other enum in this file.
+enum SubscriptionStatus {
+  none,
+  active,
+  pastDue,
+  canceled;
+
+  static SubscriptionStatus fromWire(dynamic value) {
+    if (value is int && value >= 0 && value < SubscriptionStatus.values.length) {
+      return SubscriptionStatus.values[value];
+    }
+    if (value is String) {
+      return SubscriptionStatus.values.firstWhere(
+        (e) => e.name.toLowerCase() == value.toLowerCase(),
+        orElse: () => SubscriptionStatus.none,
+      );
+    }
+    return SubscriptionStatus.none;
+  }
+}
+
 enum FriendRelationshipStatus {
   none,
   friends,

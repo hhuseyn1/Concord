@@ -611,6 +611,9 @@ class AppLocalizationsAz extends AppLocalizations {
   String get voiceTabLabel => 'Səs';
 
   @override
+  String get billingTabLabel => 'Ödəniş';
+
+  @override
   String get editProfileButton => 'Profili redaktə et';
 
   @override
@@ -680,6 +683,80 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get signOutDeviceTooltip => 'Bu cihazdan çıxış et';
+
+  @override
+  String get billingLoadErrorTitle => 'Abunəliyiniz yüklənə bilmədi';
+
+  @override
+  String get billingPremiumTitle => 'Concord Premium';
+
+  @override
+  String get billingPremiumDescription =>
+      'Concord-da əlavə imkanların kilidini açan aylıq abunəlik üçün Premium-a keçin.';
+
+  @override
+  String get billingBenefitsTitle => 'Premium ilə əldə etdikləriniz';
+
+  @override
+  String get billingBenefitHdVoice => 'Hər zəngdə aydın, HD keyfiyyətli səs';
+
+  @override
+  String get billingBenefitVoiceCapacity =>
+      'Səs kanallarında daha yüksək iştirakçı limiti';
+
+  @override
+  String get billingBenefitUploadLimit =>
+      'Söhbətdə paylaşarkən daha böyük fayl yükləmə limiti';
+
+  @override
+  String get billingBenefitMessageLength =>
+      'Mesajlarınız üçün daha uzun simvol limiti';
+
+  @override
+  String get billingCanceledNotice =>
+      'Əvvəlki abunəliyiniz başa çatıb. İstədiyiniz zaman yenidən abunə olub davam edə bilərsiniz.';
+
+  @override
+  String get billingSubscribeButton => 'Abunə ol';
+
+  @override
+  String get billingManageSubscriptionButton => 'Abunəliyi idarə et';
+
+  @override
+  String get billingActiveTitle => 'Abunəliyiniz aktivdir';
+
+  @override
+  String get billingActiveBadge => 'Aktiv';
+
+  @override
+  String get billingEndingBadge => 'Tezliklə bitir';
+
+  @override
+  String get billingPastDueBadge => 'Ödəniş uğursuz oldu';
+
+  @override
+  String billingRenewsOn(String date) {
+    return '$date tarixində yenilənir';
+  }
+
+  @override
+  String billingEndsOn(String date) {
+    return 'Premium girişi $date tarixində bitir';
+  }
+
+  @override
+  String get billingPerksReminderTitle => 'Premium üstünlükləriniz';
+
+  @override
+  String get billingPastDueTitle => 'Son ödənişiniz uğursuz oldu';
+
+  @override
+  String get billingPastDueDescription =>
+      'Premium üstünlüklərinizi saxlamaq üçün ödəniş metodunuzu yeniləyin.';
+
+  @override
+  String get billingLaunchFailedError =>
+      'Ödəniş səhifəsi açıla bilmədi. Brauzerinizin quraşdırıldığından əmin olub yenidən cəhd edin.';
 
   @override
   String get currentPasswordRequired => 'Cari şifrə tələb olunur.';

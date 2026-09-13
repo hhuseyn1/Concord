@@ -81,3 +81,7 @@ final moderationServiceProvider = Provider<ModerationService>((ref) {
 final qrLoginServiceProvider = Provider<QrLoginService>((ref) {
   return QrLoginService(ref.watch(apiClientProvider));
 });
+
+final billingServiceProvider = Provider<BillingService>((ref) {
+  return BillingService(ref.watch(apiClientProvider));
+});

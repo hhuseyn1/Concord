@@ -263,6 +263,7 @@
   "myAccountTab": "My Account",
   "privacyTabLabel": "Privacy",
   "voiceTabLabel": "Voice",
+  "billingTabLabel": "Billing",
   "editProfileButton": "Edit Profile",
   "statusButton": "Status",
   "scanQrCodeButton": "Scan QR Code to Log In on Web",
@@ -296,6 +297,34 @@
     "placeholders": {"time": {"type": "String"}}
   },
   "signOutDeviceTooltip": "Sign out this device",
+
+  "billingLoadErrorTitle": "Couldn't load your subscription",
+  "billingPremiumTitle": "Concord Premium",
+  "billingPremiumDescription": "Upgrade to Premium for a monthly subscription that unlocks extra perks across Concord.",
+  "billingBenefitsTitle": "What you get with Premium",
+  "billingBenefitHdVoice": "Crystal-clear, HD-quality voice in every call",
+  "billingBenefitVoiceCapacity": "Higher participant limits in voice channels",
+  "billingBenefitUploadLimit": "Bigger file upload limits when sharing in chat",
+  "billingBenefitMessageLength": "A longer character limit for your messages",
+  "billingCanceledNotice": "Your previous subscription has ended. Resubscribe anytime to pick up where you left off.",
+  "billingSubscribeButton": "Subscribe",
+  "billingManageSubscriptionButton": "Manage subscription",
+  "billingActiveTitle": "You're subscribed",
+  "billingActiveBadge": "Active",
+  "billingEndingBadge": "Ending soon",
+  "billingPastDueBadge": "Payment failed",
+  "billingRenewsOn": "Renews on {date}",
+  "@billingRenewsOn": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "billingEndsOn": "Premium access ends on {date}",
+  "@billingEndsOn": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "billingPerksReminderTitle": "Your Premium perks",
+  "billingPastDueTitle": "Your last payment failed",
+  "billingPastDueDescription": "Update your payment method to keep your Premium perks.",
+  "billingLaunchFailedError": "Couldn't open the checkout page. Make sure you have a browser installed and try again.",
 
   "currentPasswordRequired": "Current password is required.",
   "newPasswordTooShort": "New password must be at least 8 characters.",
