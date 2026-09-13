@@ -192,4 +192,3 @@ docker build -t shared:Local -f Dockerfile .
 docker compose --env-file .env.Local --profile db --profile backend --profile frontend up -d --build
 ```
 
-Auto start vercel deployment.
