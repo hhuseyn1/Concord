@@ -1,4 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
+import { AdminLayout } from '../app/AdminLayout'
+import { RequireAdmin } from '../app/RequireAdmin'
 import { RequireAuth } from '../app/RequireAuth'
 import { NotFoundPlaceholder, ServerPlaceholder } from '../app/routePlaceholders'
 import { LandingScreen } from '../features/landing/LandingScreen'
@@ -6,6 +8,8 @@ import {
   AdminDashboardScreen,
   CabinetRoot,
   ChannelView,
+  CheckoutCancelScreen,
+  CheckoutSuccessScreen,
   DirectMessageView,
   ForgotPasswordScreen,
   FriendsScreen,
@@ -31,6 +35,16 @@ export const router = createBrowserRouter([
     children: [
       { path: 'link', element: withSuspense(<LinkDeviceScreen />) },
       {
+        element: <RequireAdmin />,
+        children: [
+          {
+            path: 'admin',
+            element: <AdminLayout />,
+            children: [{ index: true, element: withSuspense(<AdminDashboardScreen />) }],
+          },
+        ],
+      },
+      {
         path: 'cabinet',
         element: withSuspense(<CabinetRoot />),
         children: [
@@ -39,7 +53,8 @@ export const router = createBrowserRouter([
           { path: 'servers/:serverId/channels/:channelId', element: withSuspense(<ChannelView />) },
           { path: 'dm/:conversationId', element: withSuspense(<DirectMessageView />) },
           { path: 'settings', element: withSuspense(<SettingsScreen />) },
-          { path: 'admin', element: withSuspense(<AdminDashboardScreen />) },
+          { path: 'checkout/success', element: withSuspense(<CheckoutSuccessScreen />) },
+          { path: 'checkout/cancel', element: withSuspense(<CheckoutCancelScreen />) },
         ],
       },
     ],

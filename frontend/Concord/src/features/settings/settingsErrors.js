@@ -51,3 +51,11 @@ export function mapSessionActionError(error) {
   }
   return genericMessage(error)
 }
+
+export function mapCheckoutSessionError(error) {
+  return genericMessage(error)
+}
+
+export function mapPortalSessionError(error) {
+  return genericMessage(error)
+}

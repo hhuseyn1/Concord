@@ -20,3 +20,7 @@ export async function enableUser(userId) {
 export async function setUserRole(userId, role) {
   return request(`Admin/Users/${userId}/Role`, { method: 'PUT', body: { Role: role } });
 }
+
+export async function getSubscriptions(page, pageSize, status) {
+  return request('Admin/Subscriptions', { query: { ...buildPagingQuery(page, pageSize), status: status || undefined } });
+}

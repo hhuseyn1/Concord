@@ -1,11 +1,13 @@
-import { ChevronLeft, ChevronRight, Flag } from 'lucide-react'
+import { Flag } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '../../components/ui/Avatar'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
-import { EmptyState } from '../../components/ui/EmptyState'
-import { Skeleton } from '../../components/ui/Skeleton'
+import { DataTable } from '../../components/ui/DataTable'
+import { FormField } from '../../components/ui/FormField'
+import { Input } from '../../components/ui/Input'
+import { Modal } from '../../components/ui/Modal'
 import { toast } from '../../components/ui/Toast'
 import { cn } from '../../lib/cn'
 import { mapGetReportsError, mapReviewReportError } from '../moderation/reportsErrors'
@@ -32,6 +34,8 @@ export function ReportsQueueSection() {
   const { t } = useTranslation()
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
+  const [dismissTarget, setDismissTarget] = useState(null)
+  const [dismissReason, setDismissReason] = useState('')
 
   const { data, isLoading, isFetching, isError, error } = useReportsQueue(page, status || undefined)
   const resolveMutation = useResolveReportMutation()
@@ -56,9 +60,17 @@ export function ReportsQueueSection() {
     }
   }
 
-  async function handleDismiss(report) {
+  function handleDismissClick(report) {
+    setDismissReason('')
+    setDismissTarget(report)
+  }
+
+  async function handleDismissConfirm() {
+    if (!dismissTarget) return
     try {
-      await dismissMutation.mutateAsync(report.Id)
+      await dismissMutation.mutateAsync({ reportId: dismissTarget.Id, reason: dismissReason || null })
+      setDismissTarget(null)
+      setDismissReason('')
       toast({ variant: 'success', title: t('admin.reportDismissed') })
     } catch (dismissError) {
       toast({ variant: 'danger', title: mapReviewReportError(dismissError) })
@@ -66,6 +78,75 @@ export function ReportsQueueSection() {
   }
 
   const isReviewPending = resolveMutation.isPending || dismissMutation.isPending
+
+  const columns = [
+    {
+      key: 'reporter',
+      header: t('admin.reportColumnReporter'),
+      render: (report) => {
+        const reporterName =
+          report.Reporter?.Username ||
+          [report.Reporter?.Name, report.Reporter?.Surname].filter(Boolean).join(' ') ||
+          t('common.unknownUser')
+        return (
+          <div className="flex items-center gap-2">
+            <Avatar src={report.Reporter?.AvatarUrl ?? undefined} name={reporterName} size="sm" />
+            <span className="font-medium text-fg-default">{reporterName}</span>
+          </div>
+        )
+      },
+    },
+    {
+      key: 'target',
+      header: t('admin.reportColumnTarget'),
+      cellClassName: 'max-w-[16rem] px-3 py-2 text-fg-muted',
+      render: (report) => (
+        <span className={cn('block truncate', !report.TargetSnippet && 'italic')} title={targetLabel(t, report)}>
+          {targetLabel(t, report)}
+        </span>
+      ),
+    },
+    {
+      key: 'reason',
+      header: t('admin.reportColumnReason'),
+      cellClassName: 'max-w-[20rem] px-3 py-2 text-fg-default',
+      render: (report) => (
+        <span className="block truncate" title={report.Reason}>
+          {report.Reason}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: t('admin.reportColumnStatus'),
+      render: (report) => (
+        <Badge variant={STATUS_BADGE_VARIANT[report.Status] ?? 'neutral'}>{t(`admin.reportStatus${report.Status}`)}</Badge>
+      ),
+    },
+    {
+      key: 'created',
+      header: t('admin.reportColumnCreated'),
+      cellClassName: 'px-3 py-2 whitespace-nowrap text-fg-muted',
+      render: (report) => new Date(report.CreatedUtc).toLocaleString(),
+    },
+    {
+      key: 'actions',
+      header: t('admin.reportColumnActions'),
+      render: (report) =>
+        report.Status === 'Pending' ? (
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="secondary" disabled={isReviewPending} onClick={() => handleResolve(report)}>
+              {t('admin.resolve')}
+            </Button>
+            <Button size="sm" variant="ghost" disabled={isReviewPending} onClick={() => handleDismissClick(report)}>
+              {t('admin.dismiss')}
+            </Button>
+          </div>
+        ) : (
+          <span className="text-xs text-fg-muted">-</span>
+        ),
+    },
+  ]
 
   return (
     <div className="flex flex-col gap-3">
@@ -82,111 +163,44 @@ export function ReportsQueueSection() {
         ))}
       </select>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 6 }, (_, index) => (
-            <Skeleton key={index} className="h-14 w-full rounded-md" />
-          ))}
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        rows={reports}
+        loading={isLoading}
+        error={isError}
+        errorTitle={t('admin.reportsLoadFailed')}
+        errorDescription={mapGetReportsError(error)}
+        emptyIcon={Flag}
+        emptyTitle={t('admin.noReportsTitle')}
+        emptyDescription={t('admin.noReportsDescription')}
+        skeletonRowClassName="h-14 w-full rounded-md"
+        page={page}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        isFetching={isFetching}
+        onPageChange={setPage}
+      />
 
-      {isError && <EmptyState title={t('admin.reportsLoadFailed')} description={mapGetReportsError(error)} />}
-
-      {!isLoading && !isError && reports.length === 0 && (
-        <EmptyState icon={Flag} title={t('admin.noReportsTitle')} description={t('admin.noReportsDescription')} />
-      )}
-
-      {!isLoading && !isError && reports.length > 0 && (
-        <div className="overflow-x-auto rounded-md border border-border-default">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border-default bg-surface-sidebar text-xs text-fg-muted uppercase">
-              <tr>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnReporter')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnTarget')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnReason')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnStatus')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnCreated')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.reportColumnActions')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-default">
-              {reports.map((report) => {
-                const reporterName =
-                  report.Reporter?.Username ||
-                  [report.Reporter?.Name, report.Reporter?.Surname].filter(Boolean).join(' ') ||
-                  t('common.unknownUser')
-
-                return (
-                  <tr key={report.Id}>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <Avatar src={report.Reporter?.AvatarUrl ?? undefined} name={reporterName} size="sm" />
-                        <span className="font-medium text-fg-default">{reporterName}</span>
-                      </div>
-                    </td>
-                    <td className="max-w-[16rem] px-3 py-2 text-fg-muted">
-                      <span className={cn('block truncate', !report.TargetSnippet && 'italic')} title={targetLabel(t, report)}>
-                        {targetLabel(t, report)}
-                      </span>
-                    </td>
-                    <td className="max-w-[20rem] px-3 py-2 text-fg-default">
-                      <span className="block truncate" title={report.Reason}>
-                        {report.Reason}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2">
-                      <Badge variant={STATUS_BADGE_VARIANT[report.Status] ?? 'neutral'}>
-                        {t(`admin.reportStatus${report.Status}`)}
-                      </Badge>
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-fg-muted">{new Date(report.CreatedUtc).toLocaleString()}</td>
-                    <td className="px-3 py-2">
-                      {report.Status === 'Pending' ? (
-                        <div className="flex flex-wrap gap-2">
-                          <Button size="sm" variant="secondary" disabled={isReviewPending} onClick={() => handleResolve(report)}>
-                            {t('admin.resolve')}
-                          </Button>
-                          <Button size="sm" variant="ghost" disabled={isReviewPending} onClick={() => handleDismiss(report)}>
-                            {t('admin.dismiss')}
-                          </Button>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-fg-muted">-</span>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {!isLoading && !isError && totalCount > 0 && (
-        <div className="flex items-center justify-between text-sm text-fg-muted">
-          <span>{t('admin.pageSummary', { page, totalPages, total: totalCount })}</span>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={page <= 1 || isFetching}
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-            >
-              <ChevronLeft className="size-4" aria-hidden="true" />
-              {t('admin.previous')}
+      <Modal
+        open={Boolean(dismissTarget)}
+        onOpenChange={(open) => !open && setDismissTarget(null)}
+        title={t('admin.dismissReportTitle')}
+        description={t('admin.dismissReportDescription')}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDismissTarget(null)}>
+              {t('common.cancel')}
             </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={page >= totalPages || isFetching}
-              onClick={() => setPage((current) => current + 1)}
-            >
-              {t('admin.next')}
-              <ChevronRight className="size-4" aria-hidden="true" />
+            <Button onClick={handleDismissConfirm} disabled={dismissMutation.isPending}>
+              {t('admin.dismiss')}
             </Button>
-          </div>
-        </div>
-      )}
+          </>
+        }
+      >
+        <FormField label={t('admin.reportColumnReason')} hint={t('admin.dismissReasonHint')}>
+          <Input value={dismissReason} onChange={(event) => setDismissReason(event.target.value)} maxLength={500} />
+        </FormField>
+      </Modal>
     </div>
   )
 }

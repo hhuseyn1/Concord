@@ -1,12 +1,10 @@
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ScrollText } from 'lucide-react'
+import { ChevronDown, ChevronUp, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '../../components/ui/Avatar'
-import { Button } from '../../components/ui/Button'
-import { EmptyState } from '../../components/ui/EmptyState'
+import { DataTable } from '../../components/ui/DataTable'
 import { FormField } from '../../components/ui/FormField'
 import { Input } from '../../components/ui/Input'
-import { Skeleton } from '../../components/ui/Skeleton'
 import { mapAuditLogLoadError } from './adminErrors'
 import { useAuditLog } from './auditLogQueries'
 
@@ -87,6 +85,56 @@ export function AuditLogSection() {
   const pageSize = data?.PageSize ?? 20
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
+  const columns = [
+    {
+      key: 'actor',
+      header: t('admin.auditColumnActor'),
+      render: (entry) => {
+        const actorName =
+          entry.Actor?.Username ||
+          [entry.Actor?.Name, entry.Actor?.Surname].filter(Boolean).join(' ') ||
+          t('common.unknownUser')
+        return (
+          <div className="flex items-center gap-2">
+            <Avatar src={entry.Actor?.AvatarUrl ?? undefined} name={actorName} size="sm" />
+            <span className="font-medium text-fg-default">{actorName}</span>
+          </div>
+        )
+      },
+    },
+    {
+      key: 'action',
+      header: t('admin.auditColumnAction'),
+      cellClassName: 'px-3 py-2 text-fg-default',
+      render: (entry) => formatAction(entry.Action),
+    },
+    {
+      key: 'target',
+      header: t('admin.auditColumnTarget'),
+      cellClassName: 'px-3 py-2 text-fg-muted',
+      render: (entry) =>
+        entry.TargetType ? (
+          <span title={entry.TargetId ?? undefined}>
+            {entry.TargetType}
+            {entry.TargetId ? ` #${entry.TargetId.slice(0, 8)}` : ''}
+          </span>
+        ) : (
+          t('admin.auditNoTarget')
+        ),
+    },
+    {
+      key: 'time',
+      header: t('admin.auditColumnTime'),
+      cellClassName: 'px-3 py-2 whitespace-nowrap text-fg-muted',
+      render: (entry) => new Date(entry.CreatedUtc).toLocaleString(),
+    },
+    {
+      key: 'metadata',
+      header: t('admin.auditColumnMetadata'),
+      render: (entry) => <MetadataCell metadata={entry.Metadata} />,
+    },
+  ]
+
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -112,95 +160,22 @@ export function AuditLogSection() {
         </FormField>
       </div>
 
-      {isLoading && (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 6 }, (_, index) => (
-            <Skeleton key={index} className="h-12 w-full rounded-md" />
-          ))}
-        </div>
-      )}
-
-      {isError && <EmptyState title={t('admin.auditLogLoadFailed')} description={mapAuditLogLoadError(error)} />}
-
-      {!isLoading && !isError && entries.length === 0 && (
-        <EmptyState icon={ScrollText} title={t('admin.noAuditLogTitle')} description={t('admin.noAuditLogDescription')} />
-      )}
-
-      {!isLoading && !isError && entries.length > 0 && (
-        <div className="overflow-x-auto rounded-md border border-border-default">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border-default bg-surface-sidebar text-xs text-fg-muted uppercase">
-              <tr>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnActor')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnAction')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnTarget')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnTime')}</th>
-                <th scope="col" className="px-3 py-2 font-semibold">{t('admin.auditColumnMetadata')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border-default">
-              {entries.map((entry) => {
-                const actorName =
-                  entry.Actor?.Username ||
-                  [entry.Actor?.Name, entry.Actor?.Surname].filter(Boolean).join(' ') ||
-                  t('common.unknownUser')
-
-                return (
-                  <tr key={entry.Id}>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <Avatar src={entry.Actor?.AvatarUrl ?? undefined} name={actorName} size="sm" />
-                        <span className="font-medium text-fg-default">{actorName}</span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 text-fg-default">{formatAction(entry.Action)}</td>
-                    <td className="px-3 py-2 text-fg-muted">
-                      {entry.TargetType ? (
-                        <span title={entry.TargetId ?? undefined}>
-                          {entry.TargetType}
-                          {entry.TargetId ? ` #${entry.TargetId.slice(0, 8)}` : ''}
-                        </span>
-                      ) : (
-                        t('admin.auditNoTarget')
-                      )}
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-fg-muted">{new Date(entry.CreatedUtc).toLocaleString()}</td>
-                    <td className="px-3 py-2">
-                      <MetadataCell metadata={entry.Metadata} />
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {!isLoading && !isError && totalCount > 0 && (
-        <div className="flex items-center justify-between text-sm text-fg-muted">
-          <span>{t('admin.pageSummary', { page, totalPages, total: totalCount })}</span>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={page <= 1 || isFetching}
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
-            >
-              <ChevronLeft className="size-4" aria-hidden="true" />
-              {t('admin.previous')}
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              disabled={page >= totalPages || isFetching}
-              onClick={() => setPage((current) => current + 1)}
-            >
-              {t('admin.next')}
-              <ChevronRight className="size-4" aria-hidden="true" />
-            </Button>
-          </div>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        rows={entries}
+        loading={isLoading}
+        error={isError}
+        errorTitle={t('admin.auditLogLoadFailed')}
+        errorDescription={mapAuditLogLoadError(error)}
+        emptyIcon={ScrollText}
+        emptyTitle={t('admin.noAuditLogTitle')}
+        emptyDescription={t('admin.noAuditLogDescription')}
+        page={page}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        isFetching={isFetching}
+        onPageChange={setPage}
+      />
     </div>
   )
 }
