@@ -6,6 +6,9 @@
 
 .env.Production
 
+.claude/settings.json
+.claude/settings.local.json
+
 # User-specific files
 *.rsuser
 *.suo
