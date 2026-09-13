@@ -22,6 +22,7 @@ builder.Services.Configure<LiveKitSettings>(builder.Configuration.GetSection(nam
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
 builder.Services.Configure<BlobStorageSettings>(builder.Configuration.GetSection(nameof(BlobStorageSettings)));
 builder.Services.Configure<FirebaseSettings>(builder.Configuration.GetSection(nameof(FirebaseSettings)));
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection(nameof(StripeSettings)));
 
 var authSettings = builder.Configuration.GetSection(nameof(AuthenticationSettings)).Get<AuthenticationSettings>();
 
@@ -70,6 +71,7 @@ builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddSignalRWithRedisBackplane(builder.Configuration);
 builder.Services.AddPresenceRedis(builder.Configuration);
 builder.Services.AddLiveKit(builder.Configuration);
+builder.Services.AddStripe(builder.Configuration);
 builder.Services.AddFileStorage(builder.Configuration, builder.Environment.IsProduction());
 
 builder.Services.SetupAuth(authSettings);

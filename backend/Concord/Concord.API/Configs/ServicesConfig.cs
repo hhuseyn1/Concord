@@ -35,6 +35,7 @@ public static class ServicesConfig
         services.AddScoped<ReportsService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<PushTokensService>();
+        services.AddScoped<BillingService>();
 
         var firebaseServiceAccountJson = configuration.GetSection(nameof(FirebaseSettings))[nameof(FirebaseSettings.ServiceAccountJson)];
         if (string.IsNullOrWhiteSpace(firebaseServiceAccountJson))

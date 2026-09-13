@@ -16,6 +16,11 @@ public class Notification : BaseEntity
 
     public DateTime? ReadAt { get; set; }
 
+    /// <summary>Free-text detail for notification types that carry one (currently just
+    /// <see cref="Concord.Application.Enums.NotificationType.ReportDismissed"/>) - the admin's
+    /// explanation for why a report was dismissed, shown in-app only (never in the push body).</summary>
+    public string? Reason { get; set; }
+
     /// <summary>Navigation context for types that link to a specific message (currently just
     /// Mention, P2.2/P2.7) - nullable and unused by the older notification types, kept on this one
     /// table rather than a parallel type-specific table (see the P2 plan's notification-center

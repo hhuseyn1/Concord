@@ -1,6 +1,7 @@
 using Concord.Application.Auditing;
 using Concord.Application.Enums;
 using Concord.Application.Models;
+using Concord.Application.Realtime;
 using Concord.Domain.Entities;
 using Concord.Domain.Exceptions;
 using Concord.Infrastructure.Context;
@@ -19,7 +20,9 @@ public class ReportsService(
     ApplicationDbContext context,
     ChannelsService channelsService,
     DirectMessagesService directMessagesService,
-    IAuditLogService auditLogService)
+    IAuditLogService auditLogService,
+    NotificationsService notificationsService,
+    INotificationsRealtimeNotifier notificationsRealtimeNotifier)
 {
     /// <summary>Matches ModerationService's ban/timeout reason ceiling.</summary>
     private const int MaxReasonLength = 500;
@@ -30,6 +33,8 @@ public class ReportsService(
     private readonly ChannelsService _channelsService = channelsService;
     private readonly DirectMessagesService _directMessagesService = directMessagesService;
     private readonly IAuditLogService _auditLogService = auditLogService;
+    private readonly NotificationsService _notificationsService = notificationsService;
+    private readonly INotificationsRealtimeNotifier _notificationsRealtimeNotifier = notificationsRealtimeNotifier;
 
     public async Task<ReportResponse> CreateReportAsync(Guid currentUserId, CreateReportRequest request)
     {
@@ -109,15 +114,18 @@ public class ReportsService(
 
     public async Task ResolveReportAsync(Guid adminUserId, Guid reportId)
     {
-        await ReviewReportAsync(adminUserId, reportId, ReportStatus.Resolved, "ReportResolved");
+        await ReviewReportAsync(adminUserId, reportId, ReportStatus.Resolved, "ReportResolved", reason: null);
     }
 
-    public async Task DismissReportAsync(Guid adminUserId, Guid reportId)
+    public async Task DismissReportAsync(Guid adminUserId, Guid reportId, string? reason)
     {
-        await ReviewReportAsync(adminUserId, reportId, ReportStatus.Dismissed, "ReportDismissed");
+        if (!string.IsNullOrEmpty(reason) && reason.Length > MaxReasonLength)
+            throw new ParameterValidationException(nameof(reason));
+
+        await ReviewReportAsync(adminUserId, reportId, ReportStatus.Dismissed, "ReportDismissed", reason);
     }
 
-    private async Task ReviewReportAsync(Guid adminUserId, Guid reportId, ReportStatus newStatus, string auditAction)
+    private async Task ReviewReportAsync(Guid adminUserId, Guid reportId, ReportStatus newStatus, string auditAction, string? reason)
     {
         var report = await _context.Reports.FirstOrDefaultAsync(report => report.Id == reportId)
             ?? throw new ReportNotFoundException();
@@ -129,9 +137,25 @@ public class ReportsService(
         report.ResolvedByUserId = adminUserId;
         report.ResolvedAtUtc = DateTime.UtcNow;
 
+        if (newStatus == ReportStatus.Dismissed)
+            _notificationsService.NotifyReportDismissed(report.ReporterUserId, reason);
+
         await _context.SaveChangesAsync();
 
-        await _auditLogService.LogAsync(adminUserId, auditAction, nameof(Report), report.Id);
+        if (newStatus == ReportStatus.Dismissed)
+        {
+            await _notificationsRealtimeNotifier.NotifyAsync(
+                report.ReporterUserId, NotificationType.ReportDismissed, relatedUserId: null, reason: reason);
+        }
+
+        await _auditLogService.LogAsync(
+            adminUserId,
+            auditAction,
+            nameof(Report),
+            report.Id,
+            newStatus == ReportStatus.Dismissed
+                ? System.Text.Json.JsonSerializer.Serialize(new { Reason = reason })
+                : null);
     }
 
     /// <summary>Verifies the message exists (checking both the channel-message and direct-message

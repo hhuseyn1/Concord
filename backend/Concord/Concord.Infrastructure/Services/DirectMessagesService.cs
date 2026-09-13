@@ -255,7 +255,8 @@ public class DirectMessagesService(
                 NotificationType.Mention,
                 currentUserId,
                 contextConversationId: conversationId,
-                contextMessageId: result.Id);
+                contextMessageId: result.Id,
+                reason: null);
         }
 
         // A DM is inherently "for" the other person - unlike a channel, there's no one else it could
@@ -271,7 +272,8 @@ public class DirectMessagesService(
                 NotificationType.DirectMessageReceived,
                 currentUserId,
                 contextConversationId: conversationId,
-                contextMessageId: result.Id);
+                contextMessageId: result.Id,
+                reason: null);
             await _context.SaveChangesAsync();
         }
 

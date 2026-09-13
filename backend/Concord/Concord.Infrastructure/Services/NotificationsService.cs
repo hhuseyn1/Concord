@@ -38,6 +38,23 @@ public class NotificationsService(ApplicationDbContext context, IPushNotificatio
         await SendPushAsync(recipientUserId, accepterUserId, NotificationType.FriendRequestAccepted);
     }
 
+    /// <summary>No <see cref="Notification.RelatedUserId"/> is set here - deliberately: the reporter
+    /// should not see which specific admin reviewed/dismissed their report, matching normal
+    /// moderation-privacy norms. For the same reason this skips <see cref="SendPushAsync"/> (which
+    /// always attributes the push to a related user's name) rather than attribute an OS push to
+    /// "Someone" - the in-app notification (and its realtime push, wired by the caller) is enough,
+    /// mirroring <see cref="NotifyMentionsBulkAsync"/>'s own precedent for not everything calling
+    /// through to a push provider.</summary>
+    internal void NotifyReportDismissed(Guid reporterUserId, string? reason)
+    {
+        _context.Notifications.Add(new Notification
+        {
+            RecipientUserId = reporterUserId,
+            Type = NotificationType.ReportDismissed,
+            Reason = reason
+        });
+    }
+
     internal async Task NotifyMissedCallAsync(Guid recipientUserId, Guid callerId)
     {
         _context.Notifications.Add(new Notification
@@ -146,6 +163,8 @@ public class NotificationsService(ApplicationDbContext context, IPushNotificatio
             (NotificationType.FriendRequestAccepted, false) => "accepted your friend request",
             (NotificationType.MissedCall, true) => "sizə zəng etdi (buraxılmış zəng)",
             (NotificationType.MissedCall, false) => "missed your call",
+            (NotificationType.ReportDismissed, true) => "hesabatınız nəzərdən keçirildi",
+            (NotificationType.ReportDismissed, false) => "Your report was reviewed",
             (_, true) => "yeni bildiriş",
             (_, false) => "sent you a notification",
         };

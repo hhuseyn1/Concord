@@ -573,6 +573,25 @@ public class AuthenticationService(
     }
 
     /// <summary>
+    /// Unauthenticated live-availability check for the registration form. Malformed input is reported
+    /// as unavailable without touching the database - a username that can never be registered (per
+    /// <see cref="UsernamePolicy"/>) is trivially "not available" regardless of what's taken. Reuses
+    /// <see cref="ValidateRegisterRequestAsync"/>'s exact case-insensitive uniqueness query, kept as its
+    /// own copy here rather than factored out, so this read-only check can never affect registration's
+    /// own validation path.
+    /// </summary>
+    public async Task<UsernameAvailabilityResponse> CheckUsernameAvailableAsync(string? username)
+    {
+        if (!UsernamePolicy.IsValid(username))
+            return new UsernameAvailabilityResponse { Available = false };
+
+        var usernameExists = await _context.Users
+            .AnyAsync(user => user.Username != null && user.Username.ToLower() == username!.ToLower());
+
+        return new UsernameAvailabilityResponse { Available = !usernameExists };
+    }
+
+    /// <summary>
     /// True when a login attempt for this account must be rejected. A plain admin-disabled account
     /// (<see cref="User.Disabled"/> set, <see cref="User.DeletionRequestedAt"/> null) is always
     /// rejected. An account mid self-service deletion (both set) is deliberately let through here -

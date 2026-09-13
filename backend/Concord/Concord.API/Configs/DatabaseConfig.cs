@@ -27,6 +27,7 @@ public static class DatabaseConfig
                     builder.MapEnum<PresenceStatus>();
                     builder.MapEnum<NotificationType>();
                     builder.MapEnum<QrLoginStatus>();
+                    builder.MapEnum<SubscriptionStatus>();
                 }
             )
         );

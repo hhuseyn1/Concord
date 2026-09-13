@@ -34,4 +34,7 @@ public class NotificationResponse
 
     [JsonPropertyName("ContextMessageId")]
     public Guid? ContextMessageId { get; set; }
+
+    [JsonPropertyName("Reason")]
+    public string? Reason { get; set; }
 }
