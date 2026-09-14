@@ -22,6 +22,9 @@ public class AdminUserSummary
     [JsonPropertyName("Email")]
     public string? Email { get; set; }
 
+    [JsonPropertyName("PhoneNumber")]
+    public string? PhoneNumber { get; set; }
+
     [JsonPropertyName("AvatarUrl")]
     public string? AvatarUrl { get; set; }
 

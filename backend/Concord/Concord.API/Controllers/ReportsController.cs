@@ -28,9 +28,14 @@ public class ReportsController(ReportsService reportsService) : BaseApiControlle
     [HttpGet("Admin/Reports")]
     [Authorize(Roles = "Admin")]
     public async Task<PagedResult<ReportResponse>> GetReportsAsync(
-        [FromQuery] int page, [FromQuery] int pageSize, [FromQuery] ReportStatus? status)
+        [FromQuery] int page,
+        [FromQuery] int pageSize,
+        [FromQuery] ReportStatus? status,
+        [FromQuery] string? search,
+        [FromQuery] string? sortBy,
+        [FromQuery] string? sortDirection)
     {
-        return await _reportsService.GetReportsAsync(page, pageSize, status);
+        return await _reportsService.GetReportsAsync(page, pageSize, status, search, sortBy, sortDirection);
     }
 
     [HttpPost("Admin/Reports/{reportId:guid}:Resolve")]

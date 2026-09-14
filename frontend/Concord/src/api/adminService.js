@@ -5,8 +5,24 @@ export async function getOverview() {
   return request('Admin/Overview');
 }
 
-export async function getUsers(page, pageSize, search) {
-  return request('Admin/Users', { query: { ...buildPagingQuery(page, pageSize), search: search || undefined } });
+export async function getOverviewCharts(fromUtc, toUtc) {
+  return request('Admin/Overview/Charts', {
+    query: {
+      fromUtc: fromUtc || undefined,
+      toUtc: toUtc || undefined,
+    },
+  });
+}
+
+export async function getUsers(page, pageSize, search, sortBy, sortDirection) {
+  return request('Admin/Users', {
+    query: {
+      ...buildPagingQuery(page, pageSize),
+      search: search || undefined,
+      sortBy: sortBy || undefined,
+      sortDirection: sortDirection || undefined,
+    },
+  });
 }
 
 export async function disableUser(userId) {
@@ -21,6 +37,16 @@ export async function setUserRole(userId, role) {
   return request(`Admin/Users/${userId}/Role`, { method: 'PUT', body: { Role: role } });
 }
 
-export async function getSubscriptions(page, pageSize, status) {
-  return request('Admin/Subscriptions', { query: { ...buildPagingQuery(page, pageSize), status: status || undefined } });
+export async function getSubscriptions(page, pageSize, status, search, sortBy, sortDirection, fromUtc, toUtc) {
+  return request('Admin/Subscriptions', {
+    query: {
+      ...buildPagingQuery(page, pageSize),
+      status: status || undefined,
+      search: search || undefined,
+      sortBy: sortBy || undefined,
+      sortDirection: sortDirection || undefined,
+      fromUtc: fromUtc || undefined,
+      toUtc: toUtc || undefined,
+    },
+  });
 }

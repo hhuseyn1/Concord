@@ -1,14 +1,15 @@
 import { request } from './httpClient';
 import { buildPagingQuery } from './pagination';
 
-export async function getAuditLog(page, pageSize, actorUserId, action, fromUtc, toUtc) {
+export async function getAuditLog(page, pageSize, actorEmail, action, fromUtc, toUtc, sortDirection) {
   return request('Admin/AuditLog', {
     query: {
       ...buildPagingQuery(page, pageSize),
-      actorUserId: actorUserId || undefined,
+      actorEmail: actorEmail || undefined,
       action: action || undefined,
       fromUtc: fromUtc || undefined,
       toUtc: toUtc || undefined,
+      sortDirection: sortDirection || undefined,
     },
   });
 }

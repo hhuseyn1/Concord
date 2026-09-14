@@ -5,15 +5,14 @@ import { Avatar } from '../../components/ui/Avatar'
 import { DataTable } from '../../components/ui/DataTable'
 import { FormField } from '../../components/ui/FormField'
 import { Input } from '../../components/ui/Input'
+import { formatAction } from './adminFormatters'
 import { mapAuditLogLoadError } from './adminErrors'
 import { useAuditLog } from './auditLogQueries'
+import { SortControls } from './SortControls'
 
 const SEARCH_DEBOUNCE_MS = 300
 
-function formatAction(action) {
-  if (!action) return action
-  return action.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
-}
+const SORT_FIELDS = [{ value: 'Created', label: 'admin.auditSortCreated' }]
 
 function formatMetadata(metadata) {
   try {
@@ -64,11 +63,13 @@ export function AuditLogSection() {
   const [toDate, setToDate] = useState('')
   const [filters, setFilters] = useState({})
   const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState(null)
+  const [sortDirection, setSortDirection] = useState(null)
 
   useEffect(() => {
     const handle = setTimeout(() => {
       setFilters({
-        actorUserId: actorInput.trim() || undefined,
+        actorEmail: actorInput.trim() || undefined,
         action: actionInput.trim() || undefined,
         fromUtc: toUtcBound(fromDate, false),
         toUtc: toUtcBound(toDate, true),
@@ -78,7 +79,13 @@ export function AuditLogSection() {
     return () => clearTimeout(handle)
   }, [actorInput, actionInput, fromDate, toDate])
 
-  const { data, isLoading, isFetching, isError, error } = useAuditLog(page, filters)
+  function handleSort(nextSortBy, nextSortDirection) {
+    setSortBy(nextSortBy)
+    setSortDirection(nextSortDirection)
+    setPage(1)
+  }
+
+  const { data, isLoading, isFetching, isError, error } = useAuditLog(page, filters, sortDirection)
 
   const entries = data?.Items ?? []
   const totalCount = data?.TotalCount ?? 0
@@ -159,6 +166,8 @@ export function AuditLogSection() {
           <Input type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} />
         </FormField>
       </div>
+
+      <SortControls fields={SORT_FIELDS} sortBy={sortBy} sortDirection={sortDirection} onSort={handleSort} />
 
       <DataTable
         columns={columns}

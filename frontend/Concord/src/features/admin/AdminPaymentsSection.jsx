@@ -1,16 +1,34 @@
 import { CreditCard, ExternalLink } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '../../components/ui/Avatar'
 import { Badge } from '../../components/ui/Badge'
 import { DataTable } from '../../components/ui/DataTable'
+import { Input } from '../../components/ui/Input'
 import { cn } from '../../lib/cn'
 import { mapSubscriptionsLoadError } from './adminErrors'
 import { useAdminSubscriptions } from './adminQueries'
+import { DateRangeFilter } from './DateRangeFilter'
+import { SortControls } from './SortControls'
+
+const SEARCH_DEBOUNCE_MS = 300
 
 const STATUS_OPTIONS = ['', 'Active', 'PastDue', 'Canceled']
 
 const STATUS_BADGE_VARIANT = { Active: 'success', PastDue: 'danger', Canceled: 'neutral' }
+
+const SORT_FIELDS = [
+  { value: 'Username', label: 'admin.paymentsSortUsername' },
+  { value: 'Email', label: 'admin.paymentsSortEmail' },
+  { value: 'Status', label: 'admin.paymentsSortStatus' },
+  { value: 'CurrentPeriodEnd', label: 'admin.paymentsSortPeriodEnd' },
+  { value: 'Created', label: 'admin.paymentsSortCreated' },
+]
+
+function toUtcBound(dateValue, endOfDay) {
+  if (!dateValue) return undefined
+  return endOfDay ? `${dateValue}T23:59:59.999Z` : `${dateValue}T00:00:00.000Z`
+}
 
 const selectClassName = cn(
   'h-9 rounded-md border border-border-default bg-surface-sidebar px-3 text-base sm:text-sm text-fg-default',
@@ -29,9 +47,40 @@ function stripeCustomerUrl(customerId) {
 export function AdminPaymentsSection() {
   const { t } = useTranslation()
   const [status, setStatus] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState(null)
+  const [sortDirection, setSortDirection] = useState(null)
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
 
-  const { data, isLoading, isFetching, isError, error } = useAdminSubscriptions(page, status || undefined)
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setSearch(searchInput.trim())
+      setPage(1)
+    }, SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(handle)
+  }, [searchInput])
+
+  const fromUtc = toUtcBound(fromDate, false)
+  const toUtc = toUtcBound(toDate, true)
+
+  const { data, isLoading, isFetching, isError, error } = useAdminSubscriptions(
+    page,
+    status || undefined,
+    search,
+    sortBy,
+    sortDirection,
+    fromUtc,
+    toUtc,
+  )
+
+  function handleDateRangeChange(nextFromDate, nextToDate) {
+    setFromDate(nextFromDate)
+    setToDate(nextToDate)
+    setPage(1)
+  }
 
   const subscriptions = data?.Items ?? []
   const totalCount = data?.TotalCount ?? 0
@@ -40,6 +89,12 @@ export function AdminPaymentsSection() {
 
   function handleStatusChange(nextStatus) {
     setStatus(nextStatus)
+    setPage(1)
+  }
+
+  function handleSort(nextSortBy, nextSortDirection) {
+    setSortBy(nextSortBy)
+    setSortDirection(nextSortDirection)
     setPage(1)
   }
 
@@ -103,6 +158,14 @@ export function AdminPaymentsSection() {
 
   return (
     <div className="flex flex-col gap-3">
+      <Input
+        value={searchInput}
+        onChange={(event) => setSearchInput(event.target.value)}
+        placeholder={t('admin.paymentsSearchPlaceholder')}
+        className="max-w-xs"
+        aria-label={t('admin.paymentsSearchPlaceholder')}
+      />
+
       <select
         value={status}
         onChange={(event) => handleStatusChange(event.target.value)}
@@ -115,6 +178,16 @@ export function AdminPaymentsSection() {
           </option>
         ))}
       </select>
+
+      <DateRangeFilter
+        fromDate={fromDate}
+        toDate={toDate}
+        onChange={handleDateRangeChange}
+        fromLabel={t('admin.paymentsFilterFrom')}
+        toLabel={t('admin.paymentsFilterTo')}
+      />
+
+      <SortControls fields={SORT_FIELDS} sortBy={sortBy} sortDirection={sortDirection} onSort={handleSort} />
 
       <DataTable
         columns={columns}
