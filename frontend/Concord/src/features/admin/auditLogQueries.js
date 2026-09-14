@@ -5,14 +5,22 @@ const AUDIT_LOG_PAGE_SIZE = 20
 
 export const auditLogKeys = {
   all: ['auditLog'],
-  list: (filters) => [...auditLogKeys.all, filters],
+  list: (filters, sortDirection) => [...auditLogKeys.all, filters, sortDirection ?? ''],
 }
 
-export function useAuditLog(page, filters) {
+export function useAuditLog(page, filters, sortDirection) {
   return useQuery({
-    queryKey: [...auditLogKeys.list(filters), page],
+    queryKey: [...auditLogKeys.list(filters, sortDirection), page],
     queryFn: () =>
-      auditLogService.getAuditLog(page, AUDIT_LOG_PAGE_SIZE, filters.actorUserId, filters.action, filters.fromUtc, filters.toUtc),
+      auditLogService.getAuditLog(
+        page,
+        AUDIT_LOG_PAGE_SIZE,
+        filters.actorEmail,
+        filters.action,
+        filters.fromUtc,
+        filters.toUtc,
+        sortDirection,
+      ),
     placeholderData: (previousData) => previousData,
   })
 }

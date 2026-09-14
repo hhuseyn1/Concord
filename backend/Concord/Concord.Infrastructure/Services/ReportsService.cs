@@ -65,42 +65,61 @@ public class ReportsService(
         return report.MapToResponse(reporter, snippet);
     }
 
-    public async Task<PagedResult<ReportResponse>> GetReportsAsync(int page, int pageSize, ReportStatus? status)
+    public async Task<PagedResult<ReportResponse>> GetReportsAsync(
+        int page, int pageSize, ReportStatus? status, string? search, string? sortBy, string? sortDirection)
     {
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 1, GlobalConstants.MaxPageSize);
 
-        var query = _context.Reports.AsQueryable();
+        // Joined against Users up front (like AdminService's Subscriptions/AuditLog queries) so
+        // search and the reporter-name sort option can see User columns before filtering, sorting,
+        // and paging happen - and so a report from a since-deleted reporter (no profile to show,
+        // same case the old in-memory skip handled) is naturally excluded by the inner join instead
+        // of being counted in TotalCount and then silently dropped from Items.
+        var query = _context.Reports
+            .Join(_context.Users, report => report.ReporterUserId, user => user.Id, (report, user) => new { Report = report, Reporter = user });
 
         if (status.HasValue)
-            query = query.Where(report => report.Status == status.Value);
+            query = query.Where(entry => entry.Report.Status == status.Value);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(entry =>
+                EF.Functions.ILike(entry.Report.Reason, $"%{search}%") ||
+                EF.Functions.ILike(entry.Reporter.Username ?? string.Empty, $"%{search}%") ||
+                EF.Functions.ILike(entry.Reporter.Email ?? string.Empty, $"%{search}%"));
+        }
 
         var totalCount = await query.CountAsync();
 
-        var reports = await query
-            .OrderByDescending(report => report.Created)
+        var descending = !string.Equals(sortDirection, "Asc", StringComparison.OrdinalIgnoreCase);
+
+        // Every branch ends with ThenBy(entry => entry.Report.Id) - see AdminService.GetUsersAsync
+        // for why a deterministic tiebreaker matters (Postgres has no stable order among ties otherwise).
+        query = (sortBy?.ToLowerInvariant()) switch
+        {
+            "reporter" => descending
+                ? query.OrderByDescending(entry => entry.Reporter.Username).ThenBy(entry => entry.Report.Id)
+                : query.OrderBy(entry => entry.Reporter.Username).ThenBy(entry => entry.Report.Id),
+            "status" => descending
+                ? query.OrderByDescending(entry => entry.Report.Status).ThenBy(entry => entry.Report.Id)
+                : query.OrderBy(entry => entry.Report.Status).ThenBy(entry => entry.Report.Id),
+            _ => descending
+                ? query.OrderByDescending(entry => entry.Report.Created).ThenBy(entry => entry.Report.Id)
+                : query.OrderBy(entry => entry.Report.Created).ThenBy(entry => entry.Report.Id)
+        };
+
+        var pageEntries = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
-        var reporterIds = reports.Select(report => report.ReporterUserId).Distinct().ToList();
-        var reportersById = await _context.Users
-            .Where(user => reporterIds.Contains(user.Id))
-            .ToDictionaryAsync(user => user.Id);
+        var items = new List<ReportResponse>(pageEntries.Count);
 
-        var items = new List<ReportResponse>(reports.Count);
-
-        foreach (var report in reports)
+        foreach (var entry in pageEntries)
         {
-            // A reporter whose account was since deleted has no profile to show; skip rather than
-            // surface a null one. The row itself is left alone - deletion here has never been wired
-            // through cleanup and is not this feature's concern.
-            if (!reportersById.TryGetValue(report.ReporterUserId, out var reporter))
-                continue;
-
-            var snippet = await BuildTargetSnippetAsync(report.TargetType, report.TargetId);
-
-            items.Add(report.MapToResponse(reporter, snippet));
+            var snippet = await BuildTargetSnippetAsync(entry.Report.TargetType, entry.Report.TargetId);
+            items.Add(entry.Report.MapToResponse(entry.Reporter, snippet));
         }
 
         return new PagedResult<ReportResponse>

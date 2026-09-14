@@ -1,5 +1,5 @@
 import { Flag } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '../../components/ui/Avatar'
 import { Badge } from '../../components/ui/Badge'
@@ -12,10 +12,19 @@ import { toast } from '../../components/ui/Toast'
 import { cn } from '../../lib/cn'
 import { mapGetReportsError, mapReviewReportError } from '../moderation/reportsErrors'
 import { useDismissReportMutation, useReportsQueue, useResolveReportMutation } from '../moderation/reportsQueries'
+import { SortControls } from './SortControls'
+
+const SEARCH_DEBOUNCE_MS = 300
 
 const STATUS_OPTIONS = ['', 'Pending', 'Resolved', 'Dismissed']
 
 const STATUS_BADGE_VARIANT = { Pending: 'warning', Resolved: 'success', Dismissed: 'neutral' }
+
+const SORT_FIELDS = [
+  { value: 'Reporter', label: 'admin.reportsSortReporter' },
+  { value: 'Status', label: 'admin.reportsSortStatus' },
+  { value: 'Created', label: 'admin.reportsSortCreated' },
+]
 
 const selectClassName = cn(
   'h-9 rounded-md border border-border-default bg-surface-sidebar px-3 text-base sm:text-sm text-fg-default',
@@ -33,11 +42,23 @@ function targetLabel(t, report) {
 export function ReportsQueueSection() {
   const { t } = useTranslation()
   const [status, setStatus] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState(null)
+  const [sortDirection, setSortDirection] = useState(null)
   const [dismissTarget, setDismissTarget] = useState(null)
   const [dismissReason, setDismissReason] = useState('')
 
-  const { data, isLoading, isFetching, isError, error } = useReportsQueue(page, status || undefined)
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setSearch(searchInput.trim())
+      setPage(1)
+    }, SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(handle)
+  }, [searchInput])
+
+  const { data, isLoading, isFetching, isError, error } = useReportsQueue(page, status || undefined, search, sortBy, sortDirection)
   const resolveMutation = useResolveReportMutation()
   const dismissMutation = useDismissReportMutation()
 
@@ -48,6 +69,12 @@ export function ReportsQueueSection() {
 
   function handleStatusChange(nextStatus) {
     setStatus(nextStatus)
+    setPage(1)
+  }
+
+  function handleSort(nextSortBy, nextSortDirection) {
+    setSortBy(nextSortBy)
+    setSortDirection(nextSortDirection)
     setPage(1)
   }
 
@@ -150,6 +177,14 @@ export function ReportsQueueSection() {
 
   return (
     <div className="flex flex-col gap-3">
+      <Input
+        value={searchInput}
+        onChange={(event) => setSearchInput(event.target.value)}
+        placeholder={t('admin.reportsSearchPlaceholder')}
+        className="max-w-xs"
+        aria-label={t('admin.reportsSearchPlaceholder')}
+      />
+
       <select
         value={status}
         onChange={(event) => handleStatusChange(event.target.value)}
@@ -162,6 +197,8 @@ export function ReportsQueueSection() {
           </option>
         ))}
       </select>
+
+      <SortControls fields={SORT_FIELDS} sortBy={sortBy} sortDirection={sortDirection} onSort={handleSort} />
 
       <DataTable
         columns={columns}

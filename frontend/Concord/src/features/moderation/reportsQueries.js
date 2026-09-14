@@ -5,7 +5,14 @@ const REPORTS_PAGE_SIZE = 20
 
 export const reportsKeys = {
   all: ['reports'],
-  queue: (status) => [...reportsKeys.all, 'queue', status ?? 'all'],
+  queue: (status, search, sortBy, sortDirection) => [
+    ...reportsKeys.all,
+    'queue',
+    status ?? 'all',
+    search ?? '',
+    sortBy ?? '',
+    sortDirection ?? '',
+  ],
 }
 
 export function useCreateReportMutation() {
@@ -14,10 +21,10 @@ export function useCreateReportMutation() {
   })
 }
 
-export function useReportsQueue(page, status) {
+export function useReportsQueue(page, status, search, sortBy, sortDirection) {
   return useQuery({
-    queryKey: [...reportsKeys.queue(status), page],
-    queryFn: () => reportsService.getReports(page, REPORTS_PAGE_SIZE, status),
+    queryKey: [...reportsKeys.queue(status, search, sortBy, sortDirection), page],
+    queryFn: () => reportsService.getReports(page, REPORTS_PAGE_SIZE, status, search, sortBy, sortDirection),
     placeholderData: (previousData) => previousData,
   })
 }

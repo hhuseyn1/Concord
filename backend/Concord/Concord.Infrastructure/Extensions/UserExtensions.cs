@@ -95,6 +95,7 @@ public static class UserExtensions
         Name = user.Name,
         Surname = user.Surname,
         Email = user.Email,
+        PhoneNumber = user.PhoneNumber,
         AvatarUrl = user.AvatarUrl,
         Role = user.Role.ToString(),
         Disabled = user.Disabled.HasValue,

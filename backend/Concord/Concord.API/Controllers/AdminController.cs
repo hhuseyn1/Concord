@@ -24,10 +24,21 @@ public class AdminController(AdminService adminService) : BaseApiController
         return await _adminService.GetOverviewAsync();
     }
 
-    [HttpGet("Users")]
-    public async Task<PagedResult<AdminUserSummary>> GetUsersAsync([FromQuery] int page, [FromQuery] int pageSize, [FromQuery] string? search)
+    [HttpGet("Overview/Charts")]
+    public async Task<AdminOverviewChartsResponse> GetOverviewChartsAsync([FromQuery] DateTime? fromUtc, [FromQuery] DateTime? toUtc)
     {
-        return await _adminService.GetUsersAsync(page, pageSize, search);
+        return await _adminService.GetOverviewChartsAsync(fromUtc, toUtc);
+    }
+
+    [HttpGet("Users")]
+    public async Task<PagedResult<AdminUserSummary>> GetUsersAsync(
+        [FromQuery] int page,
+        [FromQuery] int pageSize,
+        [FromQuery] string? search,
+        [FromQuery] string? sortBy,
+        [FromQuery] string? sortDirection)
+    {
+        return await _adminService.GetUsersAsync(page, pageSize, search, sortBy, sortDirection);
     }
 
     [HttpPost("Users/{userId:guid}/Disable")]
@@ -52,20 +63,26 @@ public class AdminController(AdminService adminService) : BaseApiController
     public async Task<PagedResult<AdminSubscriptionSummary>> GetSubscriptionsAsync(
         [FromQuery] int page,
         [FromQuery] int pageSize,
-        [FromQuery] SubscriptionStatus? status)
+        [FromQuery] SubscriptionStatus? status,
+        [FromQuery] string? search,
+        [FromQuery] string? sortBy,
+        [FromQuery] string? sortDirection,
+        [FromQuery] DateTime? fromUtc,
+        [FromQuery] DateTime? toUtc)
     {
-        return await _adminService.GetSubscriptionsAsync(page, pageSize, status);
+        return await _adminService.GetSubscriptionsAsync(page, pageSize, status, search, sortBy, sortDirection, fromUtc, toUtc);
     }
 
     [HttpGet("AuditLog")]
     public async Task<PagedResult<AuditLogResponse>> GetAuditLogAsync(
         [FromQuery] int page,
         [FromQuery] int pageSize,
-        [FromQuery] Guid? actorUserId,
+        [FromQuery] string? actorEmail,
         [FromQuery] string? action,
         [FromQuery] DateTime? fromUtc,
-        [FromQuery] DateTime? toUtc)
+        [FromQuery] DateTime? toUtc,
+        [FromQuery] string? sortDirection)
     {
-        return await _adminService.GetAuditLogAsync(page, pageSize, actorUserId, action, fromUtc, toUtc);
+        return await _adminService.GetAuditLogAsync(page, pageSize, actorEmail, action, fromUtc, toUtc, sortDirection);
     }
 }

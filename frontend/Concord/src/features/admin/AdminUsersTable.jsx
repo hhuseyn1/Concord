@@ -11,8 +11,17 @@ import { toast } from '../../components/ui/Toast'
 import { useAuth } from '../../hooks/useAuth'
 import { mapAdminLoadError, mapDisableUserError, mapEnableUserError, mapSetUserRoleError } from './adminErrors'
 import { useAdminUsers, useDisableUserMutation, useEnableUserMutation, useSetUserRoleMutation } from './adminQueries'
+import { SortControls } from './SortControls'
 
 const SEARCH_DEBOUNCE_MS = 300
+
+const SORT_FIELDS = [
+  { value: 'Name', label: 'admin.sortName' },
+  { value: 'Surname', label: 'admin.sortSurname' },
+  { value: 'Email', label: 'admin.sortEmail' },
+  { value: 'PhoneNumber', label: 'admin.sortPhoneNumber' },
+  { value: 'Created', label: 'admin.sortCreated' },
+]
 
 function DisableConfirmModal({ user, open, onOpenChange, onConfirm, pending }) {
   const { t } = useTranslation()
@@ -45,6 +54,8 @@ export function AdminUsersTable() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [sortBy, setSortBy] = useState('Created')
+  const [sortDirection, setSortDirection] = useState('Desc')
   const [disableTarget, setDisableTarget] = useState(null)
 
   useEffect(() => {
@@ -55,7 +66,13 @@ export function AdminUsersTable() {
     return () => clearTimeout(handle)
   }, [searchInput])
 
-  const { data, isLoading, isFetching, isError, error } = useAdminUsers(page, search)
+  function handleSort(nextSortBy, nextSortDirection) {
+    setSortBy(nextSortBy)
+    setSortDirection(nextSortDirection)
+    setPage(1)
+  }
+
+  const { data, isLoading, isFetching, isError, error } = useAdminUsers(page, search, sortBy, sortDirection)
   const disableMutation = useDisableUserMutation()
   const enableMutation = useEnableUserMutation()
   const setRoleMutation = useSetUserRoleMutation()
@@ -117,6 +134,12 @@ export function AdminUsersTable() {
       header: t('admin.columnEmail'),
       cellClassName: 'px-3 py-2 text-fg-muted',
       render: (row) => row.Email,
+    },
+    {
+      key: 'phoneNumber',
+      header: t('admin.columnPhoneNumber'),
+      cellClassName: 'px-3 py-2 text-fg-muted',
+      render: (row) => row.PhoneNumber ?? t('admin.noValue'),
     },
     {
       key: 'role',
@@ -181,6 +204,8 @@ export function AdminUsersTable() {
         className="max-w-xs"
         aria-label={t('admin.searchPlaceholder')}
       />
+
+      <SortControls fields={SORT_FIELDS} sortBy={sortBy} sortDirection={sortDirection} onSort={handleSort} />
 
       <DataTable
         columns={columns}

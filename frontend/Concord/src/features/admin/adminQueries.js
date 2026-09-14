@@ -8,8 +8,18 @@ const SUBSCRIPTIONS_PAGE_SIZE = 20
 export const adminKeys = {
   all: ['admin'],
   overview: () => [...adminKeys.all, 'overview'],
-  users: (search) => [...adminKeys.all, 'users', search ?? ''],
-  subscriptions: (status) => [...adminKeys.all, 'subscriptions', status ?? ''],
+  overviewCharts: (fromUtc, toUtc) => [...adminKeys.all, 'overviewCharts', fromUtc ?? '', toUtc ?? ''],
+  users: (search, sortBy, sortDirection) => [...adminKeys.all, 'users', search ?? '', sortBy ?? '', sortDirection ?? ''],
+  subscriptions: (status, search, sortBy, sortDirection, fromUtc, toUtc) => [
+    ...adminKeys.all,
+    'subscriptions',
+    status ?? '',
+    search ?? '',
+    sortBy ?? '',
+    sortDirection ?? '',
+    fromUtc ?? '',
+    toUtc ?? '',
+  ],
 }
 
 export function useAdminOverview() {
@@ -19,18 +29,26 @@ export function useAdminOverview() {
   })
 }
 
-export function useAdminUsers(page, search) {
+export function useAdminOverviewCharts(fromUtc, toUtc) {
   return useQuery({
-    queryKey: [...adminKeys.users(search), page],
-    queryFn: () => adminService.getUsers(page, USERS_PAGE_SIZE, search),
+    queryKey: adminKeys.overviewCharts(fromUtc, toUtc),
+    queryFn: () => adminService.getOverviewCharts(fromUtc, toUtc),
+  })
+}
+
+export function useAdminUsers(page, search, sortBy, sortDirection) {
+  return useQuery({
+    queryKey: [...adminKeys.users(search, sortBy, sortDirection), page],
+    queryFn: () => adminService.getUsers(page, USERS_PAGE_SIZE, search, sortBy, sortDirection),
     placeholderData: (previousData) => previousData,
   })
 }
 
-export function useAdminSubscriptions(page, status) {
+export function useAdminSubscriptions(page, status, search, sortBy, sortDirection, fromUtc, toUtc) {
   return useQuery({
-    queryKey: [...adminKeys.subscriptions(status), page],
-    queryFn: () => adminService.getSubscriptions(page, SUBSCRIPTIONS_PAGE_SIZE, status),
+    queryKey: [...adminKeys.subscriptions(status, search, sortBy, sortDirection, fromUtc, toUtc), page],
+    queryFn: () =>
+      adminService.getSubscriptions(page, SUBSCRIPTIONS_PAGE_SIZE, status, search, sortBy, sortDirection, fromUtc, toUtc),
     placeholderData: (previousData) => previousData,
   })
 }
