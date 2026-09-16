@@ -59,10 +59,16 @@ public class AdminService(ApplicationDbContext context, IAuditLogService auditLo
     private const int MaxChartRangeDays = 366;
 
     /// <summary>
-    /// Date-filterable chart data for the overview page (P4): daily new-user counts and a
-    /// subscriptions-by-status breakdown, both scoped to <c>[fromUtc, toUtc]</c>. If either bound is
-    /// omitted, the range defaults to the last 14 days ending now, matching the fixed window this data
-    /// used to be hardcoded to before it moved to its own endpoint.
+    /// Earliest year <see cref="GetUserGrowthAsync"/> accepts - well before the product existed, just
+    /// enough to reject obviously-wrong input without hardcoding a launch date that could change.
+    /// </summary>
+    private const int MinUserGrowthYear = 2000;
+
+    /// <summary>
+    /// Date-filterable chart data for the overview page (P4): a subscriptions-by-status breakdown
+    /// scoped to <c>[fromUtc, toUtc]</c>. If either bound is omitted, the range defaults to the last 14
+    /// days ending now, matching the fixed window this data used to be hardcoded to before it moved to
+    /// its own endpoint.
     /// </summary>
     public async Task<AdminOverviewChartsResponse> GetOverviewChartsAsync(DateTime? fromUtc, DateTime? toUtc)
     {
@@ -97,45 +103,45 @@ public class AdminService(ApplicationDbContext context, IAuditLogService auditLo
 
         return new AdminOverviewChartsResponse
         {
-            UserGrowth = await GetUserGrowthAsync(rangeStart, rangeEnd),
             SubscriptionsByStatus = await GetSubscriptionsByStatusAsync(rangeStart, rangeEnd)
         };
     }
 
     /// <summary>
-    /// Daily new-user counts across <c>[fromUtc, toUtc]</c> (UTC calendar dates, oldest first),
-    /// including days with zero signups. This is an admin-only, infrequently-hit query over a small
-    /// window, so it pulls the raw <c>Created</c> timestamps and buckets them into days in memory
+    /// Monthly new-user counts across the given calendar year (UTC), one entry per month
+    /// (Jan-Dec, oldest first), including months with zero signups. Defaults to the current year when
+    /// <paramref name="year"/> is omitted. This is an admin-only, infrequently-hit query over a single
+    /// year, so it pulls the raw <c>Created</c> timestamps and buckets them into months in memory
     /// rather than pushing a date-truncating GroupBy down to SQL.
     /// </summary>
-    private async Task<List<AdminUserGrowthPoint>> GetUserGrowthAsync(DateTime fromUtc, DateTime toUtc)
+    public async Task<List<AdminUserGrowthPoint>> GetUserGrowthAsync(int? year)
     {
-        var startDate = DateOnly.FromDateTime(fromUtc);
-        var endDate = DateOnly.FromDateTime(toUtc);
+        var now = DateTime.UtcNow;
+        var targetYear = year ?? now.Year;
 
-        // DateOnly.ToDateTime() always produces DateTimeKind.Unspecified - Npgsql refuses to compare
-        // that against a "timestamp with time zone" column ("only UTC is supported"), since Created
-        // is always UTC.
-        var rangeStart = DateTime.SpecifyKind(startDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
-        var rangeEndExclusive = DateTime.SpecifyKind(endDate.AddDays(1).ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+        if (targetYear < MinUserGrowthYear || targetYear > now.Year)
+            throw new ParameterValidationException(nameof(year));
+
+        var rangeStart = new DateTime(targetYear, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var rangeEndExclusive = rangeStart.AddYears(1);
 
         var createdDates = await _context.Users
             .Where(user => user.Created >= rangeStart && user.Created < rangeEndExclusive)
             .Select(user => user.Created)
             .ToListAsync();
 
-        var countsByDate = createdDates
-            .GroupBy(created => DateOnly.FromDateTime(created))
+        var countsByMonth = createdDates
+            .GroupBy(created => created.Month)
             .ToDictionary(group => group.Key, group => group.Count());
 
         var points = new List<AdminUserGrowthPoint>();
 
-        for (var date = startDate; date <= endDate; date = date.AddDays(1))
+        for (var month = 1; month <= 12; month++)
         {
             points.Add(new AdminUserGrowthPoint
             {
-                Date = date,
-                Count = countsByDate.GetValueOrDefault(date)
+                Date = new DateOnly(targetYear, month, 1),
+                Count = countsByMonth.GetValueOrDefault(month)
             });
         }
 

@@ -2,9 +2,6 @@ import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link, Outlet } from 'react-router-dom'
 
-// Minimal standalone shell for the /admin console - it deliberately does not reuse
-// CabinetRoot/AppShell (server rail, presence, notifications, voice calls, etc.), none of
-// which is appropriate for an admin console, only a small header and a way back to the app.
 export function AdminLayout() {
   const { t } = useTranslation()
 
