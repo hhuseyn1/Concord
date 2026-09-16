@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api/api.dart';
 import 'api_providers.dart';
 import 'message_thread_controller.dart';
+import 'messages_hub_controller.dart';
 
 class ChannelKey {
   const ChannelKey(this.serverId, this.channelId);
@@ -86,6 +87,8 @@ class MessagesController extends StateNotifier<MessagesState> implements Message
 
   MessagesService get _service => _ref.read(messagesServiceProvider);
 
+  MessagesHubController get _hubController => _ref.read(messagesHubControllerProvider.notifier);
+
   Future<void> _init() async {
     await loadInitial();
     await _connectHub();
@@ -132,8 +135,11 @@ class MessagesController extends StateNotifier<MessagesState> implements Message
   }
 
   Future<void> _connectHub() async {
-    final tokenStorage = _ref.read(tokenStorageProvider);
-    final hub = MessagesHub(tokenStorage: tokenStorage);
+    // Shared, session-scoped connection (see MessagesHubController) rather
+    // than a dedicated one per channel screen - this used to tear down and
+    // reopen a whole SignalR connection on every channel switch.
+    final hub = _hubController.hub;
+    if (hub == null || _disposed) return;
     _hub = hub;
 
     _subscriptions.addAll([
@@ -147,12 +153,7 @@ class MessagesController extends StateNotifier<MessagesState> implements Message
       hub.onUserStoppedTyping.listen(_handleStoppedTyping),
     ]);
 
-    try {
-      await hub.connect();
-      if (_disposed) return;
-      await hub.joinChannel(channelId);
-    } catch (_) {
-    }
+    await _hubController.joinChannel(channelId);
   }
 
   void _handleReceived(MessageResponse message) {
@@ -296,8 +297,7 @@ class MessagesController extends StateNotifier<MessagesState> implements Message
     final hub = _hub;
     if (hub != null) {
       unawaited(hub.stopTyping(channelId).catchError((_) {}));
-      unawaited(hub.leaveChannel(channelId).catchError((_) {}));
-      unawaited(hub.dispose());
+      unawaited(_hubController.leaveChannel(channelId));
     }
     super.dispose();
   }

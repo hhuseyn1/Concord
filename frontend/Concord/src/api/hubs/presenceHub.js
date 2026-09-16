@@ -9,6 +9,7 @@ export function createPresenceHub() {
     stop: () => connection.stop(),
 
     setStatus: (status) => connection.invoke('SetStatus', status),
+    heartbeat: () => connection.invoke('Heartbeat'),
 
     onPresenceChanged(handler) {
       connection.on('PresenceChanged', handler);

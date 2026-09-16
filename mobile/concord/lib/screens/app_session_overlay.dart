@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../providers/messages_hub_controller.dart';
 import '../providers/notifications_controller.dart';
 import '../providers/presence_controller.dart';
 import '../providers/servers_controller.dart';
@@ -15,6 +16,7 @@ class AppSessionOverlay extends ConsumerWidget {
     ref.watch(presenceControllerProvider);
     ref.watch(serversControllerProvider);
     ref.watch(notificationsControllerProvider);
+    ref.watch(messagesHubControllerProvider);
     return child;
   }
 }

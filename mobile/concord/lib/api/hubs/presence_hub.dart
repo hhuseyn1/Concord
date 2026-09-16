@@ -20,6 +20,8 @@ class PresenceHub extends ConcordHub {
     return connection.invoke('SetStatus', args: [status.toWire()]);
   }
 
+  Future<void> heartbeat() => connection.invoke('Heartbeat');
+
   Future<void> dispose() async {
     await connection.stop();
     await _presenceChanged.close();

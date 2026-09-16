@@ -47,14 +47,14 @@ public class SmtpEmailSender(IOptions<EmailSettings> emailOptions, ILogger<SmtpE
         const string subject = "Verify your Concord email";
         var body = $"""
             <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;">
-              <h2 style="color:#16a34a;">Verify Your Email</h2>
+              <h2 style="color:#a229ff;">Verify Your Email</h2>
               <p>Welcome to Concord!</p>
               <p>Please confirm this is your email address by clicking the button below:</p>
               <p style="margin:24px 0;">
-                <a href="{verificationLink}" style="background:#16a34a;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Verify Email</a>
+                <a href="{verificationLink}" style="background:#a229ff;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Verify Email</a>
               </p>
               <p>Or copy and paste this link into your browser:</p>
-              <p style="word-break:break-all;color:#16a34a;">{verificationLink}</p>
+              <p style="word-break:break-all;color:#a229ff;">{verificationLink}</p>
               <p>This link expires in 60 minutes. If you didn't create this account, you can safely ignore this email.</p>
               <p style="color:#6b7280;font-size:0.875rem;">This email was sent automatically.</p>
             </body></html>

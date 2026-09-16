@@ -1,3 +1,4 @@
+import { HubConnectionState } from '@microsoft/signalr'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPresenceHub } from '../api/hubs/presenceHub'
@@ -8,6 +9,11 @@ import { useAuth } from '../hooks/useAuth'
 import { PresenceContext } from './PresenceContext'
 
 const IDLE_TIMEOUT_MS = 5 * 60 * 1000
+
+// Well under the backend's 3-minute Redis TTL on the connection-count key (see
+// PresenceService.RenewConnectionAsync) - keeps a long-lived, otherwise-idle connection's
+// "online" state from expiring out from under it.
+const HEARTBEAT_INTERVAL_MS = 60 * 1000
 
 export function PresenceProvider({ children }) {
   const { isAuthenticated, user } = useAuth()
@@ -45,7 +51,13 @@ export function PresenceProvider({ children }) {
       console.error('Failed to connect to the presence hub', error)
     })
 
+    const heartbeatInterval = setInterval(() => {
+      if (hub.connection.state !== HubConnectionState.Connected) return
+      hub.heartbeat().catch(() => {})
+    }, HEARTBEAT_INTERVAL_MS)
+
     return () => {
+      clearInterval(heartbeatInterval)
       unsubscribe()
       hubRef.current = null
       hub.stop().catch(() => {})

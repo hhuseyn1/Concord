@@ -56,6 +56,10 @@ class ServersController extends StateNotifier<ServersState> {
       hub.onServerModerationChanged.listen((_) {}),
     ]);
 
+    hub.onReconnected(({String? connectionId}) {
+      unawaited(_rejoinServers());
+    });
+
     try {
       await hub.connect();
     } catch (_) {
@@ -89,6 +93,17 @@ class ServersController extends StateNotifier<ServersState> {
     for (final id in _joinedServerIds.difference(targetIds)) {
       unawaited(hub.leaveServer(id).catchError((_) {}));
       _joinedServerIds.remove(id);
+    }
+  }
+
+  Future<void> _rejoinServers() async {
+    final hub = _hub;
+    if (hub == null) return;
+    for (final id in _joinedServerIds) {
+      try {
+        await hub.joinServer(id);
+      } catch (_) {
+      }
     }
   }
 
