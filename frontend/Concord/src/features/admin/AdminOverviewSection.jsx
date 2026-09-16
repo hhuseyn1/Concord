@@ -1,30 +1,24 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Button } from '../../components/ui/Button'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { Skeleton } from '../../components/ui/Skeleton'
 import { mapAdminLoadError } from './adminErrors'
-import { useAdminOverview, useAdminOverviewCharts } from './adminQueries'
-import { DateRangeFilter } from './DateRangeFilter'
+import { useAdminOverview, useAdminOverviewCharts, useAdminUserGrowth } from './adminQueries'
 
-const CHART_RANGE_DAYS = 14
+// Mirrors AdminService's MinUserGrowthYear on the backend - just enough to keep the year steppers
+// from wandering off into decades with no data rather than expressing a real product launch date.
+const MIN_CHART_YEAR = 2000
 
-function toDateInputValue(date) {
-  return date.toISOString().slice(0, 10)
-}
-
-// Mirrors AuditLogSection.jsx's date-filter convention: a plain `YYYY-MM-DD` input value is
-// widened to a UTC ISO bound before being sent to the API.
-function toUtcBound(dateValue, endOfDay) {
-  if (!dateValue) return undefined
-  return endOfDay ? `${dateValue}T23:59:59.999Z` : `${dateValue}T00:00:00.000Z`
-}
-
-function defaultChartDateRange() {
-  const to = new Date()
-  const from = new Date(to)
-  from.setUTCDate(from.getUTCDate() - (CHART_RANGE_DAYS - 1))
-  return { from: toDateInputValue(from), to: toDateInputValue(to) }
+// Full-year [from, to] UTC bounds for a calendar year, for charts that filter by year rather than
+// an arbitrary date range (Admin/Overview/Charts still takes fromUtc/toUtc).
+function yearUtcBounds(year) {
+  return {
+    fromUtc: `${year}-01-01T00:00:00.000Z`,
+    toUtc: `${year}-12-31T23:59:59.999Z`,
+  }
 }
 
 // Recharts sets `fill`/`stroke` as raw SVG presentation attributes (not a `style` property), and
@@ -64,29 +58,61 @@ function useChartColors() {
   return colors
 }
 
-function formatShortDate(dateString) {
+function formatMonthShort(dateString) {
   return new Date(`${dateString}T00:00:00Z`).toLocaleDateString(undefined, {
     month: 'short',
-    day: 'numeric',
     timeZone: 'UTC',
   })
 }
 
-function formatFullDate(dateString) {
+function formatMonthFull(dateString) {
   return new Date(`${dateString}T00:00:00Z`).toLocaleDateString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
+    month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
   })
 }
 
-function ChartCard({ title, children }) {
+function ChartCard({ title, action, children }) {
   return (
     <div className="rounded-md border border-border-default bg-surface-sidebar p-4">
-      <p className="mb-3 text-sm font-semibold text-fg-heading">{title}</p>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-fg-heading">{title}</p>
+        {action}
+      </div>
       {children}
+    </div>
+  )
+}
+
+// Prev/next year control shared by the overview charts, styled after DataTable's pagination
+// Chevron buttons so admin-panel date navigation looks consistent.
+function YearStepper({ year, onChange, minYear, maxYear }) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="flex items-center gap-1">
+      <Button
+        size="sm"
+        variant="secondary"
+        className="px-2"
+        aria-label={t('admin.previousYear')}
+        disabled={year <= minYear}
+        onClick={() => onChange(year - 1)}
+      >
+        <ChevronLeft className="size-4" aria-hidden="true" />
+      </Button>
+      <span className="min-w-[4.5ch] text-center text-sm font-semibold text-fg-default">{year}</span>
+      <Button
+        size="sm"
+        variant="secondary"
+        className="px-2"
+        aria-label={t('admin.nextYear')}
+        disabled={year >= maxYear}
+        onClick={() => onChange(year + 1)}
+      >
+        <ChevronRight className="size-4" aria-hidden="true" />
+      </Button>
     </div>
   )
 }
@@ -103,46 +129,55 @@ function StatTile({ label, value, tone = 'default' }) {
   )
 }
 
-function UserGrowthChart({ growth, colors }) {
+function UserGrowthChart({ growth, colors, year, onYearChange, maxYear, loading, isError, error }) {
   const { t } = useTranslation()
   const chartData = (growth ?? []).map((point) => ({ date: point.Date, count: point.Count }))
   const tickStyle = { fill: colors.fgMuted, fontSize: 12 }
 
   return (
-    <ChartCard title={t('admin.userGrowthChartTitle')}>
-      <ResponsiveContainer width="100%" height={240}>
-        <BarChart data={chartData} barCategoryGap="24%" margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-          <CartesianGrid stroke={colors.borderSubtle} vertical={false} />
-          <XAxis
-            dataKey="date"
-            tickFormatter={formatShortDate}
-            tick={tickStyle}
-            axisLine={{ stroke: colors.borderSubtle }}
-            tickLine={false}
-          />
-          <YAxis allowDecimals={false} tick={tickStyle} axisLine={false} tickLine={false} width={32} />
-          <Tooltip
-            cursor={{ fill: colors.borderSubtle }}
-            content={({ active, payload, label }) => {
-              if (!active || !payload?.length) return null
-              return (
-                <div className="rounded-md border border-border-default bg-surface-floating px-3 py-2 text-xs shadow-md">
-                  <p className="font-medium text-fg-default">{formatFullDate(label)}</p>
-                  <p className="text-fg-muted">
-                    {t('admin.userGrowthTooltipLabel')}: {payload[0].value}
-                  </p>
-                </div>
-              )
-            }}
-          />
-          <Bar dataKey="count" name={t('admin.userGrowthTooltipLabel')} fill={colors.brand} radius={[4, 4, 0, 0]} maxBarSize={24} />
-        </BarChart>
-      </ResponsiveContainer>
+    <ChartCard
+      title={t('admin.userGrowthChartTitle')}
+      action={<YearStepper year={year} onChange={onYearChange} minYear={MIN_CHART_YEAR} maxYear={maxYear} />}
+    >
+      {loading ? (
+        <Skeleton className="h-60 rounded-md" />
+      ) : isError ? (
+        <EmptyState title={t('admin.overviewChartsLoadFailed')} description={mapAdminLoadError(error)} />
+      ) : (
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={chartData} barCategoryGap="24%" margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+            <CartesianGrid stroke={colors.borderSubtle} vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickFormatter={formatMonthShort}
+              tick={tickStyle}
+              axisLine={{ stroke: colors.borderSubtle }}
+              tickLine={false}
+            />
+            <YAxis allowDecimals={false} tick={tickStyle} axisLine={false} tickLine={false} width={32} />
+            <Tooltip
+              cursor={{ fill: colors.borderSubtle }}
+              content={({ active, payload, label }) => {
+                if (!active || !payload?.length) return null
+                return (
+                  <div className="rounded-md border border-border-default bg-surface-floating px-3 py-2 text-xs shadow-md">
+                    <p className="font-medium text-fg-default">{formatMonthFull(label)}</p>
+                    <p className="text-fg-muted">
+                      {t('admin.userGrowthTooltipLabel')}: {payload[0].value}
+                    </p>
+                  </div>
+                )
+              }}
+            />
+            <Bar dataKey="count" name={t('admin.userGrowthTooltipLabel')} fill={colors.brand} radius={[4, 4, 0, 0]} maxBarSize={24} />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
     </ChartCard>
   )
 }
 
-function SubscriptionsChart({ breakdown, colors }) {
+function SubscriptionsChart({ breakdown, colors, year, onYearChange, maxYear, loading, isError, error }) {
   const { t } = useTranslation()
 
   const segments = [
@@ -160,65 +195,76 @@ function SubscriptionsChart({ breakdown, colors }) {
       : [{ name: 'subscriptions', Empty: 1 }]
 
   return (
-    <ChartCard title={t('admin.subscriptionsChartTitle')}>
-      <ResponsiveContainer width="100%" height={72}>
-        <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-          <XAxis type="number" hide domain={[0, total > 0 ? total : 1]} />
-          <YAxis type="category" dataKey="name" hide width={0} />
-          {total > 0 && (
-            <Tooltip
-              cursor={{ fill: colors.borderSubtle }}
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null
-                return (
-                  <div className="rounded-md border border-border-default bg-surface-floating px-3 py-2 text-xs shadow-md">
-                    {payload.map((entry) => {
-                      const segment = segments.find((candidate) => candidate.key === entry.dataKey)
-                      if (!segment) return null
-                      return (
-                        <p key={entry.dataKey} className="text-fg-default">
-                          {segment.label}: <span className="text-fg-muted">{segment.count}</span>
-                        </p>
-                      )
-                    })}
-                  </div>
-                )
-              }}
-            />
-          )}
-          {total > 0 ? (
-            segments.map((segment) => (
-              <Bar
-                key={segment.key}
-                dataKey={segment.key}
-                stackId="subscriptions"
-                name={segment.label}
-                fill={segment.color}
-                stroke={colors.surfaceSidebar}
-                strokeWidth={2}
-                radius={segment.key === lastNonZeroKey ? [0, 4, 4, 0] : [0, 0, 0, 0]}
-                barSize={24}
-              />
-            ))
-          ) : (
-            <Bar dataKey="Empty" fill={colors.borderDefault} radius={[4, 4, 4, 4]} barSize={24} isAnimationActive={false} />
-          )}
-        </BarChart>
-      </ResponsiveContainer>
+    <ChartCard
+      title={t('admin.subscriptionsChartTitle')}
+      action={<YearStepper year={year} onChange={onYearChange} minYear={MIN_CHART_YEAR} maxYear={maxYear} />}
+    >
+      {loading ? (
+        <Skeleton className="h-24 rounded-md" />
+      ) : isError ? (
+        <EmptyState title={t('admin.overviewChartsLoadFailed')} description={mapAdminLoadError(error)} />
+      ) : (
+        <>
+          <ResponsiveContainer width="100%" height={72}>
+            <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+              <XAxis type="number" hide domain={[0, total > 0 ? total : 1]} />
+              <YAxis type="category" dataKey="name" hide width={0} />
+              {total > 0 && (
+                <Tooltip
+                  cursor={{ fill: colors.borderSubtle }}
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null
+                    return (
+                      <div className="rounded-md border border-border-default bg-surface-floating px-3 py-2 text-xs shadow-md">
+                        {payload.map((entry) => {
+                          const segment = segments.find((candidate) => candidate.key === entry.dataKey)
+                          if (!segment) return null
+                          return (
+                            <p key={entry.dataKey} className="text-fg-default">
+                              {segment.label}: <span className="text-fg-muted">{segment.count}</span>
+                            </p>
+                          )
+                        })}
+                      </div>
+                    )
+                  }}
+                />
+              )}
+              {total > 0 ? (
+                segments.map((segment) => (
+                  <Bar
+                    key={segment.key}
+                    dataKey={segment.key}
+                    stackId="subscriptions"
+                    name={segment.label}
+                    fill={segment.color}
+                    stroke={colors.surfaceSidebar}
+                    strokeWidth={2}
+                    radius={segment.key === lastNonZeroKey ? [0, 4, 4, 0] : [0, 0, 0, 0]}
+                    barSize={24}
+                  />
+                ))
+              ) : (
+                <Bar dataKey="Empty" fill={colors.borderDefault} radius={[4, 4, 4, 4]} barSize={24} isAnimationActive={false} />
+              )}
+            </BarChart>
+          </ResponsiveContainer>
 
-      <div className="mt-3 flex flex-wrap gap-4 text-xs">
-        {total > 0 ? (
-          segments.map((segment) => (
-            <div key={segment.key} className="flex items-center gap-1.5">
-              <span className="inline-block size-2.5 rounded-full" style={{ backgroundColor: segment.color }} aria-hidden="true" />
-              <span className="text-fg-default">{segment.label}</span>
-              <span className="text-fg-muted">— {segment.count}</span>
-            </div>
-          ))
-        ) : (
-          <span className="text-fg-muted">{t('admin.subscriptionsEmpty')}</span>
-        )}
-      </div>
+          <div className="mt-3 flex flex-wrap gap-4 text-xs">
+            {total > 0 ? (
+              segments.map((segment) => (
+                <div key={segment.key} className="flex items-center gap-1.5">
+                  <span className="inline-block size-2.5 rounded-full" style={{ backgroundColor: segment.color }} aria-hidden="true" />
+                  <span className="text-fg-default">{segment.label}</span>
+                  <span className="text-fg-muted">— {segment.count}</span>
+                </div>
+              ))
+            ) : (
+              <span className="text-fg-muted">{t('admin.subscriptionsEmpty')}</span>
+            )}
+          </div>
+        </>
+      )}
     </ChartCard>
   )
 }
@@ -227,19 +273,25 @@ export function AdminOverviewSection() {
   const { t } = useTranslation()
   const { data, isLoading, isError, error } = useAdminOverview()
   const colors = useChartColors()
+  const currentYear = new Date().getUTCFullYear()
 
-  const [{ from: defaultFromDate, to: defaultToDate }] = useState(defaultChartDateRange)
-  const [fromDate, setFromDate] = useState(defaultFromDate)
-  const [toDate, setToDate] = useState(defaultToDate)
+  const [growthYear, setGrowthYear] = useState(currentYear)
+  const [subscriptionsYear, setSubscriptionsYear] = useState(currentYear)
 
-  const fromUtc = toUtcBound(fromDate, false)
-  const toUtc = toUtcBound(toDate, true)
+  const { fromUtc, toUtc } = yearUtcBounds(subscriptionsYear)
   const {
     data: chartsData,
     isLoading: chartsLoading,
     isError: chartsIsError,
     error: chartsError,
   } = useAdminOverviewCharts(fromUtc, toUtc)
+
+  const {
+    data: userGrowth,
+    isLoading: userGrowthLoading,
+    isError: userGrowthIsError,
+    error: userGrowthError,
+  } = useAdminUserGrowth(growthYear)
 
   return (
     <div className="flex flex-col gap-4">
@@ -270,30 +322,28 @@ export function AdminOverviewSection() {
         </div>
       )}
 
-      <DateRangeFilter
-        fromDate={fromDate}
-        toDate={toDate}
-        onChange={(from, to) => {
-          setFromDate(from)
-          setToDate(to)
-        }}
-        fromLabel={t('admin.overviewChartsFilterFrom')}
-        toLabel={t('admin.overviewChartsFilterTo')}
-      />
-
-      {chartsLoading ? (
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          <Skeleton className="h-64 rounded-md" />
-          <Skeleton className="h-64 rounded-md" />
-        </div>
-      ) : chartsIsError ? (
-        <EmptyState title={t('admin.overviewChartsLoadFailed')} description={mapAdminLoadError(chartsError)} />
-      ) : (
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          <UserGrowthChart growth={chartsData.UserGrowth} colors={colors} />
-          <SubscriptionsChart breakdown={chartsData.SubscriptionsByStatus} colors={colors} />
-        </div>
-      )}
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <UserGrowthChart
+          growth={userGrowth}
+          colors={colors}
+          year={growthYear}
+          onYearChange={setGrowthYear}
+          maxYear={currentYear}
+          loading={userGrowthLoading}
+          isError={userGrowthIsError}
+          error={userGrowthError}
+        />
+        <SubscriptionsChart
+          breakdown={chartsData?.SubscriptionsByStatus}
+          colors={colors}
+          year={subscriptionsYear}
+          onYearChange={setSubscriptionsYear}
+          maxYear={currentYear}
+          loading={chartsLoading}
+          isError={chartsIsError}
+          error={chartsError}
+        />
+      </div>
     </div>
   )
 }

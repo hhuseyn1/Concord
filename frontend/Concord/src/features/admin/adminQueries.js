@@ -9,6 +9,7 @@ export const adminKeys = {
   all: ['admin'],
   overview: () => [...adminKeys.all, 'overview'],
   overviewCharts: (fromUtc, toUtc) => [...adminKeys.all, 'overviewCharts', fromUtc ?? '', toUtc ?? ''],
+  userGrowth: (year) => [...adminKeys.all, 'userGrowth', year],
   users: (search, sortBy, sortDirection) => [...adminKeys.all, 'users', search ?? '', sortBy ?? '', sortDirection ?? ''],
   subscriptions: (status, search, sortBy, sortDirection, fromUtc, toUtc) => [
     ...adminKeys.all,
@@ -33,6 +34,13 @@ export function useAdminOverviewCharts(fromUtc, toUtc) {
   return useQuery({
     queryKey: adminKeys.overviewCharts(fromUtc, toUtc),
     queryFn: () => adminService.getOverviewCharts(fromUtc, toUtc),
+  })
+}
+
+export function useAdminUserGrowth(year) {
+  return useQuery({
+    queryKey: adminKeys.userGrowth(year),
+    queryFn: () => adminService.getUserGrowth(year),
   })
 }
 

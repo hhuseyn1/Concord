@@ -30,6 +30,12 @@ public class AdminController(AdminService adminService) : BaseApiController
         return await _adminService.GetOverviewChartsAsync(fromUtc, toUtc);
     }
 
+    [HttpGet("Overview/UserGrowth")]
+    public async Task<List<AdminUserGrowthPoint>> GetUserGrowthAsync([FromQuery] int? year)
+    {
+        return await _adminService.GetUserGrowthAsync(year);
+    }
+
     [HttpGet("Users")]
     public async Task<PagedResult<AdminUserSummary>> GetUsersAsync(
         [FromQuery] int page,

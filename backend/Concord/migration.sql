@@ -1884,3 +1884,117 @@ BEGIN
 END $EF$;
 COMMIT;
 
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260910051057_AddAccountDeletionGracePeriod') THEN
+    ALTER TABLE "User" ADD "DeletionRequestedAt" timestamp with time zone;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260910051057_AddAccountDeletionGracePeriod') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260910051057_AddAccountDeletionGracePeriod', '10.0.11');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260910084213_AddDirectMessageReceivedNotificationType') THEN
+    ALTER TYPE notification_type ADD VALUE 'direct_message_received' BEFORE 'friend_request_accepted';
+    CREATE EXTENSION IF NOT EXISTS pg_trgm;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260910084213_AddDirectMessageReceivedNotificationType') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260910084213_AddDirectMessageReceivedNotificationType', '10.0.11');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260913055712_AddSubscription') THEN
+    CREATE TYPE subscription_status AS ENUM ('active', 'canceled', 'past_due');
+    CREATE EXTENSION IF NOT EXISTS pg_trgm;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260913055712_AddSubscription') THEN
+    CREATE TABLE "Subscription" (
+        "Id" uuid NOT NULL,
+        "UserId" uuid NOT NULL,
+        "StripeCustomerId" text NOT NULL,
+        "StripeSubscriptionId" text NOT NULL,
+        "Status" subscription_status NOT NULL,
+        "CurrentPeriodEnd" timestamp with time zone NOT NULL,
+        "CancelAtPeriodEnd" boolean NOT NULL,
+        "Created" timestamp with time zone NOT NULL DEFAULT (now()),
+        CONSTRAINT "PK_Subscription" PRIMARY KEY ("Id"),
+        CONSTRAINT "FK_Subscription_User_UserId" FOREIGN KEY ("UserId") REFERENCES "User" ("Id") ON DELETE RESTRICT
+    );
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260913055712_AddSubscription') THEN
+    CREATE UNIQUE INDEX "IX_Subscription_StripeSubscriptionId" ON "Subscription" ("StripeSubscriptionId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260913055712_AddSubscription') THEN
+    CREATE INDEX "IX_Subscription_UserId" ON "Subscription" ("UserId");
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260913055712_AddSubscription') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260913055712_AddSubscription', '10.0.11');
+    END IF;
+END $EF$;
+COMMIT;
+
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260913101512_AddReportDismissedNotification') THEN
+    ALTER TYPE notification_type ADD VALUE 'report_dismissed';
+    CREATE EXTENSION IF NOT EXISTS pg_trgm;
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260913101512_AddReportDismissedNotification') THEN
+    ALTER TABLE "Notification" ADD "Reason" character varying(500);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20260913101512_AddReportDismissedNotification') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20260913101512_AddReportDismissedNotification', '10.0.11');
+    END IF;
+END $EF$;
+COMMIT;
+

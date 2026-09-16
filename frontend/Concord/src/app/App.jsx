@@ -8,9 +8,6 @@ import { router } from '../lib/router'
 import { AuthProvider } from './AuthProvider'
 import { ErrorBoundary } from './ErrorBoundary'
 
-// Presence/Notifications/DirectMessages/VoiceCall providers live inside CabinetRoot (mounted only
-// for the '/cabinet' route) rather than here, so their dependencies (livekit-client, SignalR hub
-// wrappers) aren't part of the bundle a signed-out visitor downloads for the public landing page.
 function App() {
   return (
     <I18nextProvider i18n={i18n}>

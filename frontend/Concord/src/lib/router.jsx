@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { AdminLayout } from '../app/AdminLayout'
 import { RequireAdmin } from '../app/RequireAdmin'
 import { RequireAuth } from '../app/RequireAuth'
+import { RequireGuest } from '../app/RequireGuest'
 import { NotFoundPlaceholder, ServerPlaceholder } from '../app/routePlaceholders'
 import { LandingScreen } from '../features/landing/LandingScreen'
 import {
@@ -25,7 +26,10 @@ import { withSuspense } from './withSuspense'
 
 export const router = createBrowserRouter([
   { path: '/', element: <LandingScreen /> },
-  { path: '/login', element: withSuspense(<LoginScreen />) },
+  {
+    element: <RequireGuest />,
+    children: [{ path: '/login', element: withSuspense(<LoginScreen />) }],
+  },
   { path: '/register', element: withSuspense(<RegisterScreen />) },
   { path: '/forgot-password', element: withSuspense(<ForgotPasswordScreen />) },
   { path: '/reset-password', element: withSuspense(<ResetPasswordScreen />) },

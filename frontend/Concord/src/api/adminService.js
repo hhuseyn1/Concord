@@ -14,6 +14,14 @@ export async function getOverviewCharts(fromUtc, toUtc) {
   });
 }
 
+export async function getUserGrowth(year) {
+  return request('Admin/Overview/UserGrowth', {
+    query: {
+      year: year || undefined,
+    },
+  });
+}
+
 export async function getUsers(page, pageSize, search, sortBy, sortDirection) {
   return request('Admin/Users', {
     query: {
