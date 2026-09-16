@@ -61,6 +61,26 @@ public class PresenceHub(PresenceService presenceService) : Hub
         }
     }
 
+    /// <summary>
+    /// Called periodically by clients while connected, purely to keep the Redis connection-count
+    /// key (see <see cref="PresenceService.RenewConnectionAsync"/>) from expiring under a
+    /// long-lived, otherwise-idle connection. Not part of the visible presence status itself.
+    /// </summary>
+    public async Task Heartbeat()
+    {
+        try
+        {
+            var claimedUserId = Context.User?.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value;
+            var userId = Guid.TryParse(claimedUserId, out Guid parsedUserId) ? parsedUserId : throw new UnauthorizedAccessException();
+
+            await _presenceService.RenewConnectionAsync(userId);
+        }
+        catch (Exception ex)
+        {
+            throw new HubException(ex.Message);
+        }
+    }
+
     public async Task SetStatus(PresenceStatus status)
     {
         try

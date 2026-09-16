@@ -35,8 +35,14 @@ class PresenceController extends StateNotifier<PresenceState> {
 
   final Ref _ref;
 
+  // Well under the backend's 3-minute Redis TTL on the connection-count key (see
+  // PresenceService.RenewConnectionAsync) - keeps a long-lived, otherwise-idle connection's
+  // "online" state from expiring out from under it.
+  static const _heartbeatInterval = Duration(seconds: 60);
+
   PresenceHub? _hub;
   StreamSubscription<PresenceChangedEvent>? _subscription;
+  Timer? _heartbeatTimer;
 
   Future<void> _connectHub() async {
     final tokenStorage = _ref.read(tokenStorageProvider);
@@ -48,6 +54,11 @@ class PresenceController extends StateNotifier<PresenceState> {
       await hub.connect();
     } catch (_) {
     }
+
+    _heartbeatTimer = Timer.periodic(_heartbeatInterval, (_) {
+      if (!hub.isConnected) return;
+      unawaited(hub.heartbeat().catchError((_) {}));
+    });
   }
 
   void _handlePresenceChanged(PresenceChangedEvent event) {
@@ -80,6 +91,8 @@ class PresenceController extends StateNotifier<PresenceState> {
   }
 
   Future<void> _teardownConnection() async {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
     await _subscription?.cancel();
     _subscription = null;
     final hub = _hub;
