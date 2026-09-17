@@ -6,6 +6,7 @@ import * as sessionsService from '../../api/sessionsService'
 import * as tokenStorage from '../../api/tokenStorage'
 import { CustomStatusModal } from '../../features/settings/CustomStatusModal'
 import { toAvatarPresence } from '../../features/friends/presence'
+import { StarsBalanceIndicator } from '../../features/stars/StarsBalanceIndicator'
 import { VoiceCallStrip } from '../../features/voice/VoiceCallStrip'
 import { useAuth } from '../../hooks/useAuth'
 import { usePresence } from '../../hooks/usePresence'
@@ -135,6 +136,7 @@ export function UserPanel({ className }) {
                   : statusOptions.find((option) => option.value === status)?.label}
               </p>
             </div>
+            <StarsBalanceIndicator />
             <Tooltip content={t('settings.logout')} side="top">
               <IconButton
                 aria-label={t('settings.logout')}

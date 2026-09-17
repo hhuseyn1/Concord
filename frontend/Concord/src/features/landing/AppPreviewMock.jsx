@@ -2,7 +2,7 @@ import { Gift, Hash, Mic, Plus, Search, Send, Smile, Volume2 } from 'lucide-reac
 
 const SERVERS = [
   { label: 'C', active: true },
-  { label: 'DS', color: 'bg-[#47bfff]/20 text-[#47bfff]' },
+  { label: 'DS', color: 'bg-accent/20 text-accent' },
   { label: 'GD', color: 'bg-success-bg text-success' },
   { label: 'FR', color: 'bg-warning-bg text-warning' },
 ]
@@ -23,7 +23,7 @@ const MESSAGES = [
   },
   {
     name: 'Rowan',
-    color: 'bg-[#47bfff]/25 text-[#47bfff]',
+    color: 'bg-accent/25 text-accent',
     time: '10:42 AM',
     text: 'Nice! Jumping into General Voice to test it out.',
   },
@@ -144,7 +144,7 @@ export function AppPreviewMock({ className }) {
       <div className="hidden w-32 shrink-0 flex-col border-l border-border-default bg-surface-sidebar p-2 md:flex">
         <p className="px-1 pb-2 text-[10px] font-semibold tracking-wide text-fg-muted uppercase">In voice</p>
         <div className="flex items-center gap-1.5 rounded-md bg-fg-default/5 px-1.5 py-1.5">
-          <span className="flex size-6 items-center justify-center rounded-full bg-[#47bfff]/25 text-[9px] font-semibold text-[#47bfff]">
+          <span className="flex size-6 items-center justify-center rounded-full bg-accent/25 text-[9px] font-semibold text-accent">
             RO
           </span>
           <span className="truncate text-[10px] font-medium text-fg-default">Rowan</span>

@@ -85,12 +85,16 @@ export function KitchenSink() {
         </p>
       </header>
 
-      <Section title="Surfaces & elevation" description="Rail (darkest) → sidebar → base → floating (distinct, elevated).">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <Section
+        title="Surfaces & elevation"
+        description="Rail → sidebar → base → floating (elevation flips direction between themes) + the recessed input well."
+      >
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
           <Swatch name="surface-rail" className="bg-surface-rail" />
           <Swatch name="surface-sidebar" className="bg-surface-sidebar" />
           <Swatch name="surface-base" className="bg-surface-base" />
           <Swatch name="surface-floating (shadow-lg)" className="bg-surface-floating shadow-lg" />
+          <Swatch name="surface-input" className="bg-surface-input" />
         </div>
       </Section>
 
@@ -98,12 +102,14 @@ export function KitchenSink() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <Swatch name="fg-default" className="bg-fg-default" />
           <Swatch name="fg-muted" className="bg-fg-muted" />
+          <Swatch name="fg-faint" className="bg-fg-faint" />
           <Swatch name="fg-link" className="bg-fg-link" />
           <Swatch name="fg-heading" className="bg-fg-heading" />
           <Swatch name="brand" className="bg-brand" />
           <Swatch name="brand-hover" className="bg-brand-hover" />
           <Swatch name="brand-pressed" className="bg-brand-pressed" />
           <Swatch name="brand-bg" className="bg-brand-bg" />
+          <Swatch name="accent" className="bg-accent" />
         </div>
       </Section>
 
@@ -132,8 +138,9 @@ export function KitchenSink() {
             Message body text (text-base) - the size used for chat message content, optimized for
             long-form readability.
           </p>
-          <p className="text-xs text-fg-muted">Timestamp / metadata (text-xs, fg-muted) - Today at 14:32</p>
-          <p className="text-2xs text-fg-muted">Extra-small metadata (text-2xs, fg-muted)</p>
+          <p className="text-sm text-fg-muted">Secondary text (text-sm, fg-muted)</p>
+          <p className="text-xs text-fg-faint">Timestamp / least-important metadata (text-xs, fg-faint) - Today at 14:32</p>
+          <p className="text-2xs text-fg-faint">Extra-small metadata (text-2xs, fg-faint)</p>
         </div>
       </Section>
 

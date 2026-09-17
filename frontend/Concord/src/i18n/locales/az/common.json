@@ -79,6 +79,23 @@
     "deleteAccountSuccessToastTitle": "Hesabınız silindi.",
     "deleteAccountSuccessToastDescription": "Silinməni ləğv etmək üçün 30 gün ərzində yenidən daxil olun."
   },
+  "appearance": {
+    "title": "Görünüş",
+    "description": "Tema və mətn ölçüsü bu cihazda yadda saxlanılır.",
+    "theme": "Tema",
+    "darkActive": "Qaranlıq rejim aktivdir.",
+    "lightActive": "İşıqlı rejim aktivdir.",
+    "switchToLight": "İşıqlı rejimə keç",
+    "switchToDark": "Qaranlıq rejimə keç",
+    "fontSize": "Mətn ölçüsü",
+    "fontSizeHint": "Concord-da mətni böyüdür və ya kiçildir. Boşluqlar və düzülüş dəyişmir.",
+    "fontSizeSmall": "Kiçik ({{px}}px)",
+    "fontSizeDefault": "Standart ({{px}}px)",
+    "fontSizeLarge": "Böyük ({{px}}px)",
+    "fontSizeExtraLarge": "Çox böyük ({{px}}px)",
+    "fontSizePreview": "Mesajlarınız belə görünəcək.",
+    "fontSizePreviewMeta": "Vaxt damğaları və digər kiçik detallar isə belə görünəcək."
+  },
   "billing": {
     "title": "Ödəniş",
     "premiumTitle": "Concord Premium",
@@ -116,6 +133,110 @@
     "perksReminderTitle": "Premium üstünlükləriniz",
     "pastDueTitle": "Son ödənişiniz uğursuz oldu",
     "pastDueDescription": "Premium üstünlüklərinizi saxlamaq üçün ödəniş metodunuzu yeniləyin."
+  },
+  "stars": {
+    "title": "Stars",
+    "unit": "Stars",
+    "amountWithUnit": "{{amount}} Stars",
+    "balanceLabel": "Balansınız",
+    "earnHint": "Göndərdiyiniz hər mesaj üçün {{amount}} Stars qazanın - gündə {{cap}} Stars-a qədər, mükafatlar arasında {{seconds}} saniyə gözləmə ilə.",
+    "sendStars": "Stars göndər",
+    "loadErrorTitle": "Stars məlumatlarınız yüklənmədi",
+    "loadErrorDescription": "Cüzdanınıza müraciət edərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.",
+    "indicator": {
+      "tooltip": "{{amount}} Stars - Stars ayarlarını aç",
+      "ariaLabel": "Stars balansı: {{amount}}. Stars ayarlarını aç"
+    },
+    "send": {
+      "title": "Stars göndər",
+      "description": "Balansınızdan dostunuza Stars göndərin. Köçürmələr dərhal baş verir və geri qaytarıla bilməz.",
+      "recipientLabel": "Kimə",
+      "searchPlaceholder": "Dostları axtar",
+      "noFriends": "Hələ dostunuz yoxdur",
+      "noFriendsDescription": "Stars yalnız dostlara göndərilə bilər - əvvəlcə kimisə əlavə edin.",
+      "noMatches": "“{{query}}” üzrə uyğun dost tapılmadı.",
+      "friendsErrorTitle": "Dostlarınız yüklənmədi",
+      "friendsErrorDescription": "Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.",
+      "loadMoreFriends": "Daha çox dost yüklə",
+      "amountLabel": "Məbləğ",
+      "amountHint": "Sizdə {{balance}} Stars var.",
+      "noBalance": "Göndərmək üçün əvvəlcə Stars qazanmalı və ya almalısınız.",
+      "submit": "Göndər",
+      "back": "Geri",
+      "errorNoRecipient": "Stars göndərmək üçün dost seçin.",
+      "errorAmountRequired": "Neçə Stars göndərmək istədiyinizi yazın.",
+      "errorAmountPositive": "Sıfırdan böyük tam ədəd daxil edin.",
+      "errorAmountTooLarge": "Sizdə cəmi {{balance}} Stars var.",
+      "errorSelf": "Özünüzə Stars göndərə bilməzsiniz.",
+      "confirmTitle": "Bu köçürməni təsdiqləyin",
+      "confirmDescription": "{{name}} istifadəçisinə {{amount}} Stars göndərmək üzrəsiniz. Bu əməliyyat geri qaytarıla bilməz.",
+      "confirmBalanceAfter": "Sonrakı balansınız: {{balance}} Stars.",
+      "confirmAction": "{{amount}} Stars göndər",
+      "successTitle": "Stars göndərildi",
+      "successDescription": "{{amount}} Stars {{name}} istifadəçisinə yollandı."
+    },
+    "trial": {
+      "sectionTitle": "Premium sınaq müddəti",
+      "title": "Stars ilə Premium-u sınayın",
+      "description": "{{days}} gün Concord Premium üçün {{cost}} Stars xərcləyin.",
+      "action": "Premium-u sına",
+      "activeBadge": "Sınaq aktivdir",
+      "expiresOn": "Premium sınağınız {{date}} tarixinə qədər davam edir.",
+      "alreadyPremium": "Artıq Premium-unuz var, sınaq üçün Stars xərcləməyə ehtiyac yoxdur.",
+      "insufficient": "Sınağa başlamaq üçün daha {{missing}} Stars lazımdır.",
+      "confirmTitle": "Premium sınağına başlayaq?",
+      "confirmDescription": "{{cost}} Stars dərhal balansınızdan silinəcək və {{days}} gün Premium əldə edəcəksiniz.",
+      "confirmBalanceAfter": "Sonrakı balansınız: {{balance}} Stars.",
+      "confirmAction": "{{cost}} Stars xərclə",
+      "successTitle": "Premium sınağı başladı",
+      "successDescription": "{{date}} tarixinə qədər Premium-unuz var."
+    },
+    "packages": {
+      "title": "Stars al",
+      "description": "Stripe-ın təhlükəsiz ödəniş səhifəsi ilə balansınızı artırın.",
+      "starsLabel": "Birdəfəlik artırma",
+      "buyAriaLabel": "{{price}} qarşılığında {{stars}} Stars al",
+      "empty": "Hazırda əlçatan Stars paketi yoxdur."
+    },
+    "history": {
+      "title": "Son əməliyyatlar",
+      "empty": "Hələ Stars əməliyyatı yoxdur",
+      "emptyDescription": "Stars qazanmaq üçün mesaj göndərin.",
+      "errorTitle": "Stars tarixçəniz yüklənmədi",
+      "loadMore": "Daha çox yüklə",
+      "balanceAfter": "Balans: {{balance}}",
+      "chatReward": "Söhbət mükafatı",
+      "receivedFrom": "{{name}} istifadəçisindən alındı",
+      "sentTo": "{{name}} istifadəçisinə göndərildi",
+      "premiumTrial": "Premium sınağı",
+      "packagePurchase": "Stars alışı",
+      "unknown": "Stars düzəlişi"
+    },
+    "purchase": {
+      "confirmingTitle": "Alışınız təsdiqlənir…",
+      "confirmingSubtitle": "Bir az gözləyin, bu yalnız bir neçə saniyə çəkəcək.",
+      "successTitle": "Stars əlavə edildi!",
+      "successSubtitle": "Yeni Stars balansınızdadır. Stars səhifəsinə qaytarılırsınız…",
+      "failedTitle": "Alış tamamlanmadı",
+      "failedSubtitle": "Sizdən ödəniş alınmadı. Ayarlardan yenidən Stars almağa cəhd edə bilərsiniz.",
+      "timeoutTitle": "Bu gözləniləndən uzun çəkir",
+      "timeoutSubtitle": "Alışınızı vaxtında təsdiqləyə bilmədik. Bir azdan balansınızı yoxlayın və ya yenidən cəhd edin.",
+      "missingTitle": "Bu alış linki etibarsızdır",
+      "missingSubtitle": "Ayarlardan yenidən Stars almağa cəhd edin.",
+      "canceledTitle": "Alış ləğv edildi",
+      "canceledDescription": "Sizdən ödəniş alınmadı. İstənilən vaxt Ayarlardan Stars ala bilərsiniz.",
+      "backToStars": "Stars-a qayıt"
+    },
+    "errors": {
+      "network": "Serverə qoşulmaq mümkün olmadı. İnternet bağlantınızı yoxlayın.",
+      "rateLimited": "Çox sayda cəhd edildi. Bir az gözləyib yenidən cəhd edin.",
+      "notFriends": "Stars yalnız dostlarınıza göndərilə bilər.",
+      "recipientNotFound": "Bu istifadəçini tapa bilmədik - hesabını silmiş ola bilər.",
+      "insufficientBalance": "Bunun üçün kifayət qədər Stars-ınız yoxdur.",
+      "transferInvalid": "Məbləği və göndərdiyiniz şəxsi yoxlayıb yenidən cəhd edin.",
+      "trialAlreadyActive": "Premium sınağınız artıq aktivdir.",
+      "packageNotFound": "Bu Stars paketi artıq mövcud deyil."
+    }
   },
   "sessions": {
     "thisDevice": "Bu cihaz",
@@ -557,5 +678,140 @@
     "reasonHint": "Tələb olunur - bunu niyə şikayət etdiyinizi izah edin.",
     "submit": "Şikayəti Göndər",
     "submitted": "Şikayət göndərildi"
+  },
+  "landing": {
+    "nav": {
+      "features": "Xüsusiyyətlər",
+      "howItWorks": "Necə işləyir",
+      "faq": "Suallar",
+      "contact": "Əlaqə",
+      "logIn": "Daxil ol",
+      "register": "Qeydiyyat",
+      "openMenu": "Menyunu aç",
+      "closeMenu": "Menyunu bağla"
+    },
+    "hero": {
+      "eyebrow": "Real vaxt rejimində yazışma, səs və video - hamısı bir yerdə",
+      "titleLine1": "İcmanız,",
+      "titleHighlight": "həmişə bir yerdə.",
+      "description": "Concord insanlarınızın toplaşdığı yerdir - icmalarınız üçün serverlər və kanallar, ani mesajlaşma, aydın səs və video, həmçinin hər kəsin xəbərdar qalmasını təmin edən onlayn status.",
+      "getStarted": "Başla",
+      "logIn": "Daxil ol"
+    },
+    "features": {
+      "title": "İcmanız üçün lazım olan hər şey",
+      "description": "Concord əsas funksiyaları - yazışma, səs, video və moderasiyanı - bir tətbiqdə birləşdirir.",
+      "items": {
+        "messaging": {
+          "title": "Real vaxt rejimində yazışma",
+          "description": "Hər kanalda və şəxsi mesajlarda, canlı SignalR bağlantıları ilə işləyən ani mətn söhbəti - heç vaxt yeniləmək lazım deyil."
+        },
+        "servers": {
+          "title": "Serverlər və kanallar",
+          "description": "İcmanız üçün server yaradın, onu mətn və səs kanallarına bölün və insanları dəvət edin."
+        },
+        "calls": {
+          "title": "Səs və video zənglər",
+          "description": "Səs kanalına qoşulun və ya dostunuzla video zəng başladın - əlavə tətbiqə ehtiyac olmadan üz-üzə danışın."
+        },
+        "presence": {
+          "title": "Canlı status",
+          "description": "Kimin onlayn, gözləmədə və ya məşğul olduğunu bir baxışda görün, beləcə həmişə kiminlə danışa biləcəyinizi bilirsiniz."
+        },
+        "mentions": {
+          "title": "Qeyd etmələr və bildirişlər",
+          "description": "@qeyd ilə kiminsə diqqətini cəlb edin və diqqət tələb edən an bildiriş alın."
+        },
+        "search": {
+          "title": "Qlobal axtarış",
+          "description": "Serverləriniz və söhbətləriniz daxilində istənilən mesajı saniyələr ərzində tapın."
+        },
+        "moderation": {
+          "title": "Rollar və moderasiya",
+          "description": "Server üzrə incə tənzimlənən rollar və icazələr, həmçinin moderatorlarınız üçün kick, ban, fasilə və susdurma alətləri."
+        },
+        "profiles": {
+          "title": "Sizin idarə etdiyiniz profil",
+          "description": "Hər serverdə sizinlə gələn fərdi avatar, istifadəçi adı və status."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Dörd addımda başlayın",
+      "description": "Qeydiyyatdan ilk söhbətinizə qədər - bir neçə dəqiqədə.",
+      "stepLabel": "{{number}}-ci addım",
+      "steps": {
+        "createAccount": {
+          "title": "Hesab yaradın",
+          "description": "E-poçtunuzla bir dəqiqədən az müddətdə qeydiyyatdan keçin - başlamaq üçün heç nə yükləmək lazım deyil."
+        },
+        "joinCommunity": {
+          "title": "İcmaya qoşulun və ya yaradın",
+          "description": "Dəvət linki ilə serverə qoşulun və ya öz serverinizi yaradıb istədiyiniz kimi tənzimləyin."
+        },
+        "startCommunicating": {
+          "title": "Ünsiyyətə başlayın",
+          "description": "Mətn kanallarında yazışın, fayl paylaşın və əlaqə saxlamaq istədiyiniz insanları qeyd edin."
+        },
+        "connect": {
+          "title": "Başqaları ilə əlaqə qurun",
+          "description": "Dost əlavə edin, şəxsi mesajlar göndərin və canlı danışmaq istədiyiniz zaman səs və ya videoya qoşulun."
+        }
+      }
+    },
+    "faq": {
+      "title": "Tez-tez verilən suallar",
+      "description": "Başlamazdan əvvəl bilməli olduğunuz hər şey.",
+      "items": {
+        "whatIsConcord": {
+          "question": "Concord nədir?",
+          "answer": "Concord icmalar üçün real vaxt rejimində yazışma platformasıdır. Server yaradın və ya qoşulun, onu mətn və səs kanallarına bölün, insanlarınızla mesaj, səs və video vasitəsilə danışın."
+        },
+        "gettingStarted": {
+          "question": "Necə başlaya bilərəm?",
+          "answer": "Pulsuz hesab üçün qeydiyyatdan keçin, sonra dəvət linki ilə serverə qoşulun və ya öz serverinizi yaradın. Dərhal yazışmağa başlaya bilərsiniz."
+        },
+        "voiceVideo": {
+          "question": "Yalnız mətnlə deyil, səs və videoyla da danışa bilərəmmi?",
+          "answer": "Bəli. Serverdəki istənilən səs kanalına qoşularaq canlı səslə danışa, ya da şəxsi mesajdan birbaşa dostunuzla video zəng başlada bilərsiniz."
+        },
+        "security": {
+          "question": "Hesabım necə qorunur?",
+          "answer": "Əlavə qorunma üçün ikimərhələli doğrulamanı aktiv edə, artıq daxil olmuş sessiyadan QR kod skan edərək yeni cihazda daxil ola bilərsiniz."
+        },
+        "moderation": {
+          "question": "Öz icmamı moderasiya edə bilərəmmi?",
+          "answer": "Bəli. Server sahibləri incə tənzimlənən icazələrlə fərdi rollar yarada bilər, moderatorlar isə lazım gəldikdə üzvləri kick edə, ban edə, fasiləyə göndərə və ya susdura bilər."
+        },
+        "mobileApp": {
+          "question": "Mobil tətbiq varmı?",
+          "answer": "Xüsusi Android tətbiqi hazırlanır. Son mərhələdədir və hazır olan kimi endirmə linkini burada əlavə edəcəyik."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Qoşulmağa hazırsınız?",
+      "description": "Hesabınızı yaradın və bir neçə dəqiqə ərzində icmanızla danışmağa başlayın.",
+      "register": "Qeydiyyat",
+      "logIn": "Daxil ol"
+    },
+    "footer": {
+      "tagline": "Real vaxt rejimində mesajlaşma, səs və video, icmalar - hamısı bir yerdə.",
+      "product": "Məhsul",
+      "account": "Hesab",
+      "mobile": "Mobil",
+      "logIn": "Daxil ol",
+      "register": "Qeydiyyat",
+      "androidComingSoon": "Android tətbiqi - tezliklə",
+      "copyright": "© {{year}} Concord. Bütün hüquqlar qorunur."
+    },
+    "mobileApp": {
+      "title": "Harada olursunuzsa olun, əlaqədə qalın.",
+      "description": "Concord mobil tətbiqi serverlərinizi, şəxsi mesajlarınızı və zəngləri Android-ə gətirir - beləcə icmanızdan heç vaxt uzaq olmursunuz.",
+      "downloadAndroid": "Android tətbiqini endir",
+      "apkHint": "APK, Android 8.0+",
+      "comingSoon": "Tezliklə",
+      "comingSoonTitle": "Android tətbiqi hələ dərc olunmayıb - tezliklə yenidən yoxlayın."
+    }
   }
 }

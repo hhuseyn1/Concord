@@ -1,40 +1,10 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../../lib/cn'
 import { Reveal } from './Reveal'
 
-const FAQS = [
-  {
-    question: 'What is Concord?',
-    answer:
-      'Concord is a real-time chat platform for communities. Create or join a server, organize it into text and voice channels, and talk with your people through messages, voice, and video.',
-  },
-  {
-    question: 'How do I get started?',
-    answer:
-      'Register for a free account, then either join a server through an invite link or create your own. You can start chatting right away.',
-  },
-  {
-    question: 'Can I talk with voice and video, not just text?',
-    answer:
-      'Yes. Join any voice channel in a server for live audio, or start a video call directly with a friend from a direct message.',
-  },
-  {
-    question: 'How is my account kept secure?',
-    answer:
-      'You can enable two-factor authentication for an extra layer of protection, and sign in on a new device by scanning a QR code from an already-logged-in session.',
-  },
-  {
-    question: 'Can I moderate my own community?',
-    answer:
-      'Yes. Server owners can create custom roles with fine-grained permissions, and moderators can kick, ban, time out, or mute members as needed.',
-  },
-  {
-    question: 'Is there a mobile app?',
-    answer:
-      "A dedicated Android app is on the way. It's in its final stages, and we'll add the download link here as soon as it's ready.",
-  },
-]
+const FAQ_KEYS = ['whatIsConcord', 'gettingStarted', 'voiceVideo', 'security', 'moderation', 'mobileApp']
 
 function FaqItem({ id, question, answer, isOpen, onToggle }) {
   const panelId = `${id}-panel`
@@ -70,23 +40,24 @@ function FaqItem({ id, question, answer, isOpen, onToggle }) {
 }
 
 export function FaqSection() {
+  const { t } = useTranslation()
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
     <section id="faq" className="py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <Reveal className="text-center">
-          <h2 className="text-3xl font-bold text-fg-heading sm:text-4xl">Frequently asked questions</h2>
-          <p className="mt-4 text-lg text-fg-muted">Everything you need to know before you jump in.</p>
+          <h2 className="text-3xl font-bold text-fg-heading sm:text-4xl">{t('landing.faq.title')}</h2>
+          <p className="mt-4 text-lg text-fg-muted">{t('landing.faq.description')}</p>
         </Reveal>
 
         <Reveal delay={100} className="mt-10 border-t border-border-default">
-          {FAQS.map((faq, index) => (
+          {FAQ_KEYS.map((key, index) => (
             <FaqItem
-              key={faq.question}
+              key={key}
               id={`faq-item-${index}`}
-              question={faq.question}
-              answer={faq.answer}
+              question={t(`landing.faq.items.${key}.question`)}
+              answer={t(`landing.faq.items.${key}.answer`)}
               isOpen={openIndex === index}
               onToggle={() => setOpenIndex((current) => (current === index ? -1 : index))}
             />

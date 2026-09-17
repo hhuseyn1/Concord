@@ -34,6 +34,12 @@ export const CheckoutSuccessScreen = lazy(() =>
 export const CheckoutCancelScreen = lazy(() =>
   import('../features/billing/CheckoutCancelScreen').then((m) => ({ default: m.CheckoutCancelScreen })),
 )
+export const StarsPurchaseSuccessScreen = lazy(() =>
+  import('../features/stars/StarsPurchaseSuccessScreen').then((m) => ({ default: m.StarsPurchaseSuccessScreen })),
+)
+export const StarsPurchaseCancelScreen = lazy(() =>
+  import('../features/stars/StarsPurchaseCancelScreen').then((m) => ({ default: m.StarsPurchaseCancelScreen })),
+)
 export const AdminDashboardScreen = lazy(() =>
   import('../features/admin/AdminDashboardScreen').then((m) => ({ default: m.AdminDashboardScreen })),
 )

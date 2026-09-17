@@ -155,7 +155,7 @@ export function NotificationRow({ notification, onNavigate }) {
         {isSystemNotification && notification.Reason && (
           <p className="mt-0.5 text-xs text-fg-muted">{notification.Reason}</p>
         )}
-        <p className="mt-0.5 text-xs text-fg-muted">{formatRelativeTime(notification.Created)}</p>
+        <p className="mt-0.5 text-xs text-fg-faint">{formatRelativeTime(notification.Created)}</p>
 
         {matchingRequest && (
           <div className="mt-2 flex gap-2">

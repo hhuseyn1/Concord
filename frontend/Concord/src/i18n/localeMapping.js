@@ -10,6 +10,16 @@ export const SERVER_TO_SHORT_LOCALE = {
 
 export const SUPPORTED_LANGUAGES = ['en', 'az']
 
+/**
+ * Display names for every supported language, always written in that language
+ * itself (never translated) - `short` for space-constrained triggers like the
+ * landing navbar, `long` for menu items and the Settings row.
+ */
+export const LANGUAGE_LABELS = {
+  en: { short: 'EN', long: 'English' },
+  az: { short: 'AZ', long: 'Azərbaycan' },
+}
+
 export function toShortLocale(serverLocale) {
   return SERVER_TO_SHORT_LOCALE[serverLocale] ?? undefined
 }

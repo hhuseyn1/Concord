@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs'
+import { StarsSettingsSection } from '../stars/StarsSettingsSection'
 import { AccountSettingsForm } from './AccountSettingsForm'
 import { ActiveSessionsSection } from './ActiveSessionsSection'
+import { AppearanceSection } from './AppearanceSection'
 import { BillingSettingsSection } from './BillingSettingsSection'
 import { ChangePasswordForm } from './ChangePasswordForm'
 import { DeleteAccountSection } from './DeleteAccountSection'
@@ -14,19 +15,24 @@ import { ShortcutsSection } from './ShortcutsSection'
 import { TwoFactorSection } from './TwoFactorSection'
 import { VoiceVideoSettingsSection } from './VoiceVideoSettingsSection'
 
-const TAB_VALUES = ['account', 'privacy', 'voice', 'servers', 'billing']
+const TAB_VALUES = ['account', 'privacy', 'voice', 'servers', 'billing', 'stars']
 const DEFAULT_TAB = 'account'
 
 export function SettingsScreen() {
   const { t } = useTranslation()
-  const [searchParams] = useSearchParams()
-  // Only used to pick the initial tab (e.g. a Stripe Customer Portal return URL linking
-  // straight to `?tab=billing`) - the tab state itself isn't kept in sync with the URL after
-  // that, so switching tabs manually doesn't rewrite the address bar.
-  const [tab, setTab] = useState(() => {
-    const requested = searchParams.get('tab')
-    return TAB_VALUES.includes(requested) ? requested : DEFAULT_TAB
-  })
+  const [searchParams, setSearchParams] = useSearchParams()
+  // The active tab lives in `?tab=` rather than in component state. Links into a specific tab
+  // (a Stripe Customer Portal return URL pointing at `?tab=billing`, the Stars chip in the user
+  // panel pointing at `?tab=stars`) then work even when Settings is already on screen and
+  // wouldn't remount. `replace` keeps tab switching out of the back-button history.
+  const requestedTab = searchParams.get('tab')
+  const tab = TAB_VALUES.includes(requestedTab) ? requestedTab : DEFAULT_TAB
+
+  const handleTabChange = (nextTab) => {
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.set('tab', nextTab)
+    setSearchParams(nextParams, { replace: true })
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-6">
@@ -35,13 +41,14 @@ export function SettingsScreen() {
         <p className="text-sm text-fg-muted">{t('settings.subtitle')}</p>
       </div>
 
-      <Tabs value={tab} onValueChange={setTab}>
+      <Tabs value={tab} onValueChange={handleTabChange}>
         <TabsList>
           <TabsTrigger value="account">{t('settings.myAccount')}</TabsTrigger>
           <TabsTrigger value="privacy">{t('privacy.title')}</TabsTrigger>
           <TabsTrigger value="voice">{t('voice.title')}</TabsTrigger>
           <TabsTrigger value="servers">{t('settings.servers')}</TabsTrigger>
           <TabsTrigger value="billing">{t('billing.title')}</TabsTrigger>
+          <TabsTrigger value="stars">{t('stars.title')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="account">
@@ -53,6 +60,9 @@ export function SettingsScreen() {
             </div>
             <div className="max-w-md border-t border-border-subtle pt-6">
               <TwoFactorSection />
+            </div>
+            <div className="max-w-md border-t border-border-subtle pt-6">
+              <AppearanceSection />
             </div>
             <div className="max-w-md border-t border-border-subtle pt-6">
               <PreferencesSection />
@@ -79,6 +89,9 @@ export function SettingsScreen() {
         </TabsContent>
         <TabsContent value="billing">
           <BillingSettingsSection />
+        </TabsContent>
+        <TabsContent value="stars">
+          <StarsSettingsSection />
         </TabsContent>
       </Tabs>
     </div>

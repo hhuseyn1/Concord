@@ -1,11 +1,39 @@
 /*
  * Concord design tokens - Tailwind v4 CSS-first theme.
  *
- * This app is dark-first (Discord-inspired). Every color/shadow token below is
- * defined once inside `@theme` using its DARK value as the default, and a
- * `@media (prefers-color-scheme: light)` block further down overrides the
- * subset of tokens that actually change in light mode (type scale, spacing,
- * radii and motion are theme-invariant, so they're only declared once).
+ * THEME SELECTION
+ * ---------------
+ * The active theme is chosen by a `data-theme="dark"|"light"` attribute on
+ * `<html>`, written before React mounts by the inline script in `index.html`
+ * (same localStorage key as `src/lib/theme.js`: `concord.theme`) so there's no
+ * flash of the wrong theme. Every color/shadow token is defined once inside
+ * `@theme` using its DARK value as the default; the two light blocks at the
+ * bottom of this file override the subset that actually changes:
+ *
+ *   1. `:root[data-theme='light']`            - the explicit, user-chosen theme.
+ *   2. `@media (prefers-color-scheme: light)` +
+ *      `:root:not([data-theme='dark'])`       - belt-and-suspenders fallback so a
+ *      light-preferring OS still gets light colors if JS never runs. The inline
+ *      script is authoritative whenever a choice exists (it always writes an
+ *      explicit `data-theme`, so `[data-theme='dark']` opts back out of this).
+ *
+ * Those two blocks are intentionally literal duplicates of one another - CSS has
+ * no way to share one declaration block between a selector and a media query,
+ * and duplication is easier to audit than an indirection layer. KEEP THEM IN
+ * SYNC: any value edited in one must be edited in the other.
+ *
+ * Type scale, spacing, radii and motion are theme-invariant, so they're only
+ * declared once.
+ *
+ * FONT SCALE (accessibility)
+ * --------------------------
+ * `--font-scale` (set from a `data-font-size` attribute on `<html>`, see
+ * `src/lib/fontSize.js`) multiplies every `--text-*` step and its line-height,
+ * and nothing else. Deliberately NOT a root `font-size` change: Tailwind's
+ * spacing/sizing scale is rem-based, so rescaling the root would resize every
+ * padding, gap, icon and fixed height in the app and break layouts. Scaling only
+ * the type scale grows text (and the rows/buttons whose height is text + fixed
+ * padding) and leaves the rest of the layout intact.
  *
  * Anything declared under `--color-*`, `--text-*`, `--font-*`, `--spacing`,
  * `--radius-*`, `--shadow-*` and `--ease-*` is a recognized Tailwind v4 theme
@@ -15,55 +43,76 @@
 
 @theme {
   /* ---------------------------------------------------------------------
-   * Surfaces (elevation) - rail is darkest, sidebar one step lighter,
-   * base (message area) lighter still, floating (modal/popover/tooltip)
-   * distinct again - paired with `--shadow-*` to "pop" off the page.
+   * Surfaces (elevation) - Discord-inspired. In DARK the rail is the darkest
+   * strip, sidebar one step lighter, base (message area) lighter still, and
+   * floating surfaces (modal/popover/tooltip) go *darker* again, paired with
+   * `--shadow-*` to "pop" off the page. In light mode the elevation direction
+   * flips and floating surfaces go lighter, toward white (see the light
+   * blocks at the bottom) - that's intentional, not a mistake.
    * --------------------------------------------------------------------- */
-  --color-surface-rail: #17131f;
-  --color-surface-sidebar: #1e1929;
-  --color-surface-base: #262032;
-  --color-surface-floating: #120e19;
+  --color-surface-rail: #1e1f22;
+  --color-surface-sidebar: #2b2d31;
+  --color-surface-base: #313338;
+  --color-surface-floating: #1e1f22;
+  /* Inputs read as "recessed" wells rather than as another panel, so they get
+   * their own surface instead of borrowing the sidebar's. */
+  --color-surface-input: #1e1f22;
 
   /* Borders */
-  --color-border-default: #33303e;
-  --color-border-subtle: #262330;
+  --color-border-default: #3f4147;
+  /* A lower-contrast divider - blended from `border-default` toward
+   * `surface-sidebar` so it still separates rows without drawing the eye. */
+  --color-border-subtle: #35373c;
 
   /* ---------------------------------------------------------------------
-   * Foreground / text
+   * Foreground / text - three tiers: `default` (primary copy), `muted`
+   * (secondary), `faint` (timestamps and least-important metadata).
    * --------------------------------------------------------------------- */
-  --color-fg-default: #dcdbe3;
-  --color-fg-muted: #948f9e;
-  --color-fg-link: #c084fc;
-  --color-fg-heading: #f5f3f9;
-  --color-fg-on-brand: #1a1625;
+  --color-fg-default: #f2f3f5;
+  --color-fg-muted: #b5bac1;
+  --color-fg-faint: #949ba4;
+  /* Blurple links on dark surfaces are Discord's own convention, but raw
+   * `--color-brand` (#5865f2) is only 2.74:1 on `surface-base` - well under
+   * WCAG AA. Lightened along the same hue to 5.03:1 on `surface-base`
+   * (6.56:1 on `surface-floating`); visually still unmistakably blurple. */
+  --color-fg-link: #949cf7;
+  --color-fg-heading: #ffffff;
+  /* White reads correctly on the blurple brand fill in BOTH themes
+   * (#ffffff on #5865f2 = 4.61:1), unlike the old light-violet brand. */
+  --color-fg-on-brand: #ffffff;
   --color-fg-on-danger: #ffffff;
 
   /* ---------------------------------------------------------------------
-   * Brand / accent - a violet identity distinct from Discord's blurple,
-   * built on the seeded `#aa3bff` (light) / `#c084fc` (dark) accents.
+   * Brand / accent - Concord's blurple identity, identical in both themes.
    * --------------------------------------------------------------------- */
-  --color-brand: #c084fc;
-  --color-brand-hover: #d1a3fd;
-  --color-brand-pressed: #a855f7;
-  --color-brand-bg: rgb(192 132 252 / 15%);
+  --color-brand: #5865f2;
+  --color-brand-hover: #4752c4;
+  --color-brand-pressed: #3c45a5;
+  --color-brand-bg: rgb(88 101 242 / 18%);
+
+  /* Secondary accent - a cyan used purely as a companion hue in decorative
+   * landing-page gradients/orbs and illustrative avatar tints. Kept as a
+   * token so those surfaces track the theme instead of hardcoding a hex. */
+  --color-accent: #47bfff;
+  --color-accent-bg: rgb(71 191 255 / 18%);
 
   /* ---------------------------------------------------------------------
    * Semantic colors - text/icon tone + background tint (for badges,
-   * banners) per status, matching the old `--accent-bg` tint pattern.
-   * `-solid` variants are theme-invariant, high-contrast fills for solid
-   * buttons (e.g. the Button `danger` variant).
+   * banners) per status. `-solid` variants are theme-invariant,
+   * high-contrast fills for solid buttons (e.g. the Button `danger`
+   * variant), so they're only declared here.
    * --------------------------------------------------------------------- */
-  --color-danger: #f87171;
-  --color-danger-bg: rgb(248 113 113 / 15%);
-  --color-danger-solid: #dc2626;
-  --color-danger-solid-hover: #b91c1c;
-  --color-danger-solid-pressed: #991b1b;
+  --color-danger: #f23f42;
+  --color-danger-bg: rgb(242 63 66 / 15%);
+  --color-danger-solid: #da373c;
+  --color-danger-solid-hover: #a12828;
+  --color-danger-solid-pressed: #8b1d1d;
 
-  --color-success: #4ade80;
-  --color-success-bg: rgb(74 222 128 / 15%);
+  --color-success: #23a559;
+  --color-success-bg: rgb(35 165 89 / 15%);
 
-  --color-warning: #fbbf24;
-  --color-warning-bg: rgb(251 191 36 / 15%);
+  --color-warning: #f0b232;
+  --color-warning-bg: rgb(240 178 50 / 15%);
 
   --color-info: #60a5fa;
   --color-info-bg: rgb(96 165 250 / 15%);
@@ -73,11 +122,12 @@
    * Idle / DoNotDisturb / Invisible / Offline. Invisible has no dot color of
    * its own - it renders identically to Offline everywhere except the
    * status *picker* itself (the whole point is looking offline to others).
-   * Theme-invariant so a status dot reads the same regardless of light/dark.
+   * Theme-invariant so a status dot reads the same regardless of light/dark;
+   * hues aligned with the success/warning/danger family above.
    * --------------------------------------------------------------------- */
-  --color-presence-online: #3ba55d;
+  --color-presence-online: #23a559;
   --color-presence-idle: #f0b232;
-  --color-presence-dnd: #ed4245;
+  --color-presence-dnd: #f23f42;
   --color-presence-offline: #80848e;
 
   /* ---------------------------------------------------------------------
@@ -86,22 +136,28 @@
   --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, Consolas, monospace;
 
-  /* 2xs is an extra step below the requested xs–2xl range, used for
-   * timestamps/metadata that need to read even smaller than `xs`. */
-  --text-2xs: 0.6875rem; /* 11px */
-  --text-2xs--line-height: 0.875rem;
-  --text-xs: 0.75rem; /* 12px - timestamps / metadata */
-  --text-xs--line-height: 1rem;
-  --text-sm: 0.8125rem; /* 13px - UI labels, secondary text */
-  --text-sm--line-height: 1.125rem;
-  --text-base: 0.9375rem; /* 15px - message body text */
-  --text-base--line-height: 1.375rem;
-  --text-lg: 1.0625rem; /* 17px */
-  --text-lg--line-height: 1.5rem;
-  --text-xl: 1.25rem; /* 20px - section headings */
-  --text-xl--line-height: 1.75rem;
-  --text-2xl: 1.5rem; /* 24px - page/modal headings */
-  --text-2xl--line-height: 2rem;
+  /* Every step is `calc(<base rem> * var(--font-scale))` so the user's
+   * font-size preference scales the whole type ramp (and its line-heights)
+   * proportionally, everywhere `text-sm`/`text-base`/... is already used,
+   * without touching spacing/icon/radius tokens. The px comments below are
+   * the sizes at the default scale (1).
+   *
+   * 2xs is an extra step below the xs-2xl range, used for timestamps and
+   * metadata that need to read even smaller than `xs`. */
+  --text-2xs: calc(0.6875rem * var(--font-scale)); /* 11px */
+  --text-2xs--line-height: calc(0.875rem * var(--font-scale));
+  --text-xs: calc(0.75rem * var(--font-scale)); /* 12px - timestamps / metadata */
+  --text-xs--line-height: calc(1rem * var(--font-scale));
+  --text-sm: calc(0.8125rem * var(--font-scale)); /* 13px - UI labels, secondary text */
+  --text-sm--line-height: calc(1.125rem * var(--font-scale));
+  --text-base: calc(0.9375rem * var(--font-scale)); /* 15px - message body text */
+  --text-base--line-height: calc(1.375rem * var(--font-scale));
+  --text-lg: calc(1.0625rem * var(--font-scale)); /* 17px */
+  --text-lg--line-height: calc(1.5rem * var(--font-scale));
+  --text-xl: calc(1.25rem * var(--font-scale)); /* 20px - section headings */
+  --text-xl--line-height: calc(1.75rem * var(--font-scale));
+  --text-2xl: calc(1.5rem * var(--font-scale)); /* 24px - page/modal headings */
+  --text-2xl--line-height: calc(2rem * var(--font-scale));
 
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -123,13 +179,16 @@
   --radius-full: 9999px; /* avatars, chips, pills */
 
   /* ---------------------------------------------------------------------
-   * Shadows - elevation scale for popovers/modals/tooltips.
+   * Shadows - elevation scale for popovers/modals/tooltips. Opacity-based
+   * black, eased back slightly from the old palette because the new
+   * `surface-base` (#313338) is a lighter grey than the old near-black
+   * violet, which made the previous values read as heavy smudges.
    * --------------------------------------------------------------------- */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 40%);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 30%);
   --shadow-md:
-    0 4px 6px -2px rgb(0 0 0 / 35%), 0 10px 15px -3px rgb(0 0 0 / 45%);
+    0 4px 6px -2px rgb(0 0 0 / 28%), 0 10px 15px -3px rgb(0 0 0 / 36%);
   --shadow-lg:
-    0 10px 15px -3px rgb(0 0 0 / 50%), 0 20px 25px -5px rgb(0 0 0 / 55%);
+    0 10px 15px -3px rgb(0 0 0 / 40%), 0 20px 25px -5px rgb(0 0 0 / 45%);
 
   /* ---------------------------------------------------------------------
    * Motion - subtle, not decorative. `--duration-*` aren't a Tailwind
@@ -244,39 +303,142 @@
   }
 }
 
+/* -----------------------------------------------------------------------
+ * Font scale - `--font-scale` multiplies the `--text-*` ramp above (and
+ * nothing else). `data-font-size` is written to <html> before React mounts by
+ * the inline script in index.html, and kept in sync at runtime by
+ * `src/lib/fontSize.js` (localStorage key `concord.fontSize`).
+ *
+ * Ratios are relative to the 14px-equivalent default body step, so the labels
+ * shown in Settings ("Small (13px)", "Large (16px)", ...) stay honest.
+ * ----------------------------------------------------------------------- */
+:root {
+  --font-scale: 1;
+}
+
+:root[data-font-size='small'] {
+  --font-scale: 0.9286; /* 13/14 */
+}
+:root[data-font-size='default'] {
+  --font-scale: 1; /* 14 */
+}
+:root[data-font-size='large'] {
+  --font-scale: 1.1429; /* 16/14 */
+}
+:root[data-font-size='xl'] {
+  --font-scale: 1.2857; /* 18/14 */
+}
+
+/* Keep native UI (form controls, scrollbars, autofill) on the same side as the
+ * explicitly chosen theme. Without an attribute, the `color-scheme: dark light`
+ * in the base reset lets the OS preference decide, which matches the fallback
+ * block below. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+/* -----------------------------------------------------------------------
+ * LIGHT THEME (1/2) - explicit user choice.
+ * Hand-tuned per token, NOT a mechanical inversion of the dark values.
+ * Mirror every edit into the `prefers-color-scheme` block below.
+ * ----------------------------------------------------------------------- */
+:root[data-theme='light'] {
+  --color-surface-rail: #e3e5e8;
+  --color-surface-sidebar: #e3e5e8;
+  --color-surface-base: #f2f3f5;
+  /* Elevation flips in light mode: elevated surfaces go lighter, toward
+   * white (Discord's own behaviour, and standard Material-style elevation). */
+  --color-surface-floating: #ffffff;
+  --color-surface-input: #ebedef;
+
+  --color-border-default: #d4d7dc;
+  --color-border-subtle: #e3e5e8;
+
+  --color-fg-default: #1e1f22;
+  --color-fg-muted: #4e5058;
+  --color-fg-faint: #747f8d;
+  /* Do NOT reuse raw `--color-brand` here: #5865f2 is only 4.15:1 on
+   * `surface-base` / 4.61:1 on white, i.e. under (or barely at) WCAG AA's
+   * 4.5:1 for normal text. `--color-brand-hover` (#4752c4) is the same hue at
+   * 5.78:1 on `surface-base` and 6.42:1 on `surface-floating`. */
+  --color-fg-link: #4752c4;
+  --color-fg-heading: #060607;
+  --color-fg-on-brand: #ffffff;
+  --color-fg-on-danger: #ffffff;
+
+  /* Brand identity is deliberately identical across themes. */
+  --color-brand: #5865f2;
+  --color-brand-hover: #4752c4;
+  --color-brand-pressed: #3c45a5;
+  --color-brand-bg: rgb(88 101 242 / 10%);
+
+  --color-accent: #0f7cb8;
+  --color-accent-bg: rgb(15 124 184 / 10%);
+
+  --color-danger: #d83c3e;
+  --color-danger-bg: rgb(216 60 62 / 10%);
+
+  --color-success: #248046;
+  --color-success-bg: rgb(36 128 70 / 10%);
+
+  /* Amber-gold; reserved for icons, badge fills and borders rather than long
+   * runs of body copy (2.96:1 on `surface-base`). */
+  --color-warning: #c47f00;
+  --color-warning-bg: rgb(196 127 0 / 10%);
+
+  --color-info: #2563eb;
+  --color-info-bg: rgb(37 99 235 / 10%);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 6%);
+  --shadow-md:
+    0 4px 6px -2px rgb(0 0 0 / 5%), 0 10px 15px -3px rgb(0 0 0 / 10%);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 10%), 0 20px 25px -5px rgb(0 0 0 / 12%);
+}
+
+/* -----------------------------------------------------------------------
+ * LIGHT THEME (2/2) - system-preference fallback for the pre-first-visit /
+ * no-JS case. `:not([data-theme='dark'])` means an explicit dark choice always
+ * wins. Literal duplicate of the block above - keep the two in sync.
+ * ----------------------------------------------------------------------- */
 @media (prefers-color-scheme: light) {
-  :root {
-    --color-surface-rail: #e3ddec;
-    --color-surface-sidebar: #eee9f5;
-    --color-surface-base: #ffffff;
-    --color-surface-floating: #fbfaff;
+  :root:not([data-theme='dark']) {
+    --color-surface-rail: #e3e5e8;
+    --color-surface-sidebar: #e3e5e8;
+    --color-surface-base: #f2f3f5;
+    --color-surface-floating: #ffffff;
+    --color-surface-input: #ebedef;
 
-    --color-border-default: #e5e4e7;
-    --color-border-subtle: #efeef2;
+    --color-border-default: #d4d7dc;
+    --color-border-subtle: #e3e5e8;
 
-    --color-fg-default: #4a4453;
-    --color-fg-muted: #6b6375;
-    --color-fg-link: #a229ff;
-    --color-fg-heading: #08060d;
+    --color-fg-default: #1e1f22;
+    --color-fg-muted: #4e5058;
+    --color-fg-faint: #747f8d;
+    --color-fg-link: #4752c4;
+    --color-fg-heading: #060607;
     --color-fg-on-brand: #ffffff;
     --color-fg-on-danger: #ffffff;
 
-    /* #aa3bff (the seed accent) is only 4.39:1 on white - just under WCAG AA's 4.5:1 for normal
-     * text - since it doubles as both link-text color and the fg-on-brand/bg-brand button pairing.
-     * Darkened slightly along the same hue to 4.89:1; visually near-identical, same brand hue. */
-    --color-brand: #a229ff;
-    --color-brand-hover: #9526e8;
-    --color-brand-pressed: #7f1fc7;
-    --color-brand-bg: rgb(170 59 255 / 10%);
+    --color-brand: #5865f2;
+    --color-brand-hover: #4752c4;
+    --color-brand-pressed: #3c45a5;
+    --color-brand-bg: rgb(88 101 242 / 10%);
 
-    --color-danger: #dc2626;
-    --color-danger-bg: rgb(220 38 38 / 10%);
+    --color-accent: #0f7cb8;
+    --color-accent-bg: rgb(15 124 184 / 10%);
 
-    --color-success: #16a34a;
-    --color-success-bg: rgb(22 163 74 / 10%);
+    --color-danger: #d83c3e;
+    --color-danger-bg: rgb(216 60 62 / 10%);
 
-    --color-warning: #b45309;
-    --color-warning-bg: rgb(180 83 9 / 10%);
+    --color-success: #248046;
+    --color-success-bg: rgb(36 128 70 / 10%);
+
+    --color-warning: #c47f00;
+    --color-warning-bg: rgb(196 127 0 / 10%);
 
     --color-info: #2563eb;
     --color-info-bg: rgb(37 99 235 / 10%);

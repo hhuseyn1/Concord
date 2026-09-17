@@ -1,4 +1,5 @@
 import { Bell, MessageCircle, Smartphone, Users } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Reveal } from './Reveal'
 
 // Unset (the default) keeps the existing disabled "Coming soon" state - set this once a build
@@ -7,16 +8,14 @@ import { Reveal } from './Reveal'
 const ANDROID_APK_URL = import.meta.env.VITE_ANDROID_APK_URL
 
 export function MobileAppSection() {
+  const { t } = useTranslation()
   const apkUrl = ANDROID_APK_URL
   return (
     <section className="bg-surface-sidebar py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         <Reveal className="order-2 lg:order-1">
-          <h2 className="text-3xl font-bold text-fg-heading sm:text-4xl">Stay connected wherever you go.</h2>
-          <p className="mt-4 max-w-md text-lg text-fg-muted">
-            The Concord mobile app brings your servers, DMs, and calls to Android - so you're never far from your
-            community.
-          </p>
+          <h2 className="text-3xl font-bold text-fg-heading sm:text-4xl">{t('landing.mobileApp.title')}</h2>
+          <p className="mt-4 max-w-md text-lg text-fg-muted">{t('landing.mobileApp.description')}</p>
 
           <div className="mt-8">
             {apkUrl ? (
@@ -27,8 +26,8 @@ export function MobileAppSection() {
               >
                 <Smartphone className="size-6 shrink-0 text-fg-muted" aria-hidden="true" />
                 <span>
-                  <span className="block text-sm font-semibold text-fg-default">Download Android App</span>
-                  <span className="block text-xs text-fg-muted">APK, Android 8.0+</span>
+                  <span className="block text-sm font-semibold text-fg-default">{t('landing.mobileApp.downloadAndroid')}</span>
+                  <span className="block text-xs text-fg-muted">{t('landing.mobileApp.apkHint')}</span>
                 </span>
               </a>
             ) : (
@@ -36,13 +35,13 @@ export function MobileAppSection() {
                 type="button"
                 disabled
                 aria-disabled="true"
-                title="The Android app isn't published yet - check back soon."
+                title={t('landing.mobileApp.comingSoonTitle')}
                 className="inline-flex cursor-not-allowed items-center gap-3 rounded-md border border-border-default bg-surface-base px-5 py-3 text-left opacity-70"
               >
                 <Smartphone className="size-6 shrink-0 text-fg-muted" aria-hidden="true" />
                 <span>
-                  <span className="block text-sm font-semibold text-fg-default">Download Android App</span>
-                  <span className="block text-xs text-fg-muted">Coming soon</span>
+                  <span className="block text-sm font-semibold text-fg-default">{t('landing.mobileApp.downloadAndroid')}</span>
+                  <span className="block text-xs text-fg-muted">{t('landing.mobileApp.comingSoon')}</span>
                 </span>
               </button>
             )}

@@ -20,6 +20,8 @@ import {
   RegisterScreen,
   ResetPasswordScreen,
   SettingsScreen,
+  StarsPurchaseCancelScreen,
+  StarsPurchaseSuccessScreen,
   VerifyEmailScreen,
 } from './routeLazy'
 import { withSuspense } from './withSuspense'
@@ -59,6 +61,10 @@ export const router = createBrowserRouter([
           { path: 'settings', element: withSuspense(<SettingsScreen />) },
           { path: 'checkout/success', element: withSuspense(<CheckoutSuccessScreen />) },
           { path: 'checkout/cancel', element: withSuspense(<CheckoutCancelScreen />) },
+          // Stripe `StarsSuccessUrl` / `StarsCancelUrl` targets - see
+          // `features/stars/starsRoutes.js`.
+          { path: 'stars/purchase/success', element: withSuspense(<StarsPurchaseSuccessScreen />) },
+          { path: 'stars/purchase/cancel', element: withSuspense(<StarsPurchaseCancelScreen />) },
         ],
       },
     ],

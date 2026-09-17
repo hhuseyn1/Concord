@@ -242,7 +242,7 @@ export function MessageItem({
               </button>
             </ProfilePopover>
             <Tooltip content={formatAbsoluteTimestamp(message.Created)}>
-              <span className="shrink-0 text-xs text-fg-muted">{formatGroupTimestamp(message.Created)}</span>
+              <span className="shrink-0 text-xs text-fg-faint">{formatGroupTimestamp(message.Created)}</span>
             </Tooltip>
           </div>
         )}

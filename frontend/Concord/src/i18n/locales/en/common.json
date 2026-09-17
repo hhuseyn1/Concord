@@ -79,6 +79,23 @@
     "deleteAccountSuccessToastTitle": "Your account has been deleted.",
     "deleteAccountSuccessToastDescription": "Log back in within 30 days to cancel the deletion."
   },
+  "appearance": {
+    "title": "Appearance",
+    "description": "Theme and text size are saved on this device.",
+    "theme": "Theme",
+    "darkActive": "Dark mode is on.",
+    "lightActive": "Light mode is on.",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode",
+    "fontSize": "Text size",
+    "fontSizeHint": "Makes text across Concord bigger or smaller. Spacing and layout stay the same.",
+    "fontSizeSmall": "Small ({{px}}px)",
+    "fontSizeDefault": "Default ({{px}}px)",
+    "fontSizeLarge": "Large ({{px}}px)",
+    "fontSizeExtraLarge": "Extra large ({{px}}px)",
+    "fontSizePreview": "This is how your messages will look.",
+    "fontSizePreviewMeta": "And this is how timestamps and other small details will look."
+  },
   "billing": {
     "title": "Billing",
     "premiumTitle": "Concord Premium",
@@ -116,6 +133,110 @@
     "perksReminderTitle": "Your Premium perks",
     "pastDueTitle": "Your last payment failed",
     "pastDueDescription": "Update your payment method to keep your Premium perks."
+  },
+  "stars": {
+    "title": "Stars",
+    "unit": "Stars",
+    "amountWithUnit": "{{amount}} Stars",
+    "balanceLabel": "Your balance",
+    "earnHint": "Earn {{amount}} Stars for every message you send, up to {{cap}} Stars a day, with a {{seconds}}s wait between rewards.",
+    "sendStars": "Send Stars",
+    "loadErrorTitle": "Couldn't load your Stars",
+    "loadErrorDescription": "Something went wrong reaching your wallet. Please try again.",
+    "indicator": {
+      "tooltip": "{{amount}} Stars - open your Stars settings",
+      "ariaLabel": "Stars balance: {{amount}}. Open Stars settings"
+    },
+    "send": {
+      "title": "Send Stars",
+      "description": "Send Stars from your balance to a friend. Transfers are instant and can't be undone.",
+      "recipientLabel": "Send to",
+      "searchPlaceholder": "Search friends",
+      "noFriends": "No friends yet",
+      "noFriendsDescription": "Stars can only be sent to friends - add someone first.",
+      "noMatches": "No friends match “{{query}}”.",
+      "friendsErrorTitle": "Couldn't load your friends",
+      "friendsErrorDescription": "Something went wrong. Please try again.",
+      "loadMoreFriends": "Load more friends",
+      "amountLabel": "Amount",
+      "amountHint": "You have {{balance}} Stars available.",
+      "noBalance": "You'll need to earn or buy Stars before you can send any.",
+      "submit": "Send",
+      "back": "Back",
+      "errorNoRecipient": "Choose a friend to send Stars to.",
+      "errorAmountRequired": "Enter how many Stars you want to send.",
+      "errorAmountPositive": "Enter a whole number of Stars greater than zero.",
+      "errorAmountTooLarge": "You only have {{balance}} Stars.",
+      "errorSelf": "You can't send Stars to yourself.",
+      "confirmTitle": "Confirm this transfer",
+      "confirmDescription": "You're about to send {{amount}} Stars to {{name}}. This can't be undone.",
+      "confirmBalanceAfter": "Your balance afterwards: {{balance}} Stars.",
+      "confirmAction": "Send {{amount}} Stars",
+      "successTitle": "Stars sent",
+      "successDescription": "{{amount}} Stars are on their way to {{name}}."
+    },
+    "trial": {
+      "sectionTitle": "Premium trial",
+      "title": "Try Premium with Stars",
+      "description": "Spend {{cost}} Stars to unlock Concord Premium for {{days}} days.",
+      "action": "Try Premium",
+      "activeBadge": "Trial active",
+      "expiresOn": "Your Premium trial runs until {{date}}.",
+      "alreadyPremium": "You already have Premium, so there's no need to spend Stars on a trial.",
+      "insufficient": "You need {{missing}} more Stars to start the trial.",
+      "confirmTitle": "Start your Premium trial?",
+      "confirmDescription": "{{cost}} Stars will be deducted right away and you'll get {{days}} days of Premium.",
+      "confirmBalanceAfter": "Your balance afterwards: {{balance}} Stars.",
+      "confirmAction": "Spend {{cost}} Stars",
+      "successTitle": "Premium trial started",
+      "successDescription": "You have Premium until {{date}}."
+    },
+    "packages": {
+      "title": "Buy Stars",
+      "description": "Top up your balance through Stripe's secure checkout.",
+      "starsLabel": "One-time top-up",
+      "buyAriaLabel": "Buy {{stars}} Stars for {{price}}",
+      "empty": "No Stars packages are available right now."
+    },
+    "history": {
+      "title": "Recent activity",
+      "empty": "No Stars activity yet",
+      "emptyDescription": "Send messages to start earning Stars.",
+      "errorTitle": "Couldn't load your Stars history",
+      "loadMore": "Load more",
+      "balanceAfter": "Balance: {{balance}}",
+      "chatReward": "Chat reward",
+      "receivedFrom": "Received from {{name}}",
+      "sentTo": "Sent to {{name}}",
+      "premiumTrial": "Premium trial",
+      "packagePurchase": "Stars purchase",
+      "unknown": "Stars adjustment"
+    },
+    "purchase": {
+      "confirmingTitle": "Confirming your purchase…",
+      "confirmingSubtitle": "Hang tight, this will just take a moment.",
+      "successTitle": "Stars added!",
+      "successSubtitle": "Your new Stars are in your balance. Taking you back to Stars…",
+      "failedTitle": "That purchase didn't go through",
+      "failedSubtitle": "You haven't been charged. You can try buying Stars again from Settings.",
+      "timeoutTitle": "This is taking longer than expected",
+      "timeoutSubtitle": "We couldn't confirm your purchase in time. Check your balance in a moment, or try again.",
+      "missingTitle": "This purchase link is invalid",
+      "missingSubtitle": "Try buying Stars again from Settings.",
+      "canceledTitle": "Purchase canceled",
+      "canceledDescription": "You haven't been charged. You can buy Stars any time from Settings.",
+      "backToStars": "Back to Stars"
+    },
+    "errors": {
+      "network": "Can't reach the server. Check your connection.",
+      "rateLimited": "Too many attempts. Please wait a moment and try again.",
+      "notFriends": "You can only send Stars to your friends.",
+      "recipientNotFound": "We couldn't find that person - they may have deleted their account.",
+      "insufficientBalance": "You don't have enough Stars for that.",
+      "transferInvalid": "Check the amount and who you're sending to, then try again.",
+      "trialAlreadyActive": "Your Premium trial is already active.",
+      "packageNotFound": "That Stars package isn't available any more."
+    }
   },
   "sessions": {
     "thisDevice": "This device",
@@ -557,5 +678,140 @@
     "reasonHint": "Required - describe why you're reporting this.",
     "submit": "Submit Report",
     "submitted": "Report submitted"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "faq": "FAQ",
+      "contact": "Contact",
+      "logIn": "Log In",
+      "register": "Register",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "hero": {
+      "eyebrow": "Real-time chat, voice & video - all in one place",
+      "titleLine1": "Your community,",
+      "titleHighlight": "always in sync.",
+      "description": "Concord is where your people hang out - servers and channels for your communities, instant messaging, crystal-clear voice & video, and presence that keeps everyone in the loop.",
+      "getStarted": "Get Started",
+      "logIn": "Log In"
+    },
+    "features": {
+      "title": "Everything your community needs",
+      "description": "Concord bundles the essentials - chat, voice, video, and moderation - into one focused app.",
+      "items": {
+        "messaging": {
+          "title": "Real-time messaging",
+          "description": "Instant text chat in every channel and DM, powered by live SignalR connections - no refreshing, ever."
+        },
+        "servers": {
+          "title": "Servers & channels",
+          "description": "Create a server for your community, organize it into text and voice channels, and invite people in."
+        },
+        "calls": {
+          "title": "Voice & video calls",
+          "description": "Jump into a voice channel or start a video call with a friend - talk face to face, no extra app needed."
+        },
+        "presence": {
+          "title": "Live presence",
+          "description": "See who's online, idle, or busy at a glance, so you always know who's around to talk."
+        },
+        "mentions": {
+          "title": "Mentions & notifications",
+          "description": "Ping someone with @mentions and get notified the moment something needs your attention."
+        },
+        "search": {
+          "title": "Global search",
+          "description": "Find any message across your servers and conversations in seconds."
+        },
+        "moderation": {
+          "title": "Roles & moderation",
+          "description": "Fine-grained per-server roles and permissions, plus kick, ban, timeout, and mute tools for your mods."
+        },
+        "profiles": {
+          "title": "Profiles you control",
+          "description": "A custom avatar, username, and status that travel with you across every server."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Get started in four steps",
+      "description": "From sign-up to your first conversation, in minutes.",
+      "stepLabel": "Step {{number}}",
+      "steps": {
+        "createAccount": {
+          "title": "Create an account",
+          "description": "Sign up with your email in under a minute - no downloads required to get started."
+        },
+        "joinCommunity": {
+          "title": "Join or create a community",
+          "description": "Use an invite link to join a server, or start your own and set it up exactly how you want."
+        },
+        "startCommunicating": {
+          "title": "Start communicating",
+          "description": "Chat in text channels, share files, and mention the people you need to reach."
+        },
+        "connect": {
+          "title": "Connect with others",
+          "description": "Add friends, send direct messages, and hop on voice or video whenever you want to talk live."
+        }
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "description": "Everything you need to know before you jump in.",
+      "items": {
+        "whatIsConcord": {
+          "question": "What is Concord?",
+          "answer": "Concord is a real-time chat platform for communities. Create or join a server, organize it into text and voice channels, and talk with your people through messages, voice, and video."
+        },
+        "gettingStarted": {
+          "question": "How do I get started?",
+          "answer": "Register for a free account, then either join a server through an invite link or create your own. You can start chatting right away."
+        },
+        "voiceVideo": {
+          "question": "Can I talk with voice and video, not just text?",
+          "answer": "Yes. Join any voice channel in a server for live audio, or start a video call directly with a friend from a direct message."
+        },
+        "security": {
+          "question": "How is my account kept secure?",
+          "answer": "You can enable two-factor authentication for an extra layer of protection, and sign in on a new device by scanning a QR code from an already-logged-in session."
+        },
+        "moderation": {
+          "question": "Can I moderate my own community?",
+          "answer": "Yes. Server owners can create custom roles with fine-grained permissions, and moderators can kick, ban, time out, or mute members as needed."
+        },
+        "mobileApp": {
+          "question": "Is there a mobile app?",
+          "answer": "A dedicated Android app is on the way. It's in its final stages, and we'll add the download link here as soon as it's ready."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Ready to jump in?",
+      "description": "Create your account and start talking with your community in minutes.",
+      "register": "Register",
+      "logIn": "Log In"
+    },
+    "footer": {
+      "tagline": "Real-time messaging, voice & video, and communities - all in one place.",
+      "product": "Product",
+      "account": "Account",
+      "mobile": "Mobile",
+      "logIn": "Log In",
+      "register": "Register",
+      "androidComingSoon": "Android app - coming soon",
+      "copyright": "© {{year}} Concord. All rights reserved."
+    },
+    "mobileApp": {
+      "title": "Stay connected wherever you go.",
+      "description": "The Concord mobile app brings your servers, DMs, and calls to Android - so you're never far from your community.",
+      "downloadAndroid": "Download Android App",
+      "apkHint": "APK, Android 8.0+",
+      "comingSoon": "Coming soon",
+      "comingSoonTitle": "The Android app isn't published yet - check back soon."
+    }
   }
 }

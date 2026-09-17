@@ -220,7 +220,7 @@ export function MessageComposer({ serverId, channelId, onSent, onTyping, onStopT
         </div>
       )}
 
-      <div className="relative flex items-end gap-2 rounded-md border border-border-default bg-surface-sidebar px-2 py-1.5 focus-within:border-brand">
+      <div className="relative flex items-end gap-2 rounded-md border border-border-default bg-surface-input px-2 py-1.5 focus-within:border-brand">
         {mention.isOpen && (
           <MentionAutocomplete suggestions={mention.suggestions} activeIndex={mention.activeIndex} onSelect={mention.handleSelect} />
         )}
