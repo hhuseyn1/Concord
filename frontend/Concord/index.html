@@ -2,13 +2,48 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/logo-app-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
       content="Concord is where your community hangs out - servers and channels, instant messaging, crystal-clear voice & video, and presence that keeps everyone in the loop."
     />
     <title>Concord</title>
+    <!--
+      Anti-FOUC theme/font-size bootstrap. Deliberately inline, synchronous and
+      blocking so <html> carries the right `data-theme`/`data-font-size` before
+      the first paint - otherwise the app flashes the default dark theme (and
+      default type size) for a frame on every load for light-mode users.
+
+      Keys and accepted values MUST stay in sync with src/lib/theme.js and
+      src/lib/fontSize.js, and the attributes with src/styles/tokens.css.
+    -->
+    <script>
+      (function () {
+        var root = document.documentElement
+        var theme = null
+        var fontSize = null
+
+        try {
+          theme = localStorage.getItem('concord.theme')
+          fontSize = localStorage.getItem('concord.fontSize')
+        } catch (error) {
+          /* Private mode / storage disabled - fall through to the defaults. */
+        }
+
+        if (theme !== 'dark' && theme !== 'light') {
+          // No explicit choice stored yet: match the OS on this first visit.
+          theme =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark'
+        }
+        root.setAttribute('data-theme', theme)
+
+        if (['small', 'default', 'large', 'xl'].indexOf(fontSize) === -1) fontSize = 'default'
+        root.setAttribute('data-font-size', fontSize)
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

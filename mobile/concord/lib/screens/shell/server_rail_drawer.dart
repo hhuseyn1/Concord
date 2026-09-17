@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -15,6 +14,7 @@ class ServerRailDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final serversAsync = ref.watch(myServersProvider);
     final currentServerId = GoRouterState.of(context).pathParameters['serverId'];
@@ -33,7 +33,9 @@ class ServerRailDrawer extends ConsumerWidget {
                 Navigator.of(context).pop();
                 context.go('/');
               },
-              child: SvgPicture.asset('assets/logo.svg', width: 22, height: 22),
+              // Self-contained badge asset - reads fine even when this tile's own selected-state
+              // background is filled brand-blue (see AuthLayout for the same reasoning).
+              child: Image.asset('assets/logo_badge.png', width: 32, height: 32),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
@@ -49,7 +51,7 @@ class ServerRailDrawer extends ConsumerWidget {
                   child: Text(
                     l10n.couldNotLoadServersText,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 11, color: colors.fgMuted),
+                    style: TextStyle(fontSize: type.size(11), color: colors.fgMuted),
                   ),
                 ),
                 data: (servers) => ListView(
@@ -113,7 +115,12 @@ class _RailTile extends StatelessWidget {
       message: tooltip,
       child: Center(
         child: Material(
-          color: selected ? colors.brand : colors.surfaceSidebar,
+          // Unselected tiles use `surfaceBase`, not `surfaceSidebar`: the
+          // drawer itself is `surfaceRail`, and in light mode rail and sidebar
+          // are the same value now, which would make every unselected server
+          // bubble disappear into the rail. `surfaceBase` is a step away from
+          // the rail in both themes.
+          color: selected ? colors.brand : colors.surfaceBase,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(selected ? ConcordRadii.md : ConcordRadii.full),
           ),

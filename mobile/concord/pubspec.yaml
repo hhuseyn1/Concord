@@ -86,7 +86,7 @@ flutter:
   generate: true
 
   assets:
-    - assets/logo.svg
+    - assets/logo_badge.png
     - assets/icon/app_icon.png
 
   # To add assets to your application, add an assets section, like this:

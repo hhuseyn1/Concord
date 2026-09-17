@@ -32,7 +32,10 @@ export function ServerRail() {
             )
           }
         >
-          <img src="/favicon.svg" alt="" className="size-6" aria-hidden="true" />
+          {/* Self-contained badge asset (own rounded-square + brand-blue fill baked in), not the
+            * plain icon mark - this tile's hover/active state fills its own background with
+            * `bg-brand`, and the plain mark's blue is too close to that to read against it. */}
+          <img src="/logo-app-icon.png" alt="" className="size-9 rounded-xl" aria-hidden="true" />
           <span className="sr-only">Home (Friends)</span>
         </NavLink>
       </Tooltip>
