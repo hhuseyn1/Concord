@@ -191,5 +191,3 @@ cd backend/Concord
 docker build -t shared:Local -f Dockerfile .
 docker compose --env-file .env.Local --profile db --profile backend --profile frontend up -d --build
 ```
-
-Start vercel automation command.
