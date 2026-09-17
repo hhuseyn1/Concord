@@ -10,9 +10,5 @@ public static class GlobalConstants
 
     public const int MaxPageSize = 30;
 
-    /// <summary>
-    /// How long a self-service account deletion stays cancellable (by logging back in) before
-    /// <c>CleanupBackgroundService</c> purges it permanently.
-    /// </summary>
     public const int AccountDeletionGracePeriodDays = 30;
 }

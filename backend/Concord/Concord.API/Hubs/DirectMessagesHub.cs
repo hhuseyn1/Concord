@@ -5,11 +5,6 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Concord.API.Hubs;
 
-// No groups for message delivery: a DM is always exactly 2 participants, so the controller pushes
-// directly via Clients.Users([...]) (same targeted-push pattern PresenceHub/NotificationsHub use)
-// rather than a per-conversation group like MessagesHub's Channel:{channelId}. Typing (M-03) is the
-// one thing this hub does itself rather than leaving to a controller, since it has no REST action to
-// piggyback on - it needs to resolve the other participant to target the push at.
 [Authorize]
 public class DirectMessagesHub(DirectMessagesService directMessagesService) : Hub
 {
@@ -25,7 +20,6 @@ public class DirectMessagesHub(DirectMessagesService directMessagesService) : Hu
         await Clients.User(otherUserId.Value.ToString()).SendAsync("UserTyping", new { conversationId, userId });
     }
 
-    /// <summary>Explicit "I stopped typing" (P1.3) - sent on successful message send or on leaving the conversation.</summary>
     public async Task StopTyping(Guid conversationId)
     {
         var otherUserId = await ResolveOtherParticipantAsync(conversationId);

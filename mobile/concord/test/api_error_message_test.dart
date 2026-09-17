@@ -8,11 +8,6 @@ void main() {
 
   group('apiErrorMessage', () {
     test('never leaks the underlying exception text for a network error', () {
-      // Mirrors what ApiClient actually throws when the underlying http call
-      // fails outright (no connectivity, DNS failure, connection refused,
-      // etc.) - regardless of what internal detail (host, port, "localhost")
-      // that raw text contains, the user should only ever see the friendly
-      // "can't reach the server" copy.
       const exception = ApiException(
         ApiException.networkErrorStatusCode,
         'A network error occurred.',

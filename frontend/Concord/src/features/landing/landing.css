@@ -1,7 +1,3 @@
-/*
- * Decorative motion scoped to the landing page only - kept out of the shared
- * styles/tokens.css so it can't affect anything else in the app.
- */
 
 @keyframes landing-float {
   0%,

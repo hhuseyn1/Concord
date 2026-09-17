@@ -9,8 +9,6 @@ export function AdminLayout() {
     <div className="min-h-dvh bg-surface-base">
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border-subtle bg-surface-sidebar px-4 sm:px-6">
         <div className="flex items-center gap-2">
-          {/* Self-contained badge asset - see AuthLayout.jsx for why this isn't wrapped in its
-            * own `bg-brand` span. */}
           <img src="/logo-app-icon.png" alt="" className="size-8 shrink-0 rounded-lg" aria-hidden="true" />
           <span className="text-sm font-semibold text-fg-heading">Concord</span>
         </div>

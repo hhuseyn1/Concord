@@ -14,7 +14,7 @@ public class MessagesController(MessagesService messagesService, ForwardingServi
     private readonly ForwardingService _forwardingService = forwardingService;
 
     [HttpGet]
-    public async Task<PagedResult<MessageResponse>> GetMessagesAsync(Guid channelId, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<MessageResponse>> GetMessagesAsync(Guid channelId, int page, int pageSize)
     {
         return await _messagesService.GetMessagesAsync(GetUserId(), channelId, page, pageSize);
     }

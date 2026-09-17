@@ -18,13 +18,6 @@ export function useMessagesLiveUpdates(serverId, channelId) {
     channelIdRef.current = channelId
   }, [channelId])
 
-  // Connection lifecycle is scoped to the server, not the channel: switching
-  // channels within the same server is by far the most common action, and
-  // previously tore down and recreated the whole SignalR connection (a fresh
-  // negotiate + handshake) on every click, multiplying how often a transient
-  // connect failure could surface as "Live updates disconnected". Handlers
-  // below read the current channel from channelIdRef so they stay correct
-  // across channel switches without needing to be re-subscribed.
   useEffect(() => {
     if (!serverId) return undefined
 
@@ -94,10 +87,6 @@ export function useMessagesLiveUpdates(serverId, channelId) {
       })
     })
 
-    // SignalR groups are keyed by connection id server-side, so a successful
-    // automatic reconnect (a new connection id) drops prior group membership.
-    // Rejoin whatever channel is currently open so live updates resume
-    // silently instead of the client just going quiet.
     const joinCurrentChannel = () => {
       const currentChannelId = channelIdRef.current
       if (!currentChannelId) return Promise.resolve()
@@ -140,18 +129,12 @@ export function useMessagesLiveUpdates(serverId, channelId) {
     }
   }, [queryClient, serverId])
 
-  // Reset typing state during render (React's documented pattern for state
-  // that depends on a prop) rather than in an effect, which would cause an
-  // extra cascading render.
   const [prevChannelId, setPrevChannelId] = useState(channelId)
   if (channelId !== prevChannelId) {
     setPrevChannelId(channelId)
     setTypingUserIds(new Set())
   }
 
-  // Channel membership: switch which SignalR group receives events without
-  // touching the underlying connection. Runs after the connection effect
-  // above within the same commit, so hubRef.current is already up to date.
   useEffect(() => {
     if (!channelId) return undefined
     const hub = hubRef.current
@@ -161,9 +144,6 @@ export function useMessagesLiveUpdates(serverId, channelId) {
     timeouts.clear()
 
     if (!hub || hub.connection.state !== HubConnectionState.Connected) {
-      // Not connected yet (e.g. initial mount, still negotiating) - the
-      // connection effect's own start().then() joins the current channel
-      // once it comes up, using channelIdRef.
       return undefined
     }
 

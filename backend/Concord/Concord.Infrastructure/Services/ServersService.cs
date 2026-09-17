@@ -47,9 +47,6 @@ public class ServersService(
             UserId = currentUserId
         });
 
-        // Every server needs its @everyone role from the moment it exists - PermissionService reads
-        // it as the baseline for every non-owner, so a server without one would silently grant
-        // nothing to its members.
         _context.Roles.Add(RolesService.BuildDefaultRole(server.Id));
 
         await _context.SaveChangesAsync();
@@ -114,8 +111,6 @@ public class ServersService(
         if (server is null)
             throw new ServerNotFoundException();
 
-        // P1: an active ban outranks a valid invite. Queried directly rather than through
-        // ModerationService, which depends on this class - going the other way would close a cycle.
         var isBanned = await _context.ServerBans.AnyAsync(ban =>
             ban.ServerId == invite.ServerId &&
             ban.UserId == currentUserId &&
@@ -172,8 +167,6 @@ public class ServersService(
     {
         var server = await AssertPermissionAsync(currentUserId, serverId, ServerPermission.KickMembers);
 
-        // Rejects self-targeting, targeting the owner, and targeting anyone at or above the
-        // caller's own rank.
         await _permissionService.AssertCanActOnMemberAsync(currentUserId, targetUserId, server);
 
         var member = await _context.ServerMembers
@@ -341,11 +334,6 @@ public class ServersService(
         return server;
     }
 
-    /// <summary>
-    /// Reserved for the two actions that stay tied to ownership itself rather than to a permission:
-    /// deleting the server and transferring ownership. Everything else goes through
-    /// <see cref="AssertPermissionAsync"/>.
-    /// </summary>
     internal async Task<Server> AssertServerOwnerAsync(Guid currentUserId, Guid serverId)
     {
         var server = await AssertServerMemberAsync(currentUserId, serverId);
@@ -356,11 +344,6 @@ public class ServersService(
         return server;
     }
 
-    /// <summary>
-    /// The RBAC gate every capability check funnels through: confirms membership, then confirms the
-    /// resolved permission set covers <paramref name="required"/>. Returns the server so callers
-    /// keep the single-round-trip shape the old owner check had.
-    /// </summary>
     public async Task<Server> AssertPermissionAsync(Guid currentUserId, Guid serverId, ServerPermission required)
     {
         var server = await AssertServerMemberAsync(currentUserId, serverId);

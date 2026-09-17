@@ -44,8 +44,6 @@ function SubscribeCard({ canceled }) {
     setFormError('')
     try {
       const session = await createCheckoutSessionMutation.mutateAsync()
-      // Full-page redirect: Stripe Checkout is hosted cross-origin, so this can't be a
-      // client-side router navigation.
       window.location.href = session.Url
     } catch (error) {
       setFormError(mapCheckoutSessionError(error))
@@ -93,8 +91,6 @@ function ManageSubscriptionButton() {
     setFormError('')
     try {
       const session = await createPortalSessionMutation.mutateAsync()
-      // Full-page redirect: the Stripe Customer Portal is hosted cross-origin, so this can't
-      // be a client-side router navigation.
       window.location.href = session.Url
     } catch (error) {
       setFormError(mapPortalSessionError(error))

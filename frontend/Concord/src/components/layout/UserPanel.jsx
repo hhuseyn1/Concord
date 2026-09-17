@@ -62,9 +62,6 @@ export function UserPanel({ className }) {
   }
 
   return (
-    // pb-[env(...)]: keeps this row clear of the iPhone home-indicator gesture area when
-    // rendered inside the mobile drawer (AppShell) - resolves to 0 on devices/browsers without
-    // a bottom safe-area inset, so it's a no-op on the desktop sidebar this component also renders in.
     <div className={cn('flex shrink-0 flex-col pb-[env(safe-area-inset-bottom)]', className)}>
       <VoiceCallStrip />
       <div className="flex h-14 items-center gap-2 border-t border-border-subtle bg-surface-sidebar px-2">

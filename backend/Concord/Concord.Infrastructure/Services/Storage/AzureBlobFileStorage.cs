@@ -3,7 +3,6 @@ using Azure.Storage.Blobs.Models;
 
 namespace Concord.Infrastructure.Services.Storage;
 
-/// <summary>Saves to an Azure Blob Storage container. Used only in Production (see <c>FileStorageConfig</c>).</summary>
 public class AzureBlobFileStorage(BlobContainerClient containerClient) : IFileStorage
 {
     private readonly BlobContainerClient _containerClient = containerClient;

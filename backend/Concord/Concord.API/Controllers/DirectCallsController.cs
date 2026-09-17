@@ -37,7 +37,7 @@ public class DirectCallsController(DirectCallsService directCallsService) : Base
     }
 
     [HttpGet]
-    public async Task<PagedResult<CallResponse>> GetCallsAsync(Guid conversationId, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<CallResponse>> GetCallsAsync(Guid conversationId, int page, int pageSize)
     {
         return await _directCallsService.GetCallsAsync(GetUserId(), conversationId, page, pageSize);
     }

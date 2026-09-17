@@ -13,9 +13,6 @@ class ConcordBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
-    // Badge copy is real text, so it follows the user's text-size preference
-    // like everything else - the pill's height is text + fixed padding, so it
-    // grows with it without disturbing anything around it.
     final type = ConcordTypography.of(context);
     final (Color background, Color foreground) = switch (variant) {
       ConcordBadgeVariant.neutral => (colors.fgDefault.withValues(alpha: 0.1), colors.fgDefault),

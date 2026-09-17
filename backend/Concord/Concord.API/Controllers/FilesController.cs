@@ -1,7 +1,6 @@
 using Concord.Application.Models;
 using Concord.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Concord.API.Controllers;

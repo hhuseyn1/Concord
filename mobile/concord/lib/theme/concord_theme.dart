@@ -5,13 +5,6 @@ import 'concord_tokens.dart';
 import 'concord_typography.dart';
 
 abstract final class ConcordTheme {
-  /// [fontScale] multiplies every font size in [_textTheme] and nothing else -
-  /// spacing, padding, icon sizes and button heights stay put (mirroring the
-  /// web app's `--font-scale`, which is deliberately not a root `font-size`
-  /// change for exactly this reason). Rows and buttons still grow vertically
-  /// where their height is text + fixed padding, but the layout grid doesn't
-  /// rescale under them. Defaults to 1.0 so callers that don't care (tests,
-  /// previews) can keep calling `ConcordTheme.dark()`.
   static ThemeData dark({double fontScale = 1.0}) =>
       _build(ConcordColors.dark, Brightness.dark, fontScale);
 
@@ -21,11 +14,6 @@ abstract final class ConcordTheme {
   static ThemeData _build(ConcordColors colors, Brightness brightness, double fontScale) {
     final textTheme = _textTheme(colors, fontScale);
 
-    // `secondary` is a distinct neutral tone (not the brand color) so that
-    // Material widgets that fall back to theme defaults (no explicit
-    // ButtonStyle override) still read as lower-emphasis than primary
-    // actions. Built from the same neutral surface/border/foreground tokens
-    // ConcordButton's `secondary` variant already uses, rather than `brand`.
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: colors.brand,
@@ -85,11 +73,6 @@ abstract final class ConcordTheme {
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(color: colors.brand),
       iconTheme: IconThemeData(color: colors.fgDefault),
-      // Button hierarchy: filled brand = primary action, outlined neutral =
-      // secondary action, plain text = low-emphasis/tertiary action. These
-      // are defaults for raw ElevatedButton/OutlinedButton/TextButton usage
-      // that doesn't already override its own style (e.g. ConcordButton,
-      // which has its own variant system, is unaffected).
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: colors.brand,
@@ -165,16 +148,6 @@ abstract final class ConcordTheme {
     );
   }
 
-  /// Convention for destructive actions (delete, kick, leave, revoke, etc.):
-  /// Material has no built-in "destructive" button concept, so there's no
-  /// `destructiveButtonTheme`. Instead, screens that need a destructive
-  /// action should explicitly style the button using these helpers, which
-  /// key off [ConcordColors.dangerSolid] (filled, e.g. [ElevatedButton]) or
-  /// [ConcordColors.danger] (text-only, e.g. the confirm action in a
-  /// [TextButton]-based [AlertDialog]) so destructive actions are always
-  /// visually distinct from both the brand-colored primary default and the
-  /// neutral secondary/low-emphasis defaults above. See
-  /// `lib/widgets/confirm_dialog.dart` for the canonical usage.
   static ButtonStyle destructiveTextButtonStyle(ConcordColors colors) {
     return TextButton.styleFrom(
       foregroundColor: colors.danger,
@@ -191,10 +164,6 @@ abstract final class ConcordTheme {
     );
   }
 
-  /// The type ramp. Sizes are this app's own (slightly different from web's,
-  /// which is fine - only the *relative* scale steps are shared), each
-  /// multiplied by [fontScale]. `height` is a unitless multiplier, so
-  /// line-heights scale with the font size for free.
   static TextTheme _textTheme(ConcordColors colors, double fontScale) {
     double size(double base) => base * fontScale;
 

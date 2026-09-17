@@ -3,13 +3,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../theme/theme.dart';
 
-/// Requests [permission], showing a short "why we need this" explanation
-/// first if it hasn't already been granted - the OS prompt alone never says
-/// what the permission is for, and Android's permanently-denied state means
-/// re-requesting silently would just get ignored forever.
-///
-/// Returns true once [permission] is granted (immediately, if it already
-/// was), false if the user declines the rationale or the OS request.
 Future<bool> requestPermissionWithRationale(
   BuildContext context, {
   required Permission permission,

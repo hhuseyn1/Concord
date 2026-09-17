@@ -10,17 +10,11 @@ import { mapPremiumTrialError } from './starsErrors'
 import { formatStars, formatTrialExpiry, newIdempotencyKey } from './starsFormat'
 import { useActivatePremiumTrialMutation } from './starsQueries'
 
-/**
- * Spend Stars for a time-limited Premium trial. Cost and duration come from
- * `GET Stars/Config` - nothing is hardcoded here.
- */
 export function PremiumTrialCard({ config, wallet }) {
   const { t } = useTranslation()
   const activateMutation = useActivatePremiumTrialMutation()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [formError, setFormError] = useState('')
-  // Same idempotency discipline as the transfer flow: one key per attempt, held
-  // across retries, replaced once the attempt finally succeeds.
   const idempotencyKeyRef = useRef(newIdempotencyKey())
 
   const cost = config?.PremiumTrialCostStars ?? 0
@@ -68,8 +62,6 @@ export function PremiumTrialCard({ config, wallet }) {
         {t('stars.trial.description', { cost: formatStars(cost), days })}
       </p>
 
-      {/* Three mutually exclusive states: trial already running, Premium from
-        * another source (a paid subscription), or not enough Stars. */}
       {trialActive ? (
         <p className="text-sm text-fg-default">
           {expiresOn ? t('stars.trial.expiresOn', { date: expiresOn }) : t('stars.trial.activeBadge')}

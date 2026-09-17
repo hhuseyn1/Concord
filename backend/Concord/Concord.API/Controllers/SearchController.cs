@@ -13,8 +13,8 @@ public class SearchController(GlobalSearchService globalSearchService) : BaseApi
     private readonly GlobalSearchService _globalSearchService = globalSearchService;
 
     [HttpGet("Messages")]
-    public async Task<PagedResult<GlobalSearchResultResponse>> SearchMessagesAsync([FromQuery] string query, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<GlobalSearchResultResponse>> SearchMessagesAsync([FromQuery] GlobalSearchRequest request)
     {
-        return await _globalSearchService.SearchAsync(GetUserId(), query, page, pageSize);
+        return await _globalSearchService.SearchAsync(GetUserId(), request);
     }
 }

@@ -49,7 +49,7 @@ public class FriendsController(FriendsService friendsService) : BaseApiControlle
     }
 
     [HttpGet]
-    public async Task<PagedResult<PublicProfileResponse>> GetFriendsListAsync([FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<PublicProfileResponse>> GetFriendsListAsync(int page, int pageSize)
     {
         return await _friendsService.GetFriendsListAsync(GetUserId(), page, pageSize);
     }
@@ -67,7 +67,7 @@ public class FriendsController(FriendsService friendsService) : BaseApiControlle
     }
 
     [HttpGet("Blocks")]
-    public async Task<PagedResult<PublicProfileResponse>> GetBlockedListAsync([FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<PublicProfileResponse>> GetBlockedListAsync(int page, int pageSize)
     {
         return await _friendsService.GetBlockedListAsync(GetUserId(), page, pageSize);
     }

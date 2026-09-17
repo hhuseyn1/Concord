@@ -2,10 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Concord.Application.Models;
 
-/// <summary>
-/// What the approving device is shown before it decides. Approving blind is the central risk of a
-/// cross-device sign-in, so the device details are surfaced rather than just the code.
-/// </summary>
 public class QrLoginRequestInfoResponse
 {
     [JsonPropertyName("UserCode")]

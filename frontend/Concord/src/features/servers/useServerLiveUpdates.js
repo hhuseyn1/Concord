@@ -60,10 +60,6 @@ export function useServerLiveUpdates(serverId) {
       navigate('/cabinet')
     })
 
-    // Groups are keyed by connection id server-side, so a successful automatic
-    // reconnect (a new connection id) drops prior group membership - rejoin
-    // the server room so channel/member updates keep flowing silently instead
-    // of the client just going quiet.
     hub.connection.onreconnected(() => {
       hub.joinServer(serverId).catch((error) => console.error('Failed to rejoin server group', error))
     })

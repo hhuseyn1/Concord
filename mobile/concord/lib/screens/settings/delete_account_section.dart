@@ -11,12 +11,6 @@ import '../../providers/auth_controller.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 
-/// "Danger Zone" section at the bottom of Settings: soft-deletes the current
-/// account via `UsersService.deleteMe` (30-day grace period - logging back
-/// in before then cancels the deletion; see `_DeleteAccountDialog`).
-/// Styled distinctly from the rest of Settings using the danger color
-/// tokens so it reads as irreversible/high-consequence, mirroring the web
-/// app's `DeleteAccountSection`.
 class DeleteAccountSection extends StatelessWidget {
   const DeleteAccountSection({super.key});
 
@@ -94,19 +88,11 @@ class _DeleteAccountDialogState extends ConsumerState<_DeleteAccountDialog> {
       await ref.read(usersServiceProvider).deleteMe(password: _passwordController.text);
       if (!mounted) return;
 
-      // The account is already deactivated/logged-out server-side at this
-      // point; capture what we need before popping (this dialog's context
-      // becomes unusable once its route starts closing).
       final messenger = ScaffoldMessenger.of(context);
       final authNotifier = ref.read(authControllerProvider.notifier);
 
       Navigator.of(context).pop();
       messenger.showSnackBar(SnackBar(content: Text(l10n.deleteAccountSuccessSnackbar)));
-      // Reuses the existing logout mechanism to clear local tokens/state -
-      // the router's auth-state-driven redirect then takes over and sends
-      // the user to /login. `revokeCurrentSession` (called internally by
-      // `logout`) is expected to no-op/fail harmlessly since the server
-      // already revoked every session as part of deleting the account.
       await authNotifier.logout();
     } on ApiException catch (e) {
       if (!mounted) return;

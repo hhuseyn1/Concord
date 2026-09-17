@@ -1,18 +1,6 @@
 @import 'tailwindcss';
 @import './tokens.css';
 
-/*
- * Base styles / reset. Tailwind's Preflight already normalizes most
- * browser defaults - this only covers the app-wide baseline that sits on
- * top of the design tokens above.
- *
- * Wrapped in `@layer base` (Tailwind v4's documented spot for custom base
- * styles) rather than left unlayered: per the CSS cascade-layers spec,
- * unlayered rules beat every `@layer`-ed rule outright regardless of
- * specificity, so an unlayered `a { color }` here would silently win over
- * any `text-*` utility a component applies to a link/NavLink - which is
- * exactly the opposite of what a *base* default is supposed to do.
- */
 @layer base {
   *,
   *::before,
@@ -22,8 +10,6 @@
 
   html {
     color-scheme: dark light;
-    /* Stops iOS Safari/old Android from auto-boosting text size for "readability" on a narrow
-     * viewport - that boost happens after layout, so it reads as the page opening zoomed in. */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
@@ -76,8 +62,6 @@
     color: var(--color-fg-default);
   }
 
-  /* Slim, Discord-style scrollbars for anything not using the ScrollArea
-   * primitive (e.g. native overflow containers). */
   * {
     scrollbar-width: thin;
     scrollbar-color: var(--color-border-default) transparent;

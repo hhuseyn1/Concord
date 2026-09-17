@@ -12,16 +12,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Concord.Infrastructure.Services;
 
-/// <summary>
-/// Ban, mute, and timeout (P1). Kick already exists as
-/// <see cref="ServersService.RemoveMemberAsync"/> and is left there rather than duplicated.
-///
-/// Every action here goes through two gates, in this order: the relevant
-/// <see cref="ServerPermission"/>, then <see cref="PermissionService.AssertCanActOnMemberAsync"/>,
-/// which is what stops a moderator acting on the owner, on someone who outranks them, or on
-/// themselves. Mute and timeout are stored on the member row and subtract from resolved permissions
-/// in <see cref="PermissionService.ResolveAsync"/>, so no other service needs to know they exist.
-/// </summary>
 public class ModerationService(
     ApplicationDbContext context,
     ServersService serversService,
@@ -31,7 +21,6 @@ public class ModerationService(
     IAuditLogService auditLogService,
     ILogger<ModerationService> logger)
 {
-    /// <summary>Matches Discord's ceiling; also keeps a typo from producing an effectively permanent timeout.</summary>
     private const int MaxTimeoutMinutes = 28 * 24 * 60;
 
     private const int MaxReasonLength = 500;
@@ -44,11 +33,6 @@ public class ModerationService(
     private readonly IAuditLogService _auditLogService = auditLogService;
     private readonly ILogger<ModerationService> _logger = logger;
 
-    /// <summary>
-    /// True while a live ban row exists for this user. Expired bans are treated as absent but are not
-    /// deleted here - a read path should not mutate, and the row is still useful history until an
-    /// unban or a re-ban replaces it.
-    /// </summary>
     public async Task<bool> IsBannedAsync(Guid serverId, Guid userId)
     {
         return await _context.ServerBans.AnyAsync(ban =>
@@ -73,8 +57,6 @@ public class ModerationService(
 
         if (existingBan is not null)
         {
-            // A lapsed row is reused rather than rejected - re-banning someone whose temporary ban
-            // already expired is a normal action, not a conflict.
             var stillActive = existingBan.ExpiresAtUtc is null || existingBan.ExpiresAtUtc > DateTime.UtcNow;
 
             if (stillActive)
@@ -97,8 +79,6 @@ public class ModerationService(
             });
         }
 
-        // A ban is a kick plus a rejoin block: dropping the membership row keeps every existing
-        // membership check correct without teaching them about bans.
         var member = await _context.ServerMembers
             .FirstOrDefaultAsync(member => member.ServerId == serverId && member.UserId == targetUserId);
 
@@ -145,8 +125,6 @@ public class ModerationService(
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 1, GlobalConstants.MaxPageSize);
 
-        // Lapsed bans are filtered out rather than listed as inactive - the list answers "who cannot
-        // get back in right now", which is what a moderator is actually asking.
         var bansQuery = _context.ServerBans
             .Where(ban => ban.ServerId == serverId && (ban.ExpiresAtUtc == null || ban.ExpiresAtUtc > DateTime.UtcNow));
 
@@ -180,8 +158,6 @@ public class ModerationService(
 
         await _context.SaveChangesAsync();
 
-        // Revoking Speak only changes the *next* token they mint, so an already-connected participant
-        // keeps publishing until this lands on the LiveKit side too.
         await ApplyVoicePublishPermissionAsync(serverId, targetUserId, canPublish: !muted);
 
         await _realtimeNotifier.ServerModerationChangedAsync(serverId, targetUserId);
@@ -215,8 +191,6 @@ public class ModerationService(
 
         await _context.SaveChangesAsync();
 
-        // A timeout takes Speak as well as SendMessages, so it has to reach a live voice session for
-        // the same reason a mute does.
         await ApplyVoicePublishPermissionAsync(serverId, targetUserId, canPublish: false);
 
         await _realtimeNotifier.ServerModerationChangedAsync(serverId, targetUserId);
@@ -244,7 +218,6 @@ public class ModerationService(
 
         await _context.SaveChangesAsync();
 
-        // Only hand Speak back if a mute is not independently holding it down.
         await ApplyVoicePublishPermissionAsync(serverId, targetUserId, canPublish: !member.IsMuted);
 
         await _realtimeNotifier.ServerModerationChangedAsync(serverId, targetUserId);
@@ -273,12 +246,6 @@ public class ModerationService(
             ?? throw new TargetNotServerMemberException();
     }
 
-    /// <summary>
-    /// Pushes a publish-permission change into every voice channel of this server where the user is
-    /// currently connected. LiveKit is a live system the database cannot reach on its own, so this is
-    /// best-effort by design: failures are logged and swallowed, because the durable state is already
-    /// committed and the next token mint will enforce it regardless.
-    /// </summary>
     private async Task ApplyVoicePublishPermissionAsync(Guid serverId, Guid userId, bool canPublish)
     {
         foreach (var room in await GetLiveVoiceRoomsAsync(serverId))
@@ -299,13 +266,11 @@ public class ModerationService(
             }
             catch (Exception ex)
             {
-                // Expected whenever they are simply not in this particular room.
                 _logger.LogDebug(ex, "Could not update LiveKit permissions for {UserId} in room {Room}", userId, room);
             }
         }
     }
 
-    /// <summary>Drops a banned user out of any voice channel of this server they are still sitting in.</summary>
     private async Task DisconnectFromServerVoiceAsync(Guid serverId, Guid userId)
     {
         foreach (var room in await GetLiveVoiceRoomsAsync(serverId))
@@ -325,16 +290,6 @@ public class ModerationService(
         }
     }
 
-    /// <summary>
-    /// The server's voice channels that currently exist as live LiveKit rooms.
-    ///
-    /// A room only exists while someone is in it, so filtering through <c>ListRooms</c> first turns
-    /// "one doomed call per voice channel" into one call plus, almost always, zero or one more - the
-    /// difference between 1 and 20+ Twirp round-trips on a server with many voice channels.
-    ///
-    /// Returns empty on failure: LiveKit being unreachable must not fail a moderation action whose
-    /// durable state is already committed and which the next token mint will enforce anyway.
-    /// </summary>
     private async Task<List<string>> GetLiveVoiceRoomsAsync(Guid serverId)
     {
         var voiceChannelIds = await _context.Channels

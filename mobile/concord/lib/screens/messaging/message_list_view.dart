@@ -43,7 +43,6 @@ class MessageListView extends StatefulWidget {
   final VoidCallback onLoadMore;
   final VoidCallback onRetryInitialLoad;
 
-  /// Falls back to [AppLocalizations.channelThreadNoun] when omitted.
   final String? threadNoun;
   final String? emptyTitle;
   final String? emptySubtitle;

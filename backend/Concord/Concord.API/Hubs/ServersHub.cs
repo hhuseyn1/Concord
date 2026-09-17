@@ -5,11 +5,6 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Concord.API.Hubs;
 
-// Group join/leave signaling only, mirroring MessagesHub exactly - the group is joined while a
-// server is open in ChannelSidebar (any channel, or none selected yet), not per-channel. Structural
-// broadcasts (ChannelCreated/Updated/Deleted, ServerMemberJoined/Left) are sent to this group from
-// ChannelsController/ServersController after each mutation, the same way MessagesController sends
-// to a Channel:{channelId} group after every message action.
 [Authorize]
 public class ServersHub(ServersService serversService) : Hub
 {

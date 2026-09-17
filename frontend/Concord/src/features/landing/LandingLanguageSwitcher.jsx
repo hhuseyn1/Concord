@@ -12,15 +12,6 @@ import { cn } from '../../lib/cn'
 import { setLanguage } from '../../i18n'
 import { LANGUAGE_LABELS } from '../../i18n/localeMapping'
 
-/**
- * Compact language picker for the (unauthenticated) landing navbar.
- *
- * Deliberately NOT `features/settings/LanguageSwitcher.jsx`: that one also
- * persists the choice to the backend via the preferences mutation, which
- * requires a signed-in user. Here the localStorage-backed `setLanguage()` is
- * the whole job - if the visitor later signs in and changes the language from
- * Settings, that's when it gets written to their account.
- */
 export function LandingLanguageSwitcher({ className }) {
   const { t, i18n } = useTranslation()
   const currentLabel = LANGUAGE_LABELS[i18n.language] ?? LANGUAGE_LABELS.en

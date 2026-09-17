@@ -1,10 +1,6 @@
 import '../../api/api.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Fallback copy shared by the mappers below when the backend didn't send a
-/// usable `Message`. Branches on [ApiException.kind] so a dropped connection
-/// or a request that timed out reads differently from a genuine server-side
-/// failure, instead of one identical sentence for every failure type.
 String _fallbackMessage(AppLocalizations l10n, ApiException error) {
   if (error.isConnectivityError) {
     return l10n.errorCouldNotReachServer;

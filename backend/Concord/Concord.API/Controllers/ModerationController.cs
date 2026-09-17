@@ -6,10 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Concord.API.Controllers;
 
 
-/// <summary>
-/// Ban, mute, and timeout (P1). Kick lives on <see cref="ServersController"/> as
-/// <c>DELETE Servers/{id}/Members/{userId}</c> and is not duplicated here.
-/// </summary>
 [Route("Api/V1.0/Servers/{serverId:guid}")]
 [Authorize]
 public class ModerationController(ModerationService moderationService) : BaseApiController
@@ -17,7 +13,7 @@ public class ModerationController(ModerationService moderationService) : BaseApi
     private readonly ModerationService _moderationService = moderationService;
 
     [HttpGet("Bans")]
-    public async Task<PagedResult<ServerBanResponse>> GetBansAsync(Guid serverId, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<ServerBanResponse>> GetBansAsync(Guid serverId, int page, int pageSize)
     {
         return await _moderationService.GetBansAsync(GetUserId(), serverId, page, pageSize);
     }

@@ -1,7 +1,3 @@
-// "Blink blink" the tab title so an unread message/friend request is noticeable even when Concord
-// is just a background tab, not the focused window - a browser-notification permission doesn't
-// help there (it may be denied, or the user may just not want popups), but a flashing title costs
-// nothing to notice out of the corner of an eye.
 const BLINK_INTERVAL_MS = 1000
 
 let originalTitle = null

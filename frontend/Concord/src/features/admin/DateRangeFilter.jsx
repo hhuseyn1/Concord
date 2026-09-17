@@ -4,8 +4,6 @@ import { FormField } from '../../components/ui/FormField'
 import { Input } from '../../components/ui/Input'
 import { lastMonthRange, lastNMonthsRange, thisMonthRange } from './dateRangePresets'
 
-// Shared From/To date filter with quick-range presets, used by both the Overview charts and the
-// Payments tab so "this month / last month / last 3 months" behaves identically everywhere.
 export function DateRangeFilter({ fromDate, toDate, onChange, fromLabel, toLabel }) {
   const { t } = useTranslation()
 

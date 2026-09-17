@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Concord.Application.Enums;
 
 namespace Concord.Application.Models;
 
@@ -17,11 +16,9 @@ public class RoleResponse
     [JsonPropertyName("Color")]
     public string? Color { get; set; }
 
-    /// <summary>Raw bitfield, so a client can test a single flag without a round trip.</summary>
     [JsonPropertyName("Permissions")]
     public long Permissions { get; set; }
 
-    /// <summary>The same bitfield split into flag names, for display without duplicating the enum.</summary>
     [JsonPropertyName("PermissionNames")]
     public List<string> PermissionNames { get; set; } = [];
 

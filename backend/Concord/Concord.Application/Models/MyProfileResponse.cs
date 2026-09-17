@@ -20,7 +20,6 @@ public class MyProfileResponse
     [JsonPropertyName("Email")]
     public string? Email { get; set; }
 
-    /// <summary>"Admin" or "User" - lets the client gate admin-only UI without a round trip.</summary>
     [JsonPropertyName("Role")]
     public string? Role { get; set; }
 

@@ -10,19 +10,6 @@ using Stripe;
 
 namespace Concord.Infrastructure.Services;
 
-/// <summary>
-/// Owns the Stars virtual-currency system: wallet reads, the audit ledger, friend-to-friend
-/// transfers, the Stars-funded Premium trial, DM chat rewards, and real-money Stars package
-/// purchases via Stripe Checkout.
-///
-/// Deliberately does not depend on <see cref="BillingService"/> - BillingService depends on this
-/// class instead (its webhook dispatch delegates "payment"-mode checkout sessions here), so a
-/// dependency in the other direction would be circular. Anywhere this class would otherwise want
-/// BillingService's subscription lookup (e.g. to decide whether a user is already a paying
-/// subscriber), it queries <see cref="ApplicationDbContext.Subscriptions"/> directly instead - see
-/// <see cref="HasActiveSubscriptionAsync"/>, which intentionally mirrors the query shape in
-/// BillingService.CreateCheckoutSessionAsync/GetSubscriptionAsync.
-/// </summary>
 public class StarsService(
     ApplicationDbContext context,
     StripeClient stripeClient,
@@ -122,13 +109,6 @@ public class StarsService(
         };
     }
 
-    /// <summary>
-    /// Moves Stars from the caller to a friend. Debit + credit + both ledger rows are wrapped in a
-    /// single DB transaction so the whole operation is all-or-nothing, and the debit itself uses an
-    /// atomic conditional <c>ExecuteUpdateAsync</c> (rather than read-modify-write via
-    /// SaveChanges) so two concurrent transfers from the same sender can never both succeed against
-    /// a balance that can only cover one of them.
-    /// </summary>
     public async Task<TransferStarsResponse> TransferAsync(Guid senderId, TransferStarsRequest request)
     {
         if (request.Amount <= 0)
@@ -208,13 +188,6 @@ public class StarsService(
         return new TransferStarsResponse { Balance = senderBalance };
     }
 
-    /// <summary>
-    /// Activates the Stars-funded 14-day Premium trial: atomically debits
-    /// <see cref="StarsConstants.PremiumTrialCostStars"/> and sets
-    /// <see cref="User.PremiumTrialExpiresAt"/> to <c>DateTime.UtcNow.AddDays(PremiumTrialDurationDays)</c>.
-    /// Rejected outright (no debit attempted) if the caller already has an unexpired trial or an
-    /// active/past-due Stripe subscription.
-    /// </summary>
     public async Task<ActivatePremiumTrialResponse> ActivatePremiumTrialAsync(Guid userId, ActivatePremiumTrialRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.IdempotencyKey))
@@ -291,25 +264,6 @@ public class StarsService(
         };
     }
 
-    /// <summary>
-    /// Grants the DM chat reward if every anti-abuse check passes, mutating the already-loaded
-    /// <paramref name="sender"/> in place and saving via the caller's existing
-    /// <see cref="ApplicationDbContext"/> tracking rather than issuing fresh queries - this keeps
-    /// <c>DirectMessagesService.SendMessageAsync</c> fast, since the sender row is already loaded
-    /// there for other purposes.
-    ///
-    /// Deliberately a "grant", not a "debit": under concurrent duplicate sends from the same user
-    /// there is a small race window where the daily cap could be exceeded by one reward's worth, or
-    /// the cooldown could be bypassed by a few milliseconds. That is an accepted tradeoff - chat
-    /// rewards are a small, non-adversarial trickle (unlike transfers or trial activation, which
-    /// move a user-chosen amount and use real atomic guards), and adding transactional rigor here
-    /// would put extra latency on every single DM send for a bound that is already tiny
-    /// (ChatRewardAmount) and self-limiting (ChatRewardDailyCap).
-    ///
-    /// Attachment-only messages (empty/whitespace Content) never earn a reward - only messages with
-    /// enough real text content count, which is a deliberate product choice to keep this a "chat"
-    /// reward rather than a reward for posting media.
-    /// </summary>
     public async Task TryGrantChatRewardAsync(User sender, string? content)
     {
         var trimmed = content?.Trim() ?? string.Empty;
@@ -349,15 +303,6 @@ public class StarsService(
         await _context.SaveChangesAsync();
     }
 
-    /// <summary>
-    /// Creates a one-time Stripe Checkout Session (Mode = "payment") for a Stars package, using
-    /// inline price data computed from <see cref="StarsConstants.Packages"/> rather than a
-    /// pre-created Stripe Price object, so the catalog stays fully configurable from our own code. A
-    /// <see cref="StarPurchase"/> row is persisted as Pending before the session is created, and the
-    /// session id is saved onto it - actual completion only ever happens via a verified
-    /// <c>checkout.session.completed</c> webhook event (see <see cref="CompleteStarsPurchaseAsync"/>),
-    /// never here or from client-side polling.
-    /// </summary>
     public async Task<CreateStarsCheckoutSessionResponse> CreateCheckoutSessionAsync(Guid userId, string packageId)
     {
         var package = StarsConstants.Packages.FirstOrDefault(package => package.Id == packageId);
@@ -398,9 +343,6 @@ public class StarsService(
                 Enabled = false
             },
             AllowPromotionCodes = false,
-            // The frontend success screen polls Purchases/{purchaseId}/Status, so it needs the
-            // purchase id back on the redirect - Stripe only auto-interpolates {CHECKOUT_SESSION_ID},
-            // never anything of ours, so it has to be appended to the configured URL here.
             SuccessUrl = AppendPurchaseIdQueryParam(_stripeSettings.StarsSuccessUrl, purchase.Id),
             CancelUrl = _stripeSettings.StarsCancelUrl,
             Metadata = new Dictionary<string, string>
@@ -434,12 +376,6 @@ public class StarsService(
         return new CreateStarsCheckoutSessionResponse { Url = session.Url, PurchaseId = purchase.Id };
     }
 
-    /// <summary>
-    /// Appends <c>purchase_id=&lt;id&gt;</c> to the configured success URL, whether or not it
-    /// already carries a query string. Left as a no-op (returns the blank string as-is) when the
-    /// setting is unconfigured, matching how this app leaves every other Stripe URL blank until
-    /// deploy-time secrets are supplied.
-    /// </summary>
     private static string AppendPurchaseIdQueryParam(string successUrl, Guid purchaseId)
     {
         if (string.IsNullOrWhiteSpace(successUrl))
@@ -463,14 +399,6 @@ public class StarsService(
         return purchase.Status;
     }
 
-    /// <summary>
-    /// Completes a Stars package purchase from a verified <c>checkout.session.completed</c> Stripe
-    /// webhook event (called from <see cref="BillingService.HandleWebhookAsync"/> once it branches on
-    /// Session.Mode/Metadata). Idempotent against Stripe's at-least-once webhook delivery: the guard
-    /// update only flips a still-Pending purchase to Completed, so a duplicate delivery for an
-    /// already-completed (or otherwise no-longer-pending) purchase is a silent no-op rather than a
-    /// double credit.
-    /// </summary>
     public async Task CompleteStarsPurchaseAsync(Stripe.Checkout.Session session)
     {
         if (string.IsNullOrEmpty(session.ClientReferenceId) || !Guid.TryParse(session.ClientReferenceId, out var purchaseId))
@@ -492,8 +420,6 @@ public class StarsService(
 
         if (completedRows == 0)
         {
-            // Already completed (or otherwise no longer Pending) by an earlier delivery of this same
-            // event - nothing left to do.
             return;
         }
 
@@ -523,11 +449,6 @@ public class StarsService(
     private static bool IsTrialActive(User user) =>
         user.PremiumTrialExpiresAt.HasValue && user.PremiumTrialExpiresAt.Value > DateTime.UtcNow;
 
-    /// <summary>
-    /// Mirrors the query shape in BillingService.CreateCheckoutSessionAsync/GetSubscriptionAsync -
-    /// kept duplicated rather than shared to avoid this class depending on BillingService (see the
-    /// class-level remarks).
-    /// </summary>
     private async Task<bool> HasActiveSubscriptionAsync(Guid userId)
     {
         var latestStatus = await _context.Subscriptions

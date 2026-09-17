@@ -5,9 +5,6 @@ import 'package:concord/utils/idempotency_key.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Fakes by subclassing (this project's existing test convention - see
-/// `test/billing_controller_test.dart` and `test/widget_test.dart`) rather than pulling in a
-/// mocking package.
 class _FakeStarsService extends StarsService {
   _FakeStarsService({
     this.walletResult,
@@ -94,7 +91,6 @@ void main() {
         _FakeStarsService(walletResult: _wallet(balance: 250), configResult: _config()),
       );
 
-      // The constructor kicks off `load()` itself; the initial synchronous state is the loading one.
       expect(container.read(starsControllerProvider).isLoading, isTrue);
 
       await container.read(starsControllerProvider.notifier).load();

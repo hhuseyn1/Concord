@@ -1,6 +1,5 @@
 using Concord.Application.Enums;
 using Concord.Application.Models;
-using Concord.Domain.Entities;
 using Concord.Domain.Exceptions;
 using Concord.Infrastructure.Context;
 using Concord.Infrastructure.Extensions;
@@ -109,10 +108,6 @@ public class UsersService(
         if (string.IsNullOrWhiteSpace(query) || query.Length < 2)
             throw new ParameterValidationException(nameof(query));
 
-        // Exact match only (case-insensitive), not a substring search: a partial query like "hus"
-        // used to return every username containing it, which let anyone browse/harvest the user list
-        // a few letters at a time instead of looking someone up by the handle they were given. Since
-        // Username is unique, this can only ever match zero or one account.
         var normalizedQuery = query.Trim().ToLower();
 
         var users = await _context.Users
@@ -277,14 +272,6 @@ public class UsersService(
         };
     }
 
-    /// <summary>
-    /// Self-service account deletion: deactivates the account immediately (hidden/blocked everywhere
-    /// <see cref="Domain.Entities.User.Disabled"/> is checked, exactly like an admin ban) and revokes
-    /// every session, but leaves <see cref="Domain.Entities.User.DeletionRequestedAt"/> set so
-    /// logging back in during the grace period cancels it (see <c>AuthenticationService</c>'s login
-    /// paths). <c>CleanupBackgroundService</c> anonymizes the row for good once the grace period
-    /// (<see cref="GlobalConstants.AccountDeletionGracePeriodDays"/>) elapses without a login.
-    /// </summary>
     public async Task RequestAccountDeletionAsync(Guid currentUserId, DeleteAccountRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Password))

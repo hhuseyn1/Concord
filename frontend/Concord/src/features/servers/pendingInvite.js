@@ -8,7 +8,6 @@ export function capturePendingInvite(code) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ code, savedAt: Date.now() }))
   } catch {
-    // localStorage unavailable (private mode, etc.) - invite just won't survive a detour
   }
 }
 
@@ -31,7 +30,6 @@ export function clearPendingInvite() {
   try {
     localStorage.removeItem(STORAGE_KEY)
   } catch {
-    // ignore
   }
 }
 

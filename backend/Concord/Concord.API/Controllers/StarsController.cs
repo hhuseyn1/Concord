@@ -24,7 +24,7 @@ public class StarsController(StarsService starsService) : BaseApiController
     }
 
     [HttpGet("Transactions")]
-    public async Task<PagedResult<StarTransactionResponse>> GetTransactionsAsync([FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<StarTransactionResponse>> GetTransactionsAsync(int page, int pageSize)
     {
         return await _starsService.GetTransactionsAsync(GetUserId(), page, pageSize);
     }

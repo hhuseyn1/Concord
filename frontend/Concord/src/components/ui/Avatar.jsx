@@ -44,10 +44,6 @@ export function Avatar({ src, alt = '', name, size = 'md', presence, shape = 'ci
     <span className={cn('relative inline-flex shrink-0', SIZES[size], className)}>
       <RadixAvatar.Root
         className={cn(
-          // A translucent tint of the foreground rather than a fixed surface token: the fallback
-          // then contrasts with whichever surface the avatar sits on in either theme (in light
-          // mode `surface-rail` and `surface-sidebar` are the same value, so a solid-token
-          // fallback would vanish into the sidebar).
           'flex size-full items-center justify-center overflow-hidden bg-fg-default/10 font-medium text-fg-default select-none',
           SHAPE[shape],
         )}

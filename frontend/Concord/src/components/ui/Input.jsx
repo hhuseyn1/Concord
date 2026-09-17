@@ -6,10 +6,6 @@ export const Input = forwardRef(function Input(
   ref,
 ) {
   return (
-    // text-base below `sm` is load-bearing, not a density choice: iOS Safari zooms the whole
-    // page in on focus for any text input under 16px, and doesn't reliably zoom back out - that's
-    // the "page opens zoomed in" bug. Keep it >=16px on mobile; sm:text-sm restores the tighter
-    // desktop sizing where the zoom quirk doesn't apply.
     <input
       ref={ref}
       aria-invalid={invalid || undefined}

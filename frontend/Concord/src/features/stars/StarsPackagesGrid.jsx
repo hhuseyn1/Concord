@@ -8,10 +8,6 @@ import { mapStarsCheckoutError } from './starsErrors'
 import { formatPackagePrice, formatStars } from './starsFormat'
 import { useCreateStarsCheckoutSessionMutation } from './starsQueries'
 
-/**
- * Real-money Stars top-ups. Same flow as the Premium subscription checkout:
- * create a session server-side, then hand the browser to Stripe's hosted page.
- */
 export function StarsPackagesGrid({ packages }) {
   const { t } = useTranslation()
   const createSessionMutation = useCreateStarsCheckoutSessionMutation()
@@ -23,10 +19,6 @@ export function StarsPackagesGrid({ packages }) {
     setPendingPackageId(starsPackage.Id)
     try {
       const session = await createSessionMutation.mutateAsync(starsPackage.Id)
-      // Full-page redirect: Stripe Checkout is hosted cross-origin, so this can't
-      // be a client-side router navigation. (`assign()` rather than setting
-      // `location.href` - same behaviour, but it's a call instead of a write to
-      // a global, which the react-hooks immutability rule rejects.)
       window.location.assign(session.Url)
     } catch (error) {
       setPendingPackageId(null)

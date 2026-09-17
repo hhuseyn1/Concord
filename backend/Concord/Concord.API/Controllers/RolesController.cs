@@ -18,7 +18,6 @@ public class RolesController(RolesService rolesService) : BaseApiController
         return await _rolesService.GetRolesAsync(GetUserId(), serverId);
     }
 
-    /// <summary>Effective permissions of the calling user - drives which controls the client renders.</summary>
     [HttpGet("Me")]
     public async Task<MyServerPermissionsResponse> GetMyPermissionsAsync(Guid serverId)
     {

@@ -135,9 +135,6 @@ class MessagesController extends StateNotifier<MessagesState> implements Message
   }
 
   Future<void> _connectHub() async {
-    // Shared, session-scoped connection (see MessagesHubController) rather
-    // than a dedicated one per channel screen - this used to tear down and
-    // reopen a whole SignalR connection on every channel switch.
     final hub = _hubController.hub;
     if (hub == null || _disposed) return;
     _hub = hub;

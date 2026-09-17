@@ -1,26 +1,9 @@
-/*
- * Font-size (accessibility) preference - same module-level, subscribable
- * persisted-state pattern as `lib/theme.js`.
- *
- * The value only ever drives the `data-font-size` attribute on <html>, which
- * `styles/tokens.css` turns into a `--font-scale` multiplier over the `--text-*`
- * ramp. Nothing here touches the root font-size, so Tailwind's rem-based
- * spacing/sizing scale is unaffected.
- *
- * STORAGE_KEY and the accepted values must stay identical to the anti-FOUC
- * inline script in index.html.
- */
 
 const STORAGE_KEY = 'concord.fontSize'
 const ATTRIBUTE = 'data-font-size'
 
 export const DEFAULT_FONT_SIZE = 'default'
 
-// `px` is the *rendered* body-text size each option produces, used only for the
-// human-readable labels in Settings ("Large (17px)"). Concord's default body
-// step (`--text-base`) is 15px, so applying the 13/14, 16/14 and 18/14 scale
-// ratios lands on 14 / 15 / 17 / 19px rather than a flat 13/14/16/18 - these
-// numbers are the honest ones a user can measure on screen.
 export const FONT_SIZES = [
   { value: 'small', px: 14 },
   { value: 'default', px: 15 },
@@ -63,7 +46,6 @@ export function setFontSize(fontSize) {
   try {
     localStorage.setItem(STORAGE_KEY, currentFontSize)
   } catch {
-    // Storage unavailable: the choice still applies for this session.
   }
   for (const listener of listeners) listener(currentFontSize)
 }

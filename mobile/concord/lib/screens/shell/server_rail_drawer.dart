@@ -33,8 +33,6 @@ class ServerRailDrawer extends ConsumerWidget {
                 Navigator.of(context).pop();
                 context.go('/');
               },
-              // Self-contained badge asset - reads fine even when this tile's own selected-state
-              // background is filled brand-blue (see AuthLayout for the same reasoning).
               child: Image.asset('assets/logo_badge.png', width: 32, height: 32),
             ),
             Padding(
@@ -115,11 +113,6 @@ class _RailTile extends StatelessWidget {
       message: tooltip,
       child: Center(
         child: Material(
-          // Unselected tiles use `surfaceBase`, not `surfaceSidebar`: the
-          // drawer itself is `surfaceRail`, and in light mode rail and sidebar
-          // are the same value now, which would make every unselected server
-          // bubble disappear into the rail. `surfaceBase` is a step away from
-          // the rail in both themes.
           color: selected ? colors.brand : colors.surfaceBase,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(selected ? ConcordRadii.md : ConcordRadii.full),

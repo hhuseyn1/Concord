@@ -31,12 +31,6 @@ export function Modal({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 motion-safe:data-[state=open]:animate-overlay-in motion-safe:data-[state=closed]:animate-overlay-out" />
         <Dialog.Content
           className={cn(
-            // flex-col + max-h bounds the whole dialog to the viewport: without it, tall content
-            // (e.g. a long permission list) just grows the box past the viewport, and since this
-            // is centered via top-1/2/-translate-y-1/2 with no scroll container anywhere in the
-            // chain, the header/close button end up rendered off-screen above the fold with no way
-            // to scroll back to them. min-h-0 on the children wrapper below is what actually lets
-            // it shrink to the remaining space instead of growing with its content.
             'fixed top-1/2 left-1/2 z-50 flex max-h-[85vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg border border-border-default bg-surface-floating p-6 shadow-lg outline-none',
             'motion-safe:data-[state=open]:animate-content-in motion-safe:data-[state=closed]:animate-content-out',
             SIZES[size],

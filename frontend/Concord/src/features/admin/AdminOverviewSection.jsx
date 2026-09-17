@@ -8,12 +8,8 @@ import { Skeleton } from '../../components/ui/Skeleton'
 import { mapAdminLoadError } from './adminErrors'
 import { useAdminOverview, useAdminOverviewCharts, useAdminUserGrowth } from './adminQueries'
 
-// Mirrors AdminService's MinUserGrowthYear on the backend - just enough to keep the year steppers
-// from wandering off into decades with no data rather than expressing a real product launch date.
 const MIN_CHART_YEAR = 2000
 
-// Full-year [from, to] UTC bounds for a calendar year, for charts that filter by year rather than
-// an arbitrary date range (Admin/Overview/Charts still takes fromUtc/toUtc).
 function yearUtcBounds(year) {
   return {
     fromUtc: `${year}-01-01T00:00:00.000Z`,
@@ -21,13 +17,6 @@ function yearUtcBounds(year) {
   }
 }
 
-// Recharts sets `fill`/`stroke` as raw SVG presentation attributes (not a `style` property), and
-// Chromium's paint step does not reliably resolve a `var(--x)` reference inside a presentation
-// attribute value - the shape stays invisible even though getComputedStyle reports the color as
-// resolved. Ticks/labels don't hit this (Recharts applies their `fill` via an inline `style`
-// object, where var() works fine) - only mark colors (Bar `fill`, grid/axis `stroke`) need the
-// value pre-resolved to a real color string. Re-read on a prefers-color-scheme change so charts
-// still follow a live OS theme switch, the same as the rest of this CSS-var-driven app.
 const CHART_COLOR_VARS = {
   brand: '--color-brand',
   success: '--color-success',
@@ -85,8 +74,6 @@ function ChartCard({ title, action, children }) {
   )
 }
 
-// Prev/next year control shared by the overview charts, styled after DataTable's pagination
-// Chevron buttons so admin-panel date navigation looks consistent.
 function YearStepper({ year, onChange, minYear, maxYear }) {
   const { t } = useTranslation()
 

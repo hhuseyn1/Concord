@@ -7,9 +7,6 @@ import { authKeys } from '../../app/authKeys'
 import { Spinner } from '../../components/ui/Spinner'
 
 const POLL_INTERVAL_MS = 2000
-// There's no webhook-driven push yet (that's a later phase), so this is a best-effort cutoff:
-// long enough to ride out a slow Stripe->backend confirmation, short enough not to spin forever
-// if something's actually stuck.
 const POLL_TIMEOUT_MS = 60000
 const REDIRECT_DELAY_MS = 2500
 
@@ -68,8 +65,6 @@ export function CheckoutSuccessScreen() {
           return
         }
 
-        // Transient network hiccups shouldn't fail the whole flow - keep polling until the
-        // give-up timeout above.
         timer = setTimeout(poll, POLL_INTERVAL_MS)
       }
     }

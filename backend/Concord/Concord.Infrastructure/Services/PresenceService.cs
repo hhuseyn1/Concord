@@ -14,13 +14,6 @@ public class PresenceService(ApplicationDbContext context, IDatabase redisDataba
     private readonly FriendsService _friendsService = friendsService;
     private readonly ServersService _serversService = serversService;
 
-    /// <summary>
-    /// TTL for the connection-count key below. Without one, a server process that dies without
-    /// running <see cref="HandleDisconnectAsync"/> for its connections (e.g. an OOM-kill) leaves
-    /// the counter stuck above zero forever, and the affected users would appear permanently
-    /// "online". The TTL bounds that window instead; <see cref="RenewConnectionAsync"/> keeps
-    /// renewing it for as long as the connection is actually still alive.
-    /// </summary>
     private static readonly TimeSpan ConnectionCountTtl = TimeSpan.FromMinutes(3);
 
     public async Task<PresenceStatus?> HandleConnectAsync(Guid userId)
@@ -47,9 +40,6 @@ public class PresenceService(ApplicationDbContext context, IDatabase redisDataba
         var key = GetConnectionCountKey(userId);
         var connectionCount = await _redisDatabase.StringDecrementAsync(key);
 
-        // <= 0 rather than == 0 so a key that already expired and got decremented into negative
-        // territory (the crash scenario this TTL exists for) is cleaned up rather than left
-        // dangling at -1, -2, etc. for the next connect to have to climb back out of.
         if (connectionCount <= 0)
             await _redisDatabase.KeyDeleteAsync(key);
         else
@@ -67,13 +57,6 @@ public class PresenceService(ApplicationDbContext context, IDatabase redisDataba
         return PresenceStatus.Offline;
     }
 
-    /// <summary>
-    /// Refreshes the connection-count key's TTL so a still-healthy, long-lived connection never
-    /// hits it - called periodically by a PresenceHub client heartbeat. A no-op if the key has
-    /// already expired (EXPIRE on a missing key does nothing): that means this connection's
-    /// heartbeats lagged past the TTL, and resurrecting a phantom counter would be worse than
-    /// letting the next real connect/disconnect re-establish it correctly.
-    /// </summary>
     public Task RenewConnectionAsync(Guid userId) =>
         _redisDatabase.KeyExpireAsync(GetConnectionCountKey(userId), ConnectionCountTtl);
 

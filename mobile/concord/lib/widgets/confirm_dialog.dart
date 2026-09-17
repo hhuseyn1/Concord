@@ -6,13 +6,6 @@ import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/theme.dart';
 
-/// Shared confirm dialog for actions that need an explicit "are you sure"
-/// step (leave server, delete channel/message, unblock user, cancel a
-/// friend request, revoke a session, etc.). Mirrors the pattern already used
-/// by `ChannelListScreen._confirmLeaveServer`, extracted here so every call
-/// site gets the same destructive styling and haptic feedback for free.
-///
-/// Returns `true` if the user confirmed, `false`/`null` if they backed out.
 Future<bool?> showConfirmDialog(
   BuildContext context, {
   required String title,

@@ -7,12 +7,6 @@ import { formatStars } from './starsFormat'
 import { STARS_SETTINGS_PATH } from './starsRoutes'
 import { useStarsWallet } from './starsQueries'
 
-/**
- * Compact "* 250" chip for the sidebar user panel. Deliberately quiet: it sits
- * next to the avatar/username/status block and must not compete with it.
- * Renders nothing at all while loading or if the wallet can't be fetched -
- * a broken chip next to the user's own name is worse than no chip.
- */
 export function StarsBalanceIndicator({ className }) {
   const { t } = useTranslation()
   const { data: wallet, isSuccess } = useStarsWallet()

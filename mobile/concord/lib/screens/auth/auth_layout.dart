@@ -32,19 +32,9 @@ class ConcordAuthLayout extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(ConcordSpacing.xl),
                 decoration: BoxDecoration(
-                  // `surfaceBase`, not `surfaceSidebar`: the page behind this
-                  // card is `surfaceRail`, and light mode gives rail and
-                  // sidebar the same value - the card would have had no edge
-                  // at all. `surfaceBase` reads as a raised panel in both
-                  // themes (lighter than the rail in dark, lighter again in
-                  // light).
                   color: colors.surfaceBase,
                   borderRadius: BorderRadius.circular(ConcordRadii.md),
                   boxShadow: [
-                    // Eased back from 0.45: the new surfaces are lighter greys
-                    // than the old near-black violet, which made the previous
-                    // value read as a smudge (same adjustment web made to its
-                    // `--shadow-*` tokens).
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.28),
                       blurRadius: 25,
@@ -58,9 +48,6 @@ class ConcordAuthLayout extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        // Self-contained badge asset (own rounded-square + brand-blue fill baked
-                        // in, unlike the old logo) - no separate colored Container needed, and
-                        // stacking one here would put near-identical blues on top of each other.
                         Image.asset('assets/logo_badge.png', width: 48, height: 48),
                         const SizedBox(height: ConcordSpacing.md),
                         Text(

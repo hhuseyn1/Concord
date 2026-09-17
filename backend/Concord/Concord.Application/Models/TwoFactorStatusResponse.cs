@@ -10,7 +10,6 @@ public class TwoFactorStatusResponse
     [JsonPropertyName("EnabledAt")]
     public DateTime? EnabledAt { get; set; }
 
-    /// <summary>True when a secret exists but has never been confirmed with a code.</summary>
     [JsonPropertyName("SetupPending")]
     public bool SetupPending { get; set; }
 

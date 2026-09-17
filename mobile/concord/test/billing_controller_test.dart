@@ -4,8 +4,6 @@ import 'package:concord/providers/billing_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Fakes by subclassing (matching this project's existing test convention - see
-/// `test/widget_test.dart`'s `_FakeTokenStorage`) rather than pulling in a mocking package.
 class _FakeBillingService extends BillingService {
   _FakeBillingService({this.subscriptionResult, this.subscriptionError}) : super(ApiClient(tokenStorage: TokenStorage()));
 
@@ -43,7 +41,6 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      // The constructor kicks off `load()` itself; the initial synchronous state is the loading one.
       expect(container.read(billingControllerProvider).isLoading, isTrue);
 
       await container.read(billingControllerProvider.notifier).load();

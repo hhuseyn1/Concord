@@ -1,6 +1,3 @@
-// Shared "quick range" helpers for the admin date-range filters (Overview charts, Payments).
-// All math is done in UTC calendar terms so a preset picked at any time of day lands on the same
-// dates regardless of the viewer's local timezone.
 
 export function toDateInputValue(date) {
   return date.toISOString().slice(0, 10)

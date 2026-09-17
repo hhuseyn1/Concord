@@ -12,13 +12,13 @@ public class GlobalSearchService(ApplicationDbContext context, FriendsService fr
     private readonly ApplicationDbContext _context = context;
     private readonly FriendsService _friendsService = friendsService;
 
-    public async Task<PagedResult<GlobalSearchResultResponse>> SearchAsync(Guid currentUserId, string query, int page, int pageSize)
+    public async Task<PagedResult<GlobalSearchResultResponse>> SearchAsync(Guid currentUserId, GlobalSearchRequest request)
     {
-        if (string.IsNullOrWhiteSpace(query))
-            throw new ParameterValidationException(nameof(query));
+        if (string.IsNullOrWhiteSpace(request.Query))
+            throw new ParameterValidationException(nameof(request.Query));
 
-        page = Math.Max(page, 1);
-        pageSize = Math.Clamp(pageSize, 1, GlobalConstants.MaxPageSize);
+        var page = Math.Max(request.Page, 1);
+        var pageSize = Math.Clamp(request.PageSize, 1, GlobalConstants.MaxPageSize);
 
         var fetchLimit = page * pageSize;
 
@@ -34,7 +34,7 @@ public class GlobalSearchService(ApplicationDbContext context, FriendsService fr
 
         var channelMatches = await _context.Messages
             .Where(message => myChannelIds.Contains(message.ChannelId))
-            .Where(message => message.Content != null && EF.Functions.ILike(message.Content, $"%{query}%"))
+            .Where(message => message.Content != null && EF.Functions.ILike(message.Content, $"%{request.Query}%"))
             .Where(message => !_context.MessageHiddenForUsers.Any(hidden => hidden.MessageId == message.Id && hidden.UserId == currentUserId))
             .OrderByDescending(message => message.Created)
             .Take(fetchLimit)
@@ -42,7 +42,7 @@ public class GlobalSearchService(ApplicationDbContext context, FriendsService fr
 
         var conversationMatches = await _context.DirectMessages
             .Where(message => myConversationIds.Contains(message.ConversationId))
-            .Where(message => message.Content != null && EF.Functions.ILike(message.Content, $"%{query}%"))
+            .Where(message => message.Content != null && EF.Functions.ILike(message.Content, $"%{request.Query}%"))
             .Where(message => !_context.DirectMessageHiddenForUsers.Any(hidden => hidden.DirectMessageId == message.Id && hidden.UserId == currentUserId))
             .OrderByDescending(message => message.Created)
             .Take(fetchLimit)
@@ -89,11 +89,11 @@ public class GlobalSearchService(ApplicationDbContext context, FriendsService fr
         var totalCount =
             await _context.Messages.CountAsync(message =>
                 myChannelIds.Contains(message.ChannelId) &&
-                message.Content != null && EF.Functions.ILike(message.Content, $"%{query}%") &&
+                message.Content != null && EF.Functions.ILike(message.Content, $"%{request.Query}%") &&
                 !_context.MessageHiddenForUsers.Any(hidden => hidden.MessageId == message.Id && hidden.UserId == currentUserId)) +
             await _context.DirectMessages.CountAsync(message =>
                 myConversationIds.Contains(message.ConversationId) &&
-                message.Content != null && EF.Functions.ILike(message.Content, $"%{query}%") &&
+                message.Content != null && EF.Functions.ILike(message.Content, $"%{request.Query}%") &&
                 !_context.DirectMessageHiddenForUsers.Any(hidden => hidden.DirectMessageId == message.Id && hidden.UserId == currentUserId));
 
         var items = merged

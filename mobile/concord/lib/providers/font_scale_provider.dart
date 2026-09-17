@@ -3,15 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _prefsKey = 'concord.fontScale';
 
-/// The four text-size steps, sharing the web app's exact multipliers
-/// (`src/styles/tokens.css`, `--font-scale`) so the *relative* jump between
-/// steps feels the same on both platforms even though the two base type ramps
-/// differ (mobile's body text is 15px, web's default step is a 14px
-/// equivalent).
-///
-/// [previewPx] is what this step actually produces for mobile's body text
-/// (`bodyLarge`, 15px at scale 1) - shown in the picker so "Large (17px)" is an
-/// honest label here rather than a copy of web's "Large (16px)".
 enum FontScaleOption {
   small(0.9286, 14),
   standard(1.0, 15),
@@ -23,9 +14,6 @@ enum FontScaleOption {
   final double scale;
   final int previewPx;
 
-  /// Nearest option to an arbitrary stored scale. Used so a value written by a
-  /// future build (or a hand-edited preference) still maps onto a selectable
-  /// step instead of leaving the picker with nothing checked.
   static FontScaleOption nearest(double scale) {
     var best = FontScaleOption.standard;
     for (final option in FontScaleOption.values) {
@@ -35,10 +23,6 @@ enum FontScaleOption {
   }
 }
 
-/// Persists the user's text-size preference as a plain multiplier. Applied by
-/// `main.dart`, which feeds it to `ConcordTheme.dark()/.light()`; see the
-/// `fontScale` doc comment there for why only type - never spacing, icons or
-/// button sizes - scales with it.
 class FontScaleController extends StateNotifier<double> {
   FontScaleController() : super(FontScaleOption.standard.scale) {
     _load();
@@ -61,7 +45,6 @@ final fontScaleControllerProvider = StateNotifierProvider<FontScaleController, d
   return FontScaleController();
 });
 
-/// The currently selected step, for UI that needs to show a checkmark.
 final fontScaleOptionProvider = Provider<FontScaleOption>((ref) {
   return FontScaleOption.nearest(ref.watch(fontScaleControllerProvider));
 });

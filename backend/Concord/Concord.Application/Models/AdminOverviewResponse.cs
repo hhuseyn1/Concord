@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Concord.Application.Models;
 
-/// <summary>Site-wide stat tiles for the admin dashboard (P4) - one query per number, all read-only.</summary>
 public class AdminOverviewResponse
 {
     [JsonPropertyName("TotalUsers")]
@@ -20,18 +19,15 @@ public class AdminOverviewResponse
     [JsonPropertyName("TotalDirectMessages")]
     public int TotalDirectMessages { get; set; }
 
-    /// <summary>Rows in ServerBan whose expiry hasn't passed - mirrors ModerationService.GetBansAsync's definition of "active".</summary>
     [JsonPropertyName("ActiveBans")]
     public int ActiveBans { get; set; }
 
-    /// <summary>Members whose TimedOutUntil is still in the future.</summary>
     [JsonPropertyName("ActiveTimeouts")]
     public int ActiveTimeouts { get; set; }
 
     [JsonPropertyName("TwoFactorEnabledUsers")]
     public int TwoFactorEnabledUsers { get; set; }
 
-    /// <summary>Sessions whose Expires hasn't passed - a proxy for "currently signed in", since nothing tracks true liveness.</summary>
     [JsonPropertyName("ActiveSessions")]
     public int ActiveSessions { get; set; }
 

@@ -15,7 +15,6 @@ String _time(AppLocalizations l10n, DateTime local) {
   return '$hour12:$minute $period';
 }
 
-/// `dd.MM.yyyy, HH:mm`, e.g. `10.09.2026, 15:45` (24-hour, day-first).
 String _dateTime(DateTime local) {
   final day = _twoDigits(local.day);
   final month = _twoDigits(local.month);
@@ -37,10 +36,6 @@ String formatGroupTimestamp(AppLocalizations l10n, DateTime utc) {
 
 String formatAbsoluteTimestamp(DateTime utc) => _dateTime(utc.toLocal());
 
-/// Coarse relative time (`just now` / `5m ago` / `3h ago` / `2d ago`), for
-/// contexts like "last active" that don't need a full timestamp. Shared by
-/// every screen that needs relative time instead of each hand-rolling its
-/// own copy.
 String formatRelativeTime(AppLocalizations l10n, DateTime utc) {
   final diff = DateTime.now().difference(utc.toLocal());
   if (diff.inMinutes < 1) return l10n.justNowLabel;

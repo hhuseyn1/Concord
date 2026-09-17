@@ -14,16 +14,6 @@ class PushNotificationsState {
   const PushNotificationsState();
 }
 
-/// Registers this device's FCM token with the backend, and deregisters it on sign-out so a device
-/// that's since logged out (or back in as someone else) stops receiving pushes meant for the
-/// previous account - `PushTokensService.RegisterAsync` on the backend already upserts by token
-/// value alone for exactly this "different account, same device" case, so this is a best-effort
-/// cleanup on top of that, not the only thing preventing it.
-///
-/// Unlike camera/mic (`permission_rationale.dart`), requesting registration needs a [BuildContext]
-/// for the rationale dialog, which a background auth-state listener doesn't have - so [ensureRegistered]
-/// is called once from `HomeScreen` (the first screen after a real login) rather than fired directly
-/// off the auth-state transition the way `ServersController`/`PresenceController` connect their hubs.
 class PushNotificationsController extends StateNotifier<PushNotificationsState> {
   PushNotificationsController(this._ref) : super(const PushNotificationsState()) {
     _ref.listen<AuthState>(authControllerProvider, (previous, next) {

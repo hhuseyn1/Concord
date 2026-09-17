@@ -81,9 +81,6 @@ public class MessagesService(
 
         await _realtimeNotifier.MessageReceivedAsync(channelId, result);
 
-        // Everyone-recipients already exclude anyone in mentionedUserIds, so this fans out to each
-        // affected user exactly once - no duplicate push for someone who was both @named and swept
-        // up by @everyone.
         foreach (var mentionedUserId in mentionedUserIds.Concat(everyoneRecipientIds))
         {
             await _notificationsRealtimeNotifier.NotifyAsync(
@@ -99,13 +96,6 @@ public class MessagesService(
         return result;
     }
 
-    /// <summary>
-    /// Resolves <c>@username</c> and the literal <c>@everyone</c> token in one pass. The former is
-    /// always available to anyone with SendMessages; the latter is additionally gated behind
-    /// <see cref="ServerPermission.MentionEveryone"/> - a sender without it just has the token do
-    /// nothing (no error, no mass notification), matching how a plain-text "@everyone" from someone
-    /// without the permission behaves on Discord.
-    /// </summary>
     private async Task<(List<Guid> MentionedUserIds, List<Guid> EveryoneRecipientIds)> ResolveAndStoreMentionsAsync(Guid channelId, Message message, string? content)
     {
         var usernames = ExtractMentionedUsernames(content);
@@ -151,8 +141,6 @@ public class MessagesService(
         {
             message.MentionsEveryone = true;
 
-            // Every current member of the server, not just those with the channel open - minus the
-            // sender and anyone already covered by an explicit @mention above.
             everyoneRecipientIds = await _context.ServerMembers
                 .Where(member => member.ServerId == channel.ServerId && member.UserId != message.SenderId)
                 .Select(member => member.UserId)
@@ -222,8 +210,6 @@ public class MessagesService(
 
         var message = await GetMessageInChannelAsync(channelId, messageId);
 
-        // Authors always delete their own; ManageMessages extends that to anyone else's. Members
-        // with neither fall through to hiding the message for themselves only.
         var canDeleteForEveryone = message.SenderId == currentUserId
             || (await _permissionService.ResolveAsync(currentUserId, channel.ServerId)).Has(ServerPermission.ManageMessages);
 

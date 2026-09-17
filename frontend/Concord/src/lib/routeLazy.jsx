@@ -1,8 +1,5 @@
 import { lazy } from 'react'
 
-// Everything here is reachable only after navigating away from the public landing page (auth
-// screens, the whole authenticated app under /cabinet, the dev kitchen sink) - lazy so a first,
-// unauthenticated visit to '/' only downloads LandingScreen instead of the entire app bundle.
 export const LoginScreen = lazy(() => import('../features/auth/LoginScreen').then((m) => ({ default: m.LoginScreen })))
 export const RegisterScreen = lazy(() =>
   import('../features/auth/RegisterScreen').then((m) => ({ default: m.RegisterScreen })),

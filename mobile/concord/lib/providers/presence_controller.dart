@@ -35,9 +35,6 @@ class PresenceController extends StateNotifier<PresenceState> {
 
   final Ref _ref;
 
-  // Well under the backend's 3-minute Redis TTL on the connection-count key (see
-  // PresenceService.RenewConnectionAsync) - keeps a long-lived, otherwise-idle connection's
-  // "online" state from expiring out from under it.
   static const _heartbeatInterval = Duration(seconds: 60);
 
   PresenceHub? _hub;

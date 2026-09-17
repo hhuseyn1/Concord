@@ -14,17 +14,6 @@ import '../../utils/stars_format.dart';
 import '../../widgets/widgets.dart';
 import 'send_stars_sheet.dart';
 
-/// The Stars tab of Settings: balance, the Stars-funded Premium trial, the
-/// real-money package catalog and the ledger history.
-///
-/// Every number shown here comes from `GET Stars/Config`/`GET Stars/Wallet` -
-/// reward amounts, the daily cap, trial cost/duration and the package list are
-/// all server-owned, so none of them are hardcoded in this file.
-///
-/// The `WidgetsBindingObserver` mirrors `billing_section.dart`: buying a
-/// package hands off to the external browser, and coming back to the
-/// foreground is the only signal we get that something may have completed.
-/// See `StarsController.refreshAfterResume` for the purchase-status poll.
 class StarsSection extends ConsumerStatefulWidget {
   const StarsSection({super.key});
 
@@ -98,7 +87,6 @@ class _StarsSectionState extends ConsumerState<StarsSection> with WidgetsBinding
   }
 }
 
-/// Shared card chrome for the Stars tab's blocks.
 class _StarsCard extends StatelessWidget {
   const _StarsCard({required this.child});
 
@@ -142,9 +130,6 @@ class _BalanceCard extends StatelessWidget {
             style: textTheme.labelSmall?.copyWith(color: colors.fgMuted, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: ConcordSpacing.xs),
-          // Baseline-ish row of icon + number + unit. Everything after the
-          // icon is wrapped so a five-digit balance at Extra large text
-          // reflows instead of overflowing a 320pt card.
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -172,9 +157,6 @@ class _BalanceCard extends StatelessWidget {
             style: textTheme.bodySmall?.copyWith(color: colors.fgMuted),
           ),
           const SizedBox(height: ConcordSpacing.md),
-          // Full-width rather than trailing the balance: at 320pt there isn't
-          // room for a balance line and a button on the same row once the
-          // text scale grows.
           ConcordButton(
             label: l10n.starsSendButton,
             leading: const Icon(Icons.send_outlined, size: 16),
@@ -195,8 +177,6 @@ class _PremiumTrialCard extends ConsumerStatefulWidget {
 }
 
 class _PremiumTrialCardState extends ConsumerState<_PremiumTrialCard> {
-  /// One key per activation attempt, held across retries (see the transfer
-  /// flow for the same discipline).
   String _idempotencyKey = newIdempotencyKey();
   String? _error;
 
@@ -258,8 +238,6 @@ class _PremiumTrialCardState extends ConsumerState<_PremiumTrialCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Wrap, not Row: the title plus the "Trial active" badge stop
-              // fitting on one line at larger text sizes.
               Wrap(
                 spacing: ConcordSpacing.sm,
                 runSpacing: ConcordSpacing.xs,
@@ -285,9 +263,6 @@ class _PremiumTrialCardState extends ConsumerState<_PremiumTrialCard> {
                 l10n.starsTrialDescription(config.premiumTrialCostStars, config.premiumTrialDurationDays),
                 style: textTheme.bodyMedium?.copyWith(color: colors.fgMuted),
               ),
-              // Three mutually exclusive states: the trial is already running,
-              // Premium came from a paid subscription, or there aren't enough
-              // Stars yet.
               if (wallet.premiumTrialActive && wallet.premiumTrialExpiresAt != null) ...[
                 const SizedBox(height: ConcordSpacing.sm),
                 Text(
@@ -383,9 +358,6 @@ class _PackagesListState extends ConsumerState<_PackagesList> {
                   children: [
                     Icon(Icons.star, size: 20, color: colors.warning),
                     const SizedBox(width: ConcordSpacing.sm),
-                    // Expanded around the text column so the Buy button keeps
-                    // its intrinsic width and the label truncates/wraps
-                    // instead of pushing the button off-screen.
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -507,8 +479,6 @@ class _TransactionRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(starsTransactionLabel(l10n, transaction), style: textTheme.bodyMedium),
-                // `fgFaint` (the third, dimmest text tier) is exactly what this
-                // kind of least-important metadata is for.
                 Text(
                   formatAbsoluteTimestamp(transaction.created),
                   style: textTheme.labelSmall?.copyWith(color: colors.fgFaint),
@@ -517,9 +487,6 @@ class _TransactionRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: ConcordSpacing.sm),
-          // The signed amount and the running balance are short, but they're
-          // still capped and right-aligned so a large scale can't let them
-          // collide with the label column.
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.3),
             child: Column(
@@ -579,14 +546,6 @@ class _InlineMessage extends StatelessWidget {
   }
 }
 
-/// Compact "★ 250" chip for the Settings account header - the mobile
-/// counterpart of the web app's `StarsBalanceIndicator` in `UserPanel.jsx`.
-/// This app has no persistent sidebar user card, and the account header row at
-/// the top of Settings > My Account is the one piece of "current user" chrome
-/// it does have, so the chip lives there rather than on every screen.
-///
-/// Renders nothing while loading or if the wallet failed: a broken chip next to
-/// the user's own name is worse than no chip.
 class StarsBalanceChip extends ConsumerWidget {
   const StarsBalanceChip({super.key, this.onTap});
 

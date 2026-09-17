@@ -31,7 +31,6 @@ export function DeleteAccountSection() {
     setFormError('')
     try {
       await deleteMutation.mutateAsync({ Password: password })
-      // Same underlying primitive the sign-out flow uses to clear local auth state.
       tokenStorage.clearTokens()
       toast({
         variant: 'success',

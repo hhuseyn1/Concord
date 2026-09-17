@@ -25,9 +25,6 @@ List<String> _benefitLabels(AppLocalizations l10n) => [
       l10n.billingBenefitMessageLength,
 ];
 
-/// The Billing tab of Settings - see the doc comment on `BillingController`
-/// (`lib/providers/billing_providers.dart`) for the full rationale behind the
-/// resume-triggered polling this screen wires up below.
 class BillingSection extends ConsumerStatefulWidget {
   const BillingSection({super.key});
 
@@ -50,10 +47,6 @@ class _BillingSectionState extends ConsumerState<BillingSection> with WidgetsBin
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // The app gets backgrounded while the external browser shows Stripe Checkout/the Customer
-    // Portal (there is no `concord://` deep-link return - see `BillingController`'s doc comment
-    // for why). Resuming is the only signal we get that the user might be done, so it's what
-    // triggers the bounded `GET Billing/Subscription` poll.
     if (state == AppLifecycleState.resumed) {
       unawaited(ref.read(billingControllerProvider.notifier).refreshAfterResume());
     }
@@ -105,8 +98,6 @@ class _BillingSectionState extends ConsumerState<BillingSection> with WidgetsBin
   }
 }
 
-/// Maps an `ApiException` to display copy - see `apiErrorMessage` for the shared logic (this
-/// wrapper only exists so call sites in this file keep reading `_actionErrorMessage`).
 String _actionErrorMessage(AppLocalizations l10n, ApiException e) {
   return apiErrorMessage(l10n, e);
 }

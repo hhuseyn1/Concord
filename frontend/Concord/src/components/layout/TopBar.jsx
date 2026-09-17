@@ -54,15 +54,6 @@ export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar, 
           <IconButton
             aria-label={sidebarOpen ? 'Close channel sidebar' : 'Open channel sidebar'}
             variant="ghost"
-            // relative z-50: the mobile sidebar's backdrop is a fixed, full-viewport z-40 overlay,
-            // which would otherwise sit on top of this button (same screen position, no way to tap
-            // it again to close) the moment the drawer opens - keeping this above the overlay's
-            // stacking order is what makes it act as an actual open/close toggle instead of only
-            // ever opening, with "tap the backdrop" as the sole, undiscoverable way to close it.
-            // pointer-events-auto: Radix's modal Dialog (via react-remove-scroll) disables pointer
-            // events on background content while open, which this button - outside the Dialog's own
-            // Portal - would otherwise inherit; Radix's own Overlay sets this same override on itself
-            // for the identical reason.
             className="relative z-50 pointer-events-auto -ml-1 sm:hidden"
             onClick={onToggleSidebar}
           >
@@ -145,9 +136,6 @@ export function TopBar({ onToggleMembers, membersOpen = false, onToggleSidebar, 
             <IconButton
               aria-label="Toggle member list"
               variant={membersOpen ? 'secondary' : 'ghost'}
-              // Below `md`, `AppShell` renders the member list as a Dialog drawer whose fixed,
-              // full-viewport overlay would otherwise sit on top of this same-position button -
-              // same fix as the sidebar toggle button above, for the same reason.
               className="relative z-50 pointer-events-auto"
               onClick={onToggleMembers}
             >

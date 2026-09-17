@@ -7,11 +7,6 @@ export const Tabs = RadixTabs.Root
 export function TabsList({ className, ...props }) {
   const listRef = useRef(null)
 
-  // A plain mouse wheel only ever produces vertical deltaY, so an overflow-x:auto strip like
-  // this one is otherwise unreachable without a trackpad/touch gesture. Redirect a vertical
-  // wheel scroll into horizontal - but only once the strip actually overflows, and only when
-  // the gesture itself is vertical (deltaX already dominant means it's a real horizontal
-  // trackpad/shift+wheel swipe, which should pass through untouched).
   const handleWheel = (event) => {
     const el = listRef.current
     if (!el || el.scrollWidth <= el.clientWidth) return

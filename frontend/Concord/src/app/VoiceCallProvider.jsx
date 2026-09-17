@@ -324,14 +324,6 @@ export function VoiceCallProvider({ children }) {
       return
     }
 
-    // The SDK's default publishDefaults.audioPreset is AudioPresets.music, a
-    // higher-bitrate, stereo-capable profile meant for music/high-fidelity
-    // content. On real-world connections with jitter/packet loss, that extra
-    // bitrate makes audible crackling/static more likely than a profile
-    // tuned for speech. dtx/red are already SDK defaults but are made
-    // explicit here since they materially help packet-loss resilience for
-    // voice, and channelCount: 1 pins mono capture since some devices
-    // default to stereo, which some browsers/pipelines handle inconsistently.
     const newRoom = new Room({
       audioCaptureDefaults: {
         echoCancellation: true,

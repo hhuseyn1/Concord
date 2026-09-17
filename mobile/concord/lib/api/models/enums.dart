@@ -255,9 +255,6 @@ enum CustomStatusExpiryPreset {
   }
 }
 
-/// The wire values used by `Billing/Subscription` ("None"/"Active"/"PastDue"/"Canceled") -
-/// REST-only (no hub ever sends this), but `fromWire` still tolerates an ordinal just in case,
-/// matching every other enum in this file.
 enum SubscriptionStatus {
   none,
   active,
@@ -301,10 +298,6 @@ enum FriendRelationshipStatus {
   }
 }
 
-/// Ledger row kinds from `Stars/Transactions` ("ChatReward"/"TransferSent"/...). The backend
-/// serializes enums by name (Newtonsoft `StringEnumConverter`), but `fromWire` tolerates an
-/// ordinal like every other enum here. Declaration order matches the backend's
-/// `StarTransactionType`, so the ordinal fallback stays correct.
 enum StarTransactionType {
   chatReward,
   transferSent,
@@ -312,8 +305,6 @@ enum StarTransactionType {
   premiumTrialPurchase,
   packagePurchase,
 
-  /// Not a backend value: what an unrecognized/future wire value maps to, so one new server-side
-  /// transaction kind can't break the whole history list.
   unknown;
 
   static StarTransactionType fromWire(dynamic value) {
@@ -329,13 +320,10 @@ enum StarTransactionType {
     return StarTransactionType.unknown;
   }
 
-  /// True for the kinds that always move Stars *out* of the wallet - used to render a sign when
-  /// the server sends a bare magnitude instead of a negative `Amount`.
   bool get isDebit =>
       this == StarTransactionType.transferSent || this == StarTransactionType.premiumTrialPurchase;
 }
 
-/// Lifecycle of a real-money Stars package purchase (`Stars/Purchases/{id}/Status`).
 enum StarPurchaseStatus {
   pending,
   completed,

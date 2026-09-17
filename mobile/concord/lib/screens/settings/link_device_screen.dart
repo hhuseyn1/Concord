@@ -28,7 +28,6 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
   String? _error;
   QrLoginRequestInfoResponse? _request;
 
-  /// Null until the camera-permission rationale flow has run once.
   bool? _cameraGranted;
 
   @override

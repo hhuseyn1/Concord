@@ -25,10 +25,6 @@ export function VerifyEmailScreen() {
     if (!token || attemptedRef.current) return
     attemptedRef.current = true
 
-    // No cancellation flag here: the ref guard above already ensures this only ever
-    // fires once per token (including through React StrictMode's dev double-invoke of
-    // effects), so tying the state update to this effect's cleanup would incorrectly
-    // drop the result when StrictMode's synthetic cleanup runs before the request settles.
     authService
       .confirmEmail(token)
       .then(() => {

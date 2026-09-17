@@ -11,8 +11,6 @@ import {
 import { useFontSize } from '../../hooks/useAppearance'
 import { FONT_SIZES, setFontSize } from '../../lib/fontSize'
 
-// Labels spell out what each option means (and the resulting text size) rather
-// than an unexplained "S / M / L / XL".
 const LABEL_KEYS = {
   small: 'appearance.fontSizeSmall',
   default: 'appearance.fontSizeDefault',
@@ -20,12 +18,6 @@ const LABEL_KEYS = {
   xl: 'appearance.fontSizeExtraLarge',
 }
 
-/**
- * Font-size preference picker. A dropdown radio group (same shape as
- * `LanguageSwitcher`) rather than a segmented control: the four labels are long
- * enough that segments would wrap or overflow on a narrow viewport - which is
- * exactly the viewport where someone is most likely to be enlarging text.
- */
 export function FontSizeControl() {
   const { t } = useTranslation()
   const fontSize = useFontSize()
@@ -58,8 +50,6 @@ export function FontSizeControl() {
         </DropdownMenu>
       </div>
 
-      {/* Live preview - the sample is styled with the same `text-base`/`text-xs`
-        * utilities the rest of the app uses, so it resizes with the choice. */}
       <div className="flex items-start gap-2 rounded-md border border-border-subtle bg-surface-sidebar p-3">
         <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
         <div className="min-w-0">

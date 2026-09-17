@@ -10,8 +10,6 @@ public class ServerMemberSummary
     [JsonPropertyName("JoinedAt")]
     public DateTime JoinedAt { get; set; }
 
-    /// <summary>P1 moderation state, so the member list can badge muted and timed-out members
-    /// without a request per row.</summary>
     [JsonPropertyName("IsMuted")]
     public bool IsMuted { get; set; }
 

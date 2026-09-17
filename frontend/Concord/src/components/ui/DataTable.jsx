@@ -4,10 +4,6 @@ import { Button } from './Button'
 import { EmptyState } from './EmptyState'
 import { Skeleton } from './Skeleton'
 
-// Shared table shell for the admin console's paginated tables (users, audit log, reports
-// queue, payments): a bordered table wrapper, loading skeleton, empty state, error state, and
-// a prev/next pagination footer. Filters/search inputs stay in the calling section - this only
-// owns what was previously identical, copy-pasted markup across those tables.
 export function DataTable({
   columns,
   rows,

@@ -34,7 +34,6 @@ export function LoginScreen() {
       return `/cabinet?invite=${encodeURIComponent(pendingInvite)}`
     }
     return '/cabinet'
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const {
     register,

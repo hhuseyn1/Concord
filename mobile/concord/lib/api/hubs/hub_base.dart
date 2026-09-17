@@ -25,10 +25,6 @@ abstract class ConcordHub {
 
   Future<void> disconnect() => connection.stop();
 
-  /// SignalR groups (Channel:/Server: membership) are keyed by connection id
-  /// server-side, so a successful automatic reconnect (a new connection id)
-  /// silently drops any group membership joined before the drop. Callers
-  /// must use this to rejoin whatever channels/servers are currently active.
   void onReconnected(ReconnectedCallback callback) {
     connection.onreconnected(callback);
   }

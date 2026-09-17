@@ -51,11 +51,6 @@ public class FilesService(IFileStorage fileStorage, ApplicationDbContext context
         ["application/zip"] = [".zip"]
     };
 
-    // Verifies the uploaded bytes actually match the claimed Content-Type instead of trusting the
-    // client-supplied header - P2.14 pentest finding, a plaintext file with an embedded <script> tag
-    // was accepted as a "PNG avatar" since only the header/extension were checked before. No entry
-    // for text/plain: plain text has no magic-byte signature to check against, so it stays gated by
-    // the content-type/extension allow-list above only.
     private static readonly Dictionary<string, Func<byte[], bool>> SignatureValidators = new()
     {
         ["image/png"] = bytes => StartsWith(bytes, [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]),
@@ -63,8 +58,6 @@ public class FilesService(IFileStorage fileStorage, ApplicationDbContext context
         ["image/gif"] = bytes => StartsWith(bytes, "GIF87a"u8.ToArray()) || StartsWith(bytes, "GIF89a"u8.ToArray()),
         ["image/webp"] = bytes => bytes.Length >= 12 && StartsWith(bytes, "RIFF"u8.ToArray()) && bytes.AsSpan(8, 4).SequenceEqual("WEBP"u8),
         ["video/mp4"] = bytes => bytes.Length >= 8 && bytes.AsSpan(4, 4).SequenceEqual("ftyp"u8),
-        // MP3 either carries a leading ID3 tag, or starts directly with a frame-sync byte pair
-        // (11 set bits: 0xFF followed by a byte with its top 3 bits set).
         ["audio/mpeg"] = bytes => StartsWith(bytes, "ID3"u8.ToArray()) || (bytes.Length >= 2 && bytes[0] == 0xFF && (bytes[1] & 0xE0) == 0xE0),
         ["audio/ogg"] = bytes => StartsWith(bytes, "OggS"u8.ToArray()),
         ["application/pdf"] = bytes => StartsWith(bytes, "%PDF-"u8.ToArray()),
@@ -100,17 +93,6 @@ public class FilesService(IFileStorage fileStorage, ApplicationDbContext context
 
     public bool IsOwnUploadUrl(string? url) => _fileStorage.OwnsUrl(url);
 
-    /// <summary>
-    /// The message-attachment-specific half of the ownership check: <see cref="IsOwnUploadUrl"/>
-    /// only confirms the URL is *shaped* like something this server saved, which any user who has
-    /// merely seen the URL in a message they can view can satisfy. This additionally confirms the
-    /// <see cref="UploadedFile"/> row for that exact URL was uploaded by <paramref name="userId"/>.
-    /// Not first-use/consumption-tracked on purpose: a user reusing their own attachment across
-    /// multiple messages of their own is not the gap this closes, and <c>ForwardingService</c>
-    /// deliberately reuses another user's attachment URL when forwarding a message the current user
-    /// can already see - it does not call this check at all, so consumption-tracking here would have
-    /// no effect on it either way.
-    /// </summary>
     public async Task<bool> IsOwnAttachmentAsync(Guid userId, string? url)
     {
         if (!IsOwnUploadUrl(url))

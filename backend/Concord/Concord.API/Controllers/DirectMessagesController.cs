@@ -14,7 +14,7 @@ public class DirectMessagesController(DirectMessagesService directMessagesServic
     private readonly ForwardingService _forwardingService = forwardingService;
 
     [HttpGet("Conversations")]
-    public async Task<PagedResult<ConversationResponse>> GetConversationsAsync([FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<ConversationResponse>> GetConversationsAsync(int page, int pageSize)
     {
         return await _directMessagesService.GetConversationsAsync(GetUserId(), page, pageSize);
     }
@@ -26,15 +26,15 @@ public class DirectMessagesController(DirectMessagesService directMessagesServic
     }
 
     [HttpGet("Conversations/{conversationId:guid}/Messages")]
-    public async Task<PagedResult<DirectMessageResponse>> GetMessagesAsync(Guid conversationId, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<DirectMessageResponse>> GetMessagesAsync(Guid conversationId, int page, int pageSize)
     {
         return await _directMessagesService.GetMessagesAsync(GetUserId(), conversationId, page, pageSize);
     }
 
     [HttpGet("Conversations/{conversationId:guid}/Messages/Search")]
-    public async Task<PagedResult<DirectMessageResponse>> SearchMessagesAsync(Guid conversationId, [FromQuery] string query, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<DirectMessageResponse>> SearchMessagesAsync(Guid conversationId, [FromQuery] SearchDirectMessagesRequest request)
     {
-        return await _directMessagesService.SearchMessagesAsync(GetUserId(), conversationId, query, page, pageSize);
+        return await _directMessagesService.SearchMessagesAsync(GetUserId(), conversationId, request);
     }
 
     [HttpPost("Conversations/{conversationId:guid}/Messages")]

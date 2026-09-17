@@ -1,6 +1,4 @@
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.Routing;
 
 namespace Concord.API.Configs;
 
@@ -24,48 +22,36 @@ public static class RateLimitingConfig
 
                 return routeKey switch
                 {
-                    // Login: unauthenticated + credential stuffing target, so partition by client IP.
                     "POST Api/V1.0/Login" or "POST Api/V1.0/Login/TwoFactor" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"login:{GetClientIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // Register: unauthenticated, same mass-account-creation concern as Login - partition by IP.
                     "POST Api/V1.0/Register" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"register:{GetClientIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // ForgotPassword: unauthenticated, same concern as Login/Register (also a vector for
-                    // spamming a victim's inbox with reset emails) - partition by IP.
                     "POST Api/V1.0/Forgot-password" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"forgot-password:{GetClientIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // ResendVerificationEmail: unauthenticated, same concern as Forgot-password - could
-                    // otherwise be used to spam a victim's inbox with verification emails.
                     "POST Api/V1.0/Resend-verification-email" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"resend-verification:{GetClientIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // ResetPassword: unauthenticated - bounds brute-forcing the reset token itself.
                     "POST Api/V1.0/Reset-password" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"reset-password:{GetClientIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // VerifyEmail: unauthenticated - same concern as Reset-password, bounds brute-forcing the
-                    // verification token itself.
                     "POST Api/V1.0/Verify-email" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"verify-email:{GetClientIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // ChangePassword + every 2FA management action: authenticated but still worth bounding -
-                    // each either re-checks the current password server-side or is equally security-sensitive,
-                    // so an attacker with a live session could otherwise brute-force it.
                     "POST Api/V1.0/Me:Change-password" or
                     "POST Api/V1.0/Me/TwoFactor/Setup" or
                     "POST Api/V1.0/Me/TwoFactor/Enable" or
@@ -75,28 +61,22 @@ public static class RateLimitingConfig
                             $"change-password:{GetUserOrIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // SendMessage: authenticated, partition per user so one account spamming doesn't consume
-                    // other users' quota. Compounds with the Content length cap.
                     "POST Api/V1.0/Servers/{serverId:guid}/Channels/{channelId:guid}/Messages" or
                     "POST Api/V1.0/DirectMessages/Conversations/{conversationId:guid}/Messages" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"send-message:{GetUserOrIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromSeconds(10), QueueLimit = 0 }),
 
-                    // FriendRequest: authenticated - bounds mass-request spam toward other users.
                     "POST Api/V1.0/Friends/Requests/{targetUserId:guid}" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"friend-request:{GetUserOrIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // Search: authenticated - ILIKE/trigram queries are more expensive than a typical read, so
-                    // this is tighter than most authenticated policies despite being read-only.
                     "GET Api/V1.0/Search/Messages" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"search:{GetUserOrIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromSeconds(10), QueueLimit = 0 }),
 
-                    // FileUpload: authenticated - bounds storage/bandwidth abuse from a single account.
                     "POST Api/V1.0/Files/Avatar" or
                     "POST Api/V1.0/Files/ServerIcon" or
                     "POST Api/V1.0/Files/Attachment" =>
@@ -104,11 +84,6 @@ public static class RateLimitingConfig
                             $"file-upload:{GetUserOrIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // QrLogin: partly unauthenticated, so partitioned by user-or-IP together. The limit has to
-                    // absorb genuine polling - a browser polls roughly every 2s for up to 2 minutes, so ~60
-                    // calls per attempt - while still bounding someone grinding user codes against the approve
-                    // endpoint. Codes are 8 characters from a 32-character alphabet and live 2 minutes, so even
-                    // at this ceiling a guessing attack is not viable.
                     "POST Api/V1.0/QrLogin/Sessions" or
                     "GET Api/V1.0/QrLogin/Sessions/Status" or
                     "GET Api/V1.0/QrLogin/Requests/{userCode}" or
@@ -118,9 +93,6 @@ public static class RateLimitingConfig
                             $"qr-login:{GetUserOrIp(httpContext)}",
                             _ => new FixedWindowRateLimiterOptions { PermitLimit = 90, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }),
 
-                    // VoiceWebhook: unauthenticated (trust comes from the signature check in VoiceService),
-                    // called by LiveKit itself rather than end users, so the limit is generous but still bounds
-                    // a misbehaving/compromised LiveKit deployment.
                     "POST Api/V1.0/Voice/Webhook" =>
                         RateLimitPartition.GetFixedWindowLimiter(
                             $"voice-webhook:{GetClientIp(httpContext)}",

@@ -19,11 +19,6 @@ public static class RoleExtensions
         MemberCount = memberCount
     };
 
-    /// <summary>
-    /// Splits a bitfield into its individual flag names. <c>Enum.ToString()</c> on a combined value
-    /// would collapse to "All"-style aliases and yields a single comma-joined string, so the flags
-    /// are tested one by one instead.
-    /// </summary>
     public static List<string> ToPermissionNames(this ServerPermission permissions) => Enum
         .GetValues<ServerPermission>()
         .Where(permission => permission != ServerPermission.None && permissions.HasFlag(permission))

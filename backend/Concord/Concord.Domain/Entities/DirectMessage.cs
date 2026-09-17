@@ -13,13 +13,11 @@ public class DirectMessage : BaseEntity
 
     public string? AttachmentUrl { get; set; }
 
-    /// <summary>Mirrors <see cref="Concord.Domain.Entities.Message.ReplyToMessageId"/> (M-02).</summary>
     public Guid? ReplyToMessageId { get; set; }
 
     public DateTime? PinnedAt { get; set; }
     public Guid? PinnedByUserId { get; set; }
 
-    /// <summary>Mirrors <see cref="Concord.Domain.Entities.Message.ForwardedFromSenderId"/> (P2.5).</summary>
     public Guid? ForwardedFromSenderId { get; set; }
     public DateTime? ForwardedFromCreatedAt { get; set; }
 }

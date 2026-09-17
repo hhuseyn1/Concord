@@ -27,9 +27,6 @@ class ApiClient {
 
   Future<void>? _refreshInFlight;
 
-  /// Bounded timeout applied to every underlying HTTP call so a bad network
-  /// (or a request that never gets a response) surfaces as a distinguishable
-  /// [ApiException] instead of hanging the UI indefinitely.
   static const Duration _requestTimeout = Duration(seconds: 15);
 
   Uri _buildUri(String path, Map<String, dynamic>? query) {

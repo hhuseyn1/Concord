@@ -2,10 +2,6 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../../components/ui/Button'
 
-// Shared 3-state sort control row used by both the Users and Payments admin tables.
-// Per field, repeated clicks cycle: inactive -> Asc -> Desc -> inactive (no sort at all,
-// letting the backend fall back to its own default order). Clicking a different field
-// always starts that field fresh at Asc, regardless of the previously active field's state.
 export function SortControls({ fields, sortBy, sortDirection, onSort }) {
   const { t } = useTranslation()
 

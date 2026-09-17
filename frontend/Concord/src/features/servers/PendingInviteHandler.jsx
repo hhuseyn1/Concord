@@ -5,8 +5,6 @@ import { clearPendingInvite, getPendingInvite } from './pendingInvite'
 import { mapJoinServerError } from './serversErrors'
 import { useJoinServerMutation } from './serversQueries'
 
-// Headless: auto-applies a pending invite (from the URL or from localStorage, captured earlier
-// in the auth flow) once the user is authenticated, then redirects straight into the server.
 export function PendingInviteHandler() {
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -45,7 +43,6 @@ export function PendingInviteHandler() {
         toast({ variant: 'danger', title: 'Could not join server', description: mapJoinServerError(error) })
       }
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams])
 
   return null

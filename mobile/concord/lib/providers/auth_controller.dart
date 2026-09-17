@@ -60,10 +60,6 @@ class AuthController extends StateNotifier<AuthState> {
     unawaited(_loadProfile());
   }
 
-  /// Registration requires email confirmation before the account can log in, so - unlike
-  /// [login] - this never transitions [state] to authenticated. A successful call just means the
-  /// verification email was sent; the caller shows a "check your email" state and the user logs
-  /// in separately once confirmed.
   Future<void> register({
     required String name,
     required String surname,

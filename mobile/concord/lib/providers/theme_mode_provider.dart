@@ -4,15 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _prefsKey = 'concord.themeMode';
 
-/// Persists the user's Dark/Light/System theme choice across restarts via
-/// [SharedPreferences] - same shape as `LocaleController`.
-///
-/// The default is [ThemeMode.system] rather than a hardcoded dark: until
-/// someone makes an explicit choice, following the OS is both the least
-/// surprising behaviour and the one that matches the web app's
-/// `prefers-color-scheme` fallback. Once a choice is made it's stored verbatim
-/// (`'light'`/`'dark'`/`'system'`) and wins from then on - including "System"
-/// itself, which is a real, re-selectable choice and not just the absence of one.
 class ThemeModeController extends StateNotifier<ThemeMode> {
   ThemeModeController() : super(ThemeMode.system) {
     _load();

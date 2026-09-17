@@ -1,6 +1,5 @@
 import 'json_utils.dart';
 
-/// One buyable real-money Stars package from `GET Stars/Config`.
 class StarPackage {
   const StarPackage({
     required this.id,
@@ -13,9 +12,7 @@ class StarPackage {
     return StarPackage(
       id: json.field('Id') as String,
       stars: json.field('Stars') as int,
-      // Decimal on the wire: JSON gives us an int for a round price and a double otherwise.
       priceAmount: (json.field('PriceAmount') as num).toDouble(),
-      // Stripe-style lowercase code ("usd").
       currency: json.field('Currency') as String? ?? 'usd',
     );
   }
@@ -26,10 +23,6 @@ class StarPackage {
   final String currency;
 }
 
-/// Server-owned Stars tuning knobs. Every number the Stars UI shows (reward
-/// amount, daily cap, trial cost/duration, package catalog) comes from here -
-/// nothing is hardcoded client-side, so changing `StarsConstants` on the
-/// backend is enough to change the copy on both platforms.
 class StarsConfigResponse {
   const StarsConfigResponse({
     required this.chatRewardAmount,

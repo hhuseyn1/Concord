@@ -24,11 +24,6 @@ public partial class RolesService(
     [GeneratedRegex("^#[0-9A-Fa-f]{6}$")]
     private static partial Regex HexColorRegex();
 
-    /// <summary>
-    /// Builds the <c>@everyone</c> role that every new server starts with. Called from
-    /// <see cref="ServersService.CreateServerAsync"/> inside the same unit of work, so a server can
-    /// never exist without one.
-    /// </summary>
     public static Role BuildDefaultRole(Guid serverId) => new()
     {
         ServerId = serverId,
@@ -55,8 +50,6 @@ public partial class RolesService(
             .Select(group => new { RoleId = group.Key, Count = group.Count() })
             .ToDictionaryAsync(entry => entry.RoleId, entry => entry.Count);
 
-        // The default role applies to everyone implicitly, so its count is the whole membership
-        // rather than the (always empty) set of assignment rows.
         var totalMembers = await _context.ServerMembers.CountAsync(member => member.ServerId == serverId);
 
         return roles
@@ -131,8 +124,6 @@ public partial class RolesService(
         await _permissionService.AssertCanManageRoleAsync(currentUserId, server, role);
         await AssertCanGrantAsync(currentUserId, server, permissions);
 
-        // The default role keeps its name and position - only its permission set is editable, since
-        // that set is the server's baseline for every member.
         if (!role.IsDefault)
         {
             ValidateName(request.Name);
@@ -158,7 +149,6 @@ public partial class RolesService(
 
         await _permissionService.AssertCanManageRoleAsync(currentUserId, server, role);
 
-        // Assignments go with it via the cascade configured on ServerMemberRole.
         _context.Roles.Remove(role);
 
         await _context.SaveChangesAsync();
@@ -180,8 +170,6 @@ public partial class RolesService(
         if (request.RoleIds.Any(roleId => !rolesById.ContainsKey(roleId)))
             throw new RoleNotFoundException();
 
-        // Every role in the set must already be one the caller outranks, both before and after the
-        // move - otherwise reordering would be a way around the hierarchy.
         foreach (var role in roles)
             await _permissionService.AssertCanManageRoleAsync(currentUserId, server, role);
 
@@ -270,11 +258,6 @@ public partial class RolesService(
             ?? throw new TargetNotServerMemberException();
     }
 
-    /// <summary>
-    /// Blocks privilege escalation: a non-owner may only put permissions into a role that they
-    /// themselves already hold. Without this, ManageRoles alone would be enough to mint an
-    /// Administrator role and take over the server.
-    /// </summary>
     private async Task AssertCanGrantAsync(Guid currentUserId, Server server, ServerPermission permissions)
     {
         var resolved = await _permissionService.ResolveAsync(currentUserId, server);
@@ -292,8 +275,6 @@ public partial class RolesService(
     {
         var value = (ServerPermission)permissions;
 
-        // Reject unknown bits rather than storing them - they would survive round trips and quietly
-        // become meaningful when a later phase claims that bit.
         if ((value & ~PermissionService.All) != ServerPermission.None)
             throw new ParameterValidationException(nameof(permissions));
 

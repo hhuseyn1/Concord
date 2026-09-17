@@ -1,7 +1,3 @@
-/**
- * Maps API failures to copy a person can act on. Mirrors
- * `features/settings/settingsErrors.js`.
- */
 
 function genericMessage(t, error) {
   if (error?.isNetworkError) return t('stars.errors.network')

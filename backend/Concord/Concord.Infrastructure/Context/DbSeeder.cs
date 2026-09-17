@@ -11,12 +11,11 @@ public static class DbSeeder
     {
         if (await context.Users.AnyAsync())
             return;
-        
-        // Admin
+
         var adminPassword = PasswordHasher.HashPassword("admin");
         var admin = new User("admin@gmail.com", adminPassword, "994773911322", "az-AZ", Roles.Admin, "Admin", "Admin");
         context.Users.Add(admin);
-        
+
         await context.SaveChangesAsync();
     }
 }

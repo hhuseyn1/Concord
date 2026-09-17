@@ -85,7 +85,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         ConfigureStarTransaction(modelBuilder.Entity<StarTransaction>());
         ConfigureStarPurchase(modelBuilder.Entity<StarPurchase>());
     }
-    
+
     private static void ConfigureSession(EntityTypeBuilder<Session> builder)
     {
         builder.ToTable("Session");
@@ -105,7 +105,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
     }
-    
+
     private static void ConfigurePasswordResetToken(EntityTypeBuilder<PasswordResetToken> builder)
     {
         builder.ToTable("PasswordResetToken");
@@ -154,8 +154,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(code => code.CodeHash).IsRequired().HasMaxLength(100);
 
-        // Redemption looks codes up by user, then compares hashes in memory - the hash is salted per
-        // row, so it cannot be used as a lookup key the way PasswordResetToken's can.
         builder.HasIndex(code => code.UserId);
 
         builder.HasOne<User>()
@@ -176,8 +174,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Property(session => session.UserCode).IsRequired().HasMaxLength(16);
         builder.Property(session => session.PollingTokenHash).IsRequired().HasMaxLength(64);
 
-        // Both are lookup keys on unauthenticated or near-unauthenticated paths, so both are unique
-        // and indexed - a scan here would be a denial-of-service lever.
         builder.HasIndex(session => session.UserCode).IsUnique();
         builder.HasIndex(session => session.PollingTokenHash).IsUnique();
 
@@ -231,9 +227,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(user => user.ActivityApplicationName).HasMaxLength(128);
 
-        // Base32 of a 20-byte secret is 32 chars, but the stored value is that secret wrapped by
-        // Data Protection's IDataProtector.Protect - measured at ~176 base64 chars for a 32-char
-        // input, so 64 silently truncated it. 512 leaves comfortable headroom.
         builder.Property(user => user.TwoFactorSecret).HasMaxLength(512);
 
         builder.Property(user => user.StarsBalance).HasDefaultValue(0);
@@ -308,12 +301,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(role => role.Color).HasMaxLength(7);
 
-        // Persisted as bigint so the flags enum has room to grow past 32 permissions.
         builder.Property(role => role.Permissions).HasConversion<long>();
 
         builder.HasIndex(role => new { role.ServerId, role.Position });
 
-        // One @everyone role per server, enforced in the database rather than only in the service.
         builder.HasIndex(role => role.ServerId)
             .IsUnique()
             .HasFilter("\"IsDefault\"")
@@ -346,8 +337,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(ban => ban.Reason).HasMaxLength(500);
 
-        // One live ban row per (server, user). Lifting a ban deletes the row rather than flagging it,
-        // so this stays a plain unique index and "is banned" never needs a status column.
         builder.HasIndex(ban => new { ban.ServerId, ban.UserId }).IsUnique();
 
         builder.HasOne<Server>().WithMany().HasForeignKey(ban => ban.ServerId).OnDelete(DeleteBehavior.Cascade);
@@ -422,8 +411,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.HasOne<User>().WithMany().HasForeignKey(message => message.PinnedByUserId).OnDelete(DeleteBehavior.SetNull);
         builder.HasOne<User>().WithMany().HasForeignKey(message => message.ForwardedFromSenderId).OnDelete(DeleteBehavior.SetNull);
 
-        // P2.3 global search: trigram-backed ILIKE lookups over Content, widened from the P1
-        // per-conversation search to every channel/DM the caller can access.
         builder.HasIndex(message => message.Content).HasMethod("gin").HasOperators("gin_trgm_ops");
     }
 
@@ -506,7 +493,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.HasOne<User>().WithMany().HasForeignKey(message => message.PinnedByUserId).OnDelete(DeleteBehavior.SetNull);
         builder.HasOne<User>().WithMany().HasForeignKey(message => message.ForwardedFromSenderId).OnDelete(DeleteBehavior.SetNull);
 
-        // Mirrors ConfigureMessage's trigram index (P2.3).
         builder.HasIndex(message => message.Content).HasMethod("gin").HasOperators("gin_trgm_ops");
     }
 
@@ -574,7 +560,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(notification => notification.Created).HasDefaultValueSql("now()");
 
-        // Matches ModerationService's/ReportsService's ban/timeout/report reason ceiling.
         builder.Property(notification => notification.Reason).HasMaxLength(500);
 
         builder.HasOne<User>().WithMany().HasForeignKey(notification => notification.RecipientUserId).OnDelete(DeleteBehavior.Restrict);
@@ -607,8 +592,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(file => file.Created).HasDefaultValueSql("now()");
 
-        // Matches AvatarUrl's ceiling (ConfigureUser) - every URL this table stores comes from the
-        // same FilesService.SaveFileAsync path.
         builder.Property(file => file.Url).IsRequired().HasMaxLength(2048);
 
         builder.HasIndex(file => file.Url).IsUnique();
@@ -629,11 +612,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(report => report.Created).HasDefaultValueSql("now()");
 
-        // Matches ModerationService's ban/timeout reason ceiling (MaxReasonLength = 500).
         builder.Property(report => report.Reason).IsRequired().HasMaxLength(500);
 
-        // Read pattern is "give me the queue" (filtered by Status) and "who filed this" - both get
-        // their own index rather than a composite, since either can be queried alone.
         builder.HasIndex(report => report.Status);
         builder.HasIndex(report => report.ReporterUserId);
 
@@ -643,15 +623,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Nullable, unset until reviewed; Restrict for the same reason every other actor FK on this
-        // context is Restrict - an admin account is never expected to be hard-deleted out from under
-        // rows that reference it.
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(report => report.ResolvedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // TargetId is deliberately not an FK - see the Report class doc comment.
     }
 
     private static void ConfigureAuditLog(EntityTypeBuilder<AuditLog> builder)
@@ -665,8 +641,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Property(log => log.Action).IsRequired().HasMaxLength(64);
         builder.Property(log => log.TargetType).HasMaxLength(64);
 
-        // The admin feed is read newest-first and commonly filtered by actor or by action; a composite
-        // covering the default sort keeps both filtered and unfiltered reads off a full scan.
         builder.HasIndex(log => new { log.ActorUserId, log.Created });
         builder.HasIndex(log => new { log.Action, log.Created });
 
@@ -687,8 +661,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(token => token.Token).IsRequired().HasMaxLength(4096);
 
-        // Unique on Token alone, not (UserId, Token) - see PushTokensService.RegisterAsync for why a
-        // re-registration under a different account must reassign this row rather than duplicate it.
         builder.HasIndex(token => token.Token).IsUnique();
         builder.HasIndex(token => token.UserId);
 
@@ -710,10 +682,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Property(subscription => subscription.StripeCustomerId).IsRequired();
         builder.Property(subscription => subscription.StripeSubscriptionId).IsRequired();
 
-        // Idempotency backstop against concurrent webhook races - see BillingService's upsert.
         builder.HasIndex(subscription => subscription.StripeSubscriptionId).IsUnique();
 
-        // Not unique - a user accumulates multiple historical rows across resubscribe cycles.
         builder.HasIndex(subscription => subscription.UserId);
 
         builder.HasOne<User>()
@@ -732,13 +702,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         builder.Property(transaction => transaction.IdempotencyKey).HasMaxLength(100);
 
-        // The ledger is read as "give me this user's history", newest first - a composite covering
-        // that default sort keeps it off a full scan.
         builder.HasIndex(transaction => new { transaction.UserId, transaction.Created });
 
-        // Idempotency backstop against duplicate transfer/trial-activation requests (see
-        // StarsService) - scoped to rows that actually carry a key, since chat rewards and
-        // webhook-driven package purchases never set one.
         builder.HasIndex(transaction => new { transaction.UserId, transaction.IdempotencyKey })
             .IsUnique()
             .HasFilter("\"IdempotencyKey\" IS NOT NULL");
@@ -773,9 +738,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Property(purchase => purchase.StripeCheckoutSessionId).HasMaxLength(255);
         builder.Property(purchase => purchase.StripePaymentIntentId).HasMaxLength(255);
 
-        // decimal defaults to (18,2) precision under Npgsql, which is exactly right for a two-decimal
-        // currency amount - set explicitly so it's not left to the provider's own default-mapping
-        // convention.
         builder.Property(purchase => purchase.PriceAmount).HasPrecision(18, 2);
 
         builder.HasIndex(purchase => purchase.UserId);

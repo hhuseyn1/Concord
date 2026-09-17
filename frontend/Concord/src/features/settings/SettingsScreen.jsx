@@ -21,10 +21,6 @@ const DEFAULT_TAB = 'account'
 export function SettingsScreen() {
   const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
-  // The active tab lives in `?tab=` rather than in component state. Links into a specific tab
-  // (a Stripe Customer Portal return URL pointing at `?tab=billing`, the Stars chip in the user
-  // panel pointing at `?tab=stars`) then work even when Settings is already on screen and
-  // wouldn't remount. `replace` keeps tab switching out of the back-button history.
   const requestedTab = searchParams.get('tab')
   const tab = TAB_VALUES.includes(requestedTab) ? requestedTab : DEFAULT_TAB
 

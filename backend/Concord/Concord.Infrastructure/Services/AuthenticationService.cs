@@ -34,18 +34,12 @@ public class AuthenticationService(
     private const int PasswordResetTokenExpiresInMinutes = 30;
     private const int EmailVerificationTokenExpiresInMinutes = 60;
 
-    /// <summary>Long enough to open an authenticator app, short enough that a leaked token is stale fast.</summary>
     private const int TwoFactorTokenExpiresInMinutes = 5;
 
     private const string TwoFactorPurposeClaim = "purpose";
     private const string TwoFactorPurposeValue = "two_factor";
     private const string TwoFactorRememberMeClaim = "remember_me";
 
-    /// <summary>
-    /// Distinct audience for the interstitial token. This is what makes it useless as an access
-    /// token: <c>AuthConfig</c> validates against <c>AuthenticationSettings.Audience</c>, so a token
-    /// minted for this audience fails there before any claim is inspected.
-    /// </summary>
     private string TwoFactorTokenAudience => $"{_settings.Audience}:2fa";
 
     private readonly ApplicationDbContext _context = context;
@@ -60,10 +54,10 @@ public class AuthenticationService(
     {
         if (string.IsNullOrWhiteSpace(request.Email))
             throw new ParameterValidationException(nameof(request.Email));
-        
+
         if (string.IsNullOrWhiteSpace(request.Password))
             throw new ParameterValidationException(nameof(request.Password));
-        
+
         var user = await _context.Users
             .FirstOrDefaultAsync(user => user.Email == request.Email);
 
@@ -72,7 +66,7 @@ public class AuthenticationService(
 
         if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             throw new UserLockoutException(user.Id);
-        
+
         if (string.IsNullOrWhiteSpace(user.Password))
             throw new UnauthorizedAccessException();
 
@@ -101,15 +95,9 @@ public class AuthenticationService(
 
         await _context.SaveChangesAsync();
 
-        // Unverified accounts can't log in at all - not even into the two-factor interstitial below,
-        // since that would still leak "these credentials are correct" for an account that hasn't
-        // proven the email is real yet.
         if (!user.EmailConfirmed)
             throw new EmailNotConfirmedException();
 
-        // P2: with a second factor enrolled the password alone buys nothing but the right to try a
-        // code. No Session row is created here, so there is no session to steal if the second step
-        // is never completed.
         if (user.TwoFactorEnabled)
         {
             return new TokenResponse
@@ -122,10 +110,6 @@ public class AuthenticationService(
         return await CreateNewSessionAsync(user, request.RememberMe);
     }
 
-    /// <summary>
-    /// Second step of a two-factor login: exchanges the short-lived token from
-    /// <see cref="LoginAsync"/> plus a TOTP or recovery code for a real session.
-    /// </summary>
     public async Task<TokenResponse> CompleteTwoFactorLoginAsync(TwoFactorLoginRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.TwoFactorToken))
@@ -134,8 +118,6 @@ public class AuthenticationService(
         var principal = GetPrincipalFromToken(request.TwoFactorToken, TwoFactorTokenAudience)
             ?? throw new UnauthorizedAccessException();
 
-        // Belt and braces: the audience check above already rejects an access or refresh token here,
-        // and this rejects anything minted for a different purpose under the same audience.
         if (principal.FindFirst(TwoFactorPurposeClaim)?.Value != TwoFactorPurposeValue)
             throw new UnauthorizedAccessException();
 
@@ -152,16 +134,11 @@ public class AuthenticationService(
         if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
             throw new UserLockoutException(user.Id);
 
-        // Defense in depth: LoginAsync no longer issues a two-factor token to an unverified account,
-        // so this should be unreachable in practice, but a stale/edge-case token should never be
-        // redeemable into a real session for one either.
         if (!user.EmailConfirmed)
             throw new EmailNotConfirmedException();
 
         if (!await _twoFactorService.VerifyForLoginAsync(user, request.Code))
         {
-            // Wrong codes count toward the same lockout as wrong passwords; otherwise the second
-            // factor would be the one credential on the account open to unlimited guessing.
             user.FailedLoginAttempts++;
 
             if (user.FailedLoginAttempts >= MaxFailedLoginAttempts)
@@ -181,18 +158,11 @@ public class AuthenticationService(
 
         await _context.SaveChangesAsync();
 
-        // RememberMe is carried in the token rather than re-read from the request, so the second
-        // step cannot quietly upgrade a session to persistent.
         var rememberMe = principal.FindFirst(TwoFactorRememberMeClaim)?.Value == bool.TrueString;
 
         return await CreateNewSessionAsync(user, rememberMe);
     }
 
-    /// <summary>
-    /// Mints the interstitial token for a pending two-factor login. It carries a distinct audience,
-    /// so <c>AuthConfig</c>'s bearer scheme - which validates against the API audience - refuses it
-    /// as an access token, and a five-minute lifetime.
-    /// </summary>
     private string CreateTwoFactorToken(User user, bool rememberMe)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SigningKey!));
@@ -261,12 +231,6 @@ public class AuthenticationService(
         return new TokenResponse { EmailConfirmationRequired = true };
     }
 
-    /// <summary>
-    /// Best-effort: a broken/unreachable SMTP server should never fail the request that got a user
-    /// this far - it just means they have to ask for the link again via
-    /// <see cref="ResendVerificationEmailAsync"/> instead of a successful registration turning into a
-    /// 500.
-    /// </summary>
     private async Task SendVerificationEmailAsync(User user)
     {
         try
@@ -385,9 +349,6 @@ public class AuthenticationService(
         session.RefreshTokenId = Guid.NewGuid();
         session.Refreshed = DateTime.UtcNow;
 
-        // Only a "remembered" session keeps rolling its expiry forward on every refresh; a
-        // non-persistent one hard-expires within NonPersistentSessionExpiresInHours of login
-        // regardless of activity.
         if (session.IsPersistent)
             session.Expires = DateTime.UtcNow.AddDays(_settings.RefreshTokenExpiresInDays);
 
@@ -444,8 +405,6 @@ public class AuthenticationService(
         var user = await _context.Users
             .FirstOrDefaultAsync(user => user.Email == request.Email);
 
-        // Same response whether the account exists, is disabled, or the email is unregistered -
-        // avoids leaking which emails are registered (user enumeration).
         if (user is null || user.Disabled.HasValue)
             return;
 
@@ -508,9 +467,6 @@ public class AuthenticationService(
         var user = await _context.Users
             .FirstOrDefaultAsync(user => user.Email == request.Email);
 
-        // Same non-committal response whether the account doesn't exist, is disabled, or is
-        // already verified - avoids leaking account state to an anonymous caller (user enumeration),
-        // matching ForgotPasswordAsync's pattern above.
         if (user is null || user.Disabled.HasValue || user.EmailConfirmed)
             return;
 
@@ -572,14 +528,6 @@ public class AuthenticationService(
             throw new UsernameAlreadyTakenException(request.Username);
     }
 
-    /// <summary>
-    /// Unauthenticated live-availability check for the registration form. Malformed input is reported
-    /// as unavailable without touching the database - a username that can never be registered (per
-    /// <see cref="UsernamePolicy"/>) is trivially "not available" regardless of what's taken. Reuses
-    /// <see cref="ValidateRegisterRequestAsync"/>'s exact case-insensitive uniqueness query, kept as its
-    /// own copy here rather than factored out, so this read-only check can never affect registration's
-    /// own validation path.
-    /// </summary>
     public async Task<UsernameAvailabilityResponse> CheckUsernameAvailableAsync(string? username)
     {
         if (!UsernamePolicy.IsValid(username))
@@ -591,23 +539,11 @@ public class AuthenticationService(
         return new UsernameAvailabilityResponse { Available = !usernameExists };
     }
 
-    /// <summary>
-    /// True when a login attempt for this account must be rejected. A plain admin-disabled account
-    /// (<see cref="User.Disabled"/> set, <see cref="User.DeletionRequestedAt"/> null) is always
-    /// rejected. An account mid self-service deletion (both set) is deliberately let through here -
-    /// logging back in during the grace period is what cancels the deletion, via
-    /// <see cref="CreateNewSessionAsync"/> below. Internal so <c>QrLoginService</c>'s own
-    /// session-minting poll applies the exact same carve-out.
-    /// </summary>
     internal static bool IsBlockedFromLoggingIn(User user) =>
         user.Disabled.HasValue && user.DeletionRequestedAt is null;
 
-    /// <summary>Internal so QrLoginService can mint a session once a cross-device sign-in is approved.</summary>
     internal async Task<TokenResponse> CreateNewSessionAsync(User user, bool rememberMe)
     {
-        // A successful login is what cancels a pending self-service deletion - see
-        // IsBlockedFromLoggingIn, which is what let this account's login attempt reach here at all
-        // despite Disabled being set.
         if (user.DeletionRequestedAt is not null)
         {
             user.Disabled = null;
@@ -616,13 +552,6 @@ public class AuthenticationService(
 
         var (userAgent, ipAddress, deviceLabel, browser, os) = ResolveClientInfo();
 
-        // A fresh login from the same browser/device (same UA + IP) supersedes whatever session
-        // that device already held - without this, a device that logs in repeatedly without ever
-        // hitting the explicit logout button (closing the tab, clearing storage, reinstalling the
-        // app) piles up one still-valid Session row per login, all shown as separate "active
-        // sessions" for what is really one device. Requiring both signals together (rather than UA
-        // alone) keeps this from misfiring across two genuinely different devices that merely share
-        // a common browser/OS string.
         if (!string.IsNullOrWhiteSpace(userAgent) && !string.IsNullOrWhiteSpace(ipAddress))
         {
             await _context.Sessions
@@ -654,7 +583,6 @@ public class AuthenticationService(
         return CreateSessionTokens(user, session);
     }
 
-    /// <summary>Internal so QrLoginService can record which device asked to sign in.</summary>
     internal (string? UserAgent, string? IpAddress, string? DeviceLabel, string? Browser, string? OS) ResolveClientInfo()
     {
         var httpContext = _httpContextAccessor.HttpContext;
@@ -722,20 +650,11 @@ public class AuthenticationService(
         };
     }
 
-    /// <summary>
-    /// Validates a refresh token. Lifetime is deliberately not checked here - expiry for a refresh
-    /// token is the <c>Session.Expires</c> column, which <see cref="RefreshAsync"/> checks itself.
-    /// </summary>
     private ClaimsPrincipal? GetPrincipalFromToken(string token)
     {
         return GetPrincipalFromToken(token, _settings.Audience!, validateLifetime: false);
     }
 
-    /// <summary>
-    /// Validates a token minted for a non-session purpose (currently the two-factor interstitial).
-    /// Lifetime <em>is</em> enforced: unlike a refresh token there is no database row bounding it, so
-    /// the JWT's own expiry is the only thing that ends it.
-    /// </summary>
     private ClaimsPrincipal? GetPrincipalFromToken(string token, string audience)
     {
         return GetPrincipalFromToken(token, audience, validateLifetime: true);

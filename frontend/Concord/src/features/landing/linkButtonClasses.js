@@ -1,10 +1,5 @@
 import { cn } from '../../lib/cn'
 
-/**
- * Mirrors components/ui/Button's visual language for `<Link>`s that need to look like a button
- * (react-router navigation, not a click handler, so the real `Button` - a plain `<button>` - isn't
- * a fit). Kept local to the landing page rather than changing Button's public API for one caller.
- */
 const BASE =
   'inline-flex items-center justify-center gap-2 rounded-md font-medium ' +
   'transition-colors duration-150 [transition-timing-function:var(--ease-standard)] ' +

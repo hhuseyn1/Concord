@@ -62,12 +62,6 @@ class ConcordAvatar extends StatelessWidget {
             child: Container(
               width: _dimension,
               height: _dimension,
-              // A translucent neutral rather than a fixed surface token: the
-              // fallback circle sits on the rail, the sidebar, cards and sheets
-              // alike, and in light mode `surfaceRail` and `surfaceSidebar` are
-              // now the same value - so a hardcoded surface would make the
-              // fallback vanish on some of them. Tinting whatever is behind it
-              // keeps the circle visible on every surface in both themes.
               color: colors.fgDefault.withValues(alpha: 0.16),
               alignment: Alignment.center,
               child: resolvedUrl != null && resolvedUrl.isNotEmpty

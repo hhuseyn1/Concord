@@ -471,8 +471,6 @@ class _MessageTileState extends ConsumerState<MessageTile> {
             decoration: InputDecoration(
               isDense: true,
               filled: true,
-              // The inline message-edit box is an input, so it uses the
-              // dedicated input surface like every themed field does.
               fillColor: colors.surfaceInput,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(ConcordRadii.sm),

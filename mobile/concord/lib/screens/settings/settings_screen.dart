@@ -19,8 +19,6 @@ import 'stars_section.dart';
 import 'two_factor_section.dart';
 import 'voice_settings_tab.dart';
 
-/// Index of the Stars tab inside the [TabBar] below - referenced by the
-/// balance chip in the account header, which jumps here when tapped.
 const _starsTabIndex = 4;
 
 class SettingsScreen extends StatelessWidget {
@@ -36,8 +34,6 @@ class SettingsScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text(l10n.settingsScreenTitle),
           bottom: TabBar(
-            // Already scrollable, so the fifth tab (and longer labels at a
-            // larger text size) extends the strip instead of squeezing it.
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             tabs: [
@@ -96,9 +92,6 @@ class _MyAccountTab extends ConsumerWidget {
         const SizedBox(height: ConcordSpacing.xxl),
         const Divider(),
         const SizedBox(height: ConcordSpacing.lg),
-        // Appearance sits with the other per-device preferences (language,
-        // notifications) rather than in a tab of its own - same placement as
-        // the web app's Appearance block.
         const AppearanceSection(),
         const SizedBox(height: ConcordSpacing.xxl),
         const Divider(),
@@ -118,15 +111,6 @@ class _MyAccountTab extends ConsumerWidget {
   }
 }
 
-/// Avatar + identity + the Stars chip, with the two profile actions on their
-/// own row underneath.
-///
-/// The actions used to be a fixed-width column squeezed to the right of the
-/// name; at 430pt with the default text size that was fine, but at 320pt -
-/// and at any width once the Extra large text size is on - the name column
-/// collapsed to a couple of ellipsized characters. Giving the buttons a
-/// full-width [Wrap] of their own keeps every label readable at every size and
-/// lets them stack when they no longer fit side by side.
 class _AccountHeader extends ConsumerWidget {
   const _AccountHeader();
 

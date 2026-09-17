@@ -35,7 +35,6 @@ export function useMediaDevices() {
 
   useEffect(() => {
     if (!navigator.mediaDevices) return undefined
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshDevices()
     navigator.mediaDevices.addEventListener('devicechange', refreshDevices)
     return () => navigator.mediaDevices.removeEventListener('devicechange', refreshDevices)

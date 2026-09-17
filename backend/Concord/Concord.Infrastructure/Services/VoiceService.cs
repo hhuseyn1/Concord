@@ -34,15 +34,11 @@ public class VoiceService(
 
     public async Task<VoiceTokenResponse> GenerateTokenAsync(Guid userId, Guid channelId)
     {
-        // Gate the token, not just the UI: the token is what actually admits a client to the
-        // LiveKit room, so Connect has to be checked here.
         var channel = await _channelsService.AssertChannelPermissionAsync(userId, channelId, ServerPermission.Connect);
 
         if (channel.Type != ChannelType.Voice)
             throw new ChannelNotVoiceException();
 
-        // Speak maps onto the LiveKit grant itself, so a member without it joins listen-only and
-        // cannot start publishing client-side.
         var canSpeak = (await _permissionService.ResolveAsync(userId, channel.ServerId)).Has(ServerPermission.Speak);
 
         return await MintTokenAsync(userId, channelId.ToString(), canSpeak);
@@ -62,9 +58,6 @@ public class VoiceService(
     {
         await _directMessagesService.AssertConversationAccessAsync(userId, conversationId);
 
-        // The endpoint only proves conversation membership, not that anyone actually answered -
-        // without this, either party could mint a LiveKit token and join the room without ever
-        // going through StartCallAsync/AcceptAsync.
         var hasAcceptedCall = await _context.Calls.AnyAsync(call =>
             call.ConversationId == conversationId && call.Status == CallStatus.Accepted);
 

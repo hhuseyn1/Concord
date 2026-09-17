@@ -14,11 +14,6 @@ public static class ModerationExtensions
         BannedAt = ban.Created
     };
 
-    /// <summary>
-    /// A lapsed timeout is reported as no timeout at all, matching how
-    /// <see cref="Services.PermissionService"/> evaluates it - the stale columns are left in place
-    /// until the next moderation action rather than swept.
-    /// </summary>
     public static MemberModerationResponse MapToModerationResponse(this ServerMember member)
     {
         var isTimedOut = member.TimedOutUntil is { } until && until > DateTime.UtcNow;

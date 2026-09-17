@@ -10,9 +10,6 @@ import { PresenceContext } from './PresenceContext'
 
 const IDLE_TIMEOUT_MS = 5 * 60 * 1000
 
-// Well under the backend's 3-minute Redis TTL on the connection-count key (see
-// PresenceService.RenewConnectionAsync) - keeps a long-lived, otherwise-idle connection's
-// "online" state from expiring out from under it.
 const HEARTBEAT_INTERVAL_MS = 60 * 1000
 
 export function PresenceProvider({ children }) {

@@ -10,12 +10,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Concord.Infrastructure.Services;
 
-/// <summary>
-/// The report/flag system and moderator queue. Unlike <see cref="ModerationService"/>/<see cref="AdminService"/>,
-/// a report's target is polymorphic (a channel message, a DM, or a user) and carries no FK -
-/// <see cref="Report.TargetId"/> is validated for existence and reporter access here, at write time,
-/// rather than by the database.
-/// </summary>
 public class ReportsService(
     ApplicationDbContext context,
     ChannelsService channelsService,
@@ -24,7 +18,6 @@ public class ReportsService(
     NotificationsService notificationsService,
     INotificationsRealtimeNotifier notificationsRealtimeNotifier)
 {
-    /// <summary>Matches ModerationService's ban/timeout reason ceiling.</summary>
     private const int MaxReasonLength = 500;
 
     private const int MaxSnippetLength = 200;
@@ -65,38 +58,30 @@ public class ReportsService(
         return report.MapToResponse(reporter, snippet);
     }
 
-    public async Task<PagedResult<ReportResponse>> GetReportsAsync(
-        int page, int pageSize, ReportStatus? status, string? search, string? sortBy, string? sortDirection)
+    public async Task<PagedResult<ReportResponse>> GetReportsAsync(GetReportsRequest request)
     {
-        page = Math.Max(page, 1);
-        pageSize = Math.Clamp(pageSize, 1, GlobalConstants.MaxPageSize);
+        var page = Math.Max(request.Page, 1);
+        var pageSize = Math.Clamp(request.PageSize, 1, GlobalConstants.MaxPageSize);
 
-        // Joined against Users up front (like AdminService's Subscriptions/AuditLog queries) so
-        // search and the reporter-name sort option can see User columns before filtering, sorting,
-        // and paging happen - and so a report from a since-deleted reporter (no profile to show,
-        // same case the old in-memory skip handled) is naturally excluded by the inner join instead
-        // of being counted in TotalCount and then silently dropped from Items.
         var query = _context.Reports
             .Join(_context.Users, report => report.ReporterUserId, user => user.Id, (report, user) => new { Report = report, Reporter = user });
 
-        if (status.HasValue)
-            query = query.Where(entry => entry.Report.Status == status.Value);
+        if (request.Status.HasValue)
+            query = query.Where(entry => entry.Report.Status == request.Status.Value);
 
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrWhiteSpace(request.Search))
         {
             query = query.Where(entry =>
-                EF.Functions.ILike(entry.Report.Reason, $"%{search}%") ||
-                EF.Functions.ILike(entry.Reporter.Username ?? string.Empty, $"%{search}%") ||
-                EF.Functions.ILike(entry.Reporter.Email ?? string.Empty, $"%{search}%"));
+                EF.Functions.ILike(entry.Report.Reason, $"%{request.Search}%") ||
+                EF.Functions.ILike(entry.Reporter.Username ?? string.Empty, $"%{request.Search}%") ||
+                EF.Functions.ILike(entry.Reporter.Email ?? string.Empty, $"%{request.Search}%"));
         }
 
         var totalCount = await query.CountAsync();
 
-        var descending = !string.Equals(sortDirection, "Asc", StringComparison.OrdinalIgnoreCase);
+        var descending = !string.Equals(request.SortDirection, "Asc", StringComparison.OrdinalIgnoreCase);
 
-        // Every branch ends with ThenBy(entry => entry.Report.Id) - see AdminService.GetUsersAsync
-        // for why a deterministic tiebreaker matters (Postgres has no stable order among ties otherwise).
-        query = (sortBy?.ToLowerInvariant()) switch
+        query = (request.SortBy?.ToLowerInvariant()) switch
         {
             "reporter" => descending
                 ? query.OrderByDescending(entry => entry.Reporter.Username).ThenBy(entry => entry.Report.Id)
@@ -177,9 +162,6 @@ public class ReportsService(
                 : null);
     }
 
-    /// <summary>Verifies the message exists (checking both the channel-message and direct-message
-    /// tables, since a bare Guid cannot tell which one it is) and that the reporter can currently view
-    /// it - the same access gate <see cref="ForwardingService"/> relies on for each table.</summary>
     private async Task AssertMessageTargetAsync(Guid currentUserId, Guid messageId)
     {
         var channelMessage = await _context.Messages.FirstOrDefaultAsync(message => message.Id == messageId);
@@ -210,9 +192,6 @@ public class ReportsService(
             throw new UserNotFoundException(targetUserId);
     }
 
-    /// <summary>Best-effort preview for the admin queue - returns null rather than throwing when the
-    /// target has since been hard-deleted, so a stale report still renders instead of failing the
-    /// whole list.</summary>
     private async Task<string?> BuildTargetSnippetAsync(ReportTargetType targetType, Guid targetId)
     {
         if (targetType == ReportTargetType.User)

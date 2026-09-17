@@ -13,18 +13,9 @@ import '../../utils/idempotency_key.dart';
 import '../../utils/stars_format.dart';
 import '../../widgets/widgets.dart';
 
-/// Above either of these, sending asks for an explicit confirmation - an
-/// absolute amount that's meaningful on its own, or a big slice of what the
-/// user holds. Same thresholds as the web app's `SendStarsModal`.
 const _confirmAbsoluteThreshold = 100;
 const _confirmBalanceFraction = 0.5;
 
-/// Opens the "Send Stars" flow. Returns once the sheet is closed.
-///
-/// `isScrollControlled` + a height cap + the keyboard inset padding inside:
-/// the sheet holds a search field, a friend list and an amount field, so on a
-/// 320x568 screen with the keyboard up and Extra large text it has to scroll
-/// rather than clip.
 Future<void> showSendStarsSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
@@ -45,10 +36,6 @@ class _SendStarsSheetState extends ConsumerState<_SendStarsSheet> {
   final _searchController = TextEditingController();
   final _amountController = TextEditingController();
 
-  /// One key per attempt: held across retries of the same send (so a request
-  /// the user retries after a timeout can't double-spend) and only replaced
-  /// once the send finally succeeds. Reopening the sheet remounts this state,
-  /// which starts a brand-new attempt with a brand-new key.
   String _idempotencyKey = newIdempotencyKey();
 
   PublicProfileResponse? _recipient;
@@ -102,8 +89,6 @@ class _SendStarsSheetState extends ConsumerState<_SendStarsSheet> {
         title: l10n.starsSendConfirmTitle,
         message: l10n.starsSendConfirmDescription(amount, name, balance - amount),
         confirmLabel: l10n.starsSendConfirmAction(amount),
-        // Spending Stars is irreversible but not destructive in the
-        // delete-my-data sense, so this keeps the neutral (non-red) styling.
         isDestructive: false,
       );
       if (confirmed != true) return;
@@ -118,13 +103,10 @@ class _SendStarsSheetState extends ConsumerState<_SendStarsSheet> {
     if (!mounted) return;
 
     if (failure != null) {
-      // The key deliberately stays put: an immediate retry is the *same*
-      // attempt as far as the server is concerned.
       setState(() => _error = mapTransferError(l10n, failure));
       return;
     }
 
-    // Attempt finished for good - the next send starts a new one.
     _idempotencyKey = newIdempotencyKey();
     ref.invalidate(starsTransactionsControllerProvider);
     final messenger = ScaffoldMessenger.of(context);
@@ -149,8 +131,6 @@ class _SendStarsSheetState extends ConsumerState<_SendStarsSheet> {
         .toList();
 
     return Padding(
-      // Lifts the sheet above the software keyboard instead of letting it sit
-      // under the amount field.
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: DraggableScrollableSheet(
         expand: false,
@@ -199,9 +179,6 @@ class _SendStarsSheetState extends ConsumerState<_SendStarsSheet> {
               _InlineError(message: _error!),
             ],
             const SizedBox(height: ConcordSpacing.lg),
-            // Wrap, not Row: at Extra large text "Cancel" + "Send" stop fitting
-            // side by side on a 320pt sheet, and wrapping to two rows beats
-            // ellipsizing a button label.
             Wrap(
               alignment: WrapAlignment.end,
               spacing: ConcordSpacing.sm,
@@ -299,8 +276,6 @@ class _RecipientPicker extends ConsumerWidget {
               subtitle: query.isEmpty ? l10n.starsSendNoFriendsDescription : null,
             )
           else
-            // Height-capped and independently scrollable so a long friends list
-            // can't push the amount field and the actions off the sheet.
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 220),
               child: ListView.builder(

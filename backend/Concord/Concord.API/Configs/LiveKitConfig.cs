@@ -19,12 +19,6 @@ public static class LiveKitConfig
         if (string.IsNullOrWhiteSpace(settings.ApiSecret))
             throw new MissingSettingException(nameof(LiveKitSettings.ApiSecret));
 
-        // LiveKitSettings.Url (wss://... or ws://...) is the realtime connection URL handed to
-        // browsers via VoiceService.GenerateTokenAsync - it must stay ws(s) for Room.connect() to
-        // work. RoomServiceClient, on the other hand, is a REST/Twirp client built on a plain
-        // HttpClient, which only supports http(s) schemes; passing it the ws(s) URL as-is makes every
-        // call (e.g. ListParticipants) throw internally. Derive the https(s) management URL here,
-        // used only for RoomServiceClient - the ws(s) Url in settings is untouched everywhere else.
         var managementUrl = ToHttpScheme(settings.Url);
 
         services.AddSingleton(new RoomServiceClient(managementUrl, settings.ApiKey, settings.ApiSecret));

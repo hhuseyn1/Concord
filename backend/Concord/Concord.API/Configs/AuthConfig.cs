@@ -44,7 +44,6 @@ public static class AuthConfig
                  {
                      var sidValue = context.Principal?.FindFirst(JwtRegisteredClaimNames.Sid)?.Value;
 
-                     // No sid claim (e.g. legacy tokens in flight): do not fail.
                      if (string.IsNullOrEmpty(sidValue) || !Guid.TryParse(sidValue, out var sessionId))
                          return;
 
@@ -56,8 +55,6 @@ public static class AuthConfig
 
                      if (session is null)
                      {
-                         // P2.14: security-relevant decision point - a request presenting an
-                         // otherwise-valid access token for an already-revoked session.
                          var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("Concord.Auth");
                          logger.LogWarning("Rejected request: session {SessionId} no longer exists (revoked)", sessionId);
                          context.Fail("Session revoked");
@@ -68,9 +65,6 @@ public static class AuthConfig
 
                      if (!Guid.TryParse(jtiValue, out var accessTokenId) || accessTokenId != session.AccessTokenId)
                      {
-                         // The access token was superseded by a refresh (AccessTokenId rotated) but is
-                         // still within its own natural lifetime - reject it so rotation is actually
-                         // enforced rather than merely cosmetic.
                          var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("Concord.Auth");
                          logger.LogWarning("Rejected request: access token for session {SessionId} has been rotated out", sessionId);
                          context.Fail("Access token rotated");

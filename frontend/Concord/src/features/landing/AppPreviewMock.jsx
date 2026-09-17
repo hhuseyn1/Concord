@@ -36,18 +36,12 @@ const MESSAGES = [
   },
 ]
 
-/**
- * A faithful, static recreation of the real 3-pane layout (ServerRail /
- * ChannelSidebar / message area) - illustrative, not a live screenshot, but
- * built from the same tokens and structure as the actual app.
- */
 export function AppPreviewMock({ className }) {
   return (
     <div
       className={`flex h-full w-full overflow-hidden rounded-xl border border-border-default bg-surface-base shadow-lg ${className ?? ''}`}
       aria-hidden="true"
     >
-      {/* Server rail */}
       <div className="flex w-14 shrink-0 flex-col items-center gap-2 bg-surface-rail py-3">
         <span className="flex size-9 items-center justify-center rounded-xl bg-brand text-xs font-semibold text-fg-on-brand">
           C
@@ -66,7 +60,6 @@ export function AppPreviewMock({ className }) {
         </span>
       </div>
 
-      {/* Channel sidebar */}
       <div className="hidden w-40 shrink-0 flex-col border-r border-border-default bg-surface-sidebar sm:flex">
         <div className="flex h-10 shrink-0 items-center border-b border-border-subtle px-3">
           <p className="truncate text-xs font-semibold text-fg-heading">Concord Devs</p>
@@ -93,7 +86,6 @@ export function AppPreviewMock({ className }) {
         </div>
       </div>
 
-      {/* Message area */}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex h-10 shrink-0 items-center gap-2 border-b border-border-subtle px-3 shadow-sm">
           <Hash className="size-4 shrink-0 text-fg-muted" />
@@ -140,7 +132,6 @@ export function AppPreviewMock({ className }) {
         </div>
       </div>
 
-      {/* Voice call strip - implies the live voice/video side without a second full pane */}
       <div className="hidden w-32 shrink-0 flex-col border-l border-border-default bg-surface-sidebar p-2 md:flex">
         <p className="px-1 pb-2 text-[10px] font-semibold tracking-wide text-fg-muted uppercase">In voice</p>
         <div className="flex items-center gap-1.5 rounded-md bg-fg-default/5 px-1.5 py-1.5">

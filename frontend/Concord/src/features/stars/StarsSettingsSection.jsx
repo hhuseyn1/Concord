@@ -63,9 +63,6 @@ export function StarsSettingsSection() {
   const configQuery = useStarsConfig()
   const walletQuery = useStarsWallet()
   const [sendOpen, setSendOpen] = useState(false)
-  // Bumped on every open so `SendStarsModal` remounts with a clean form and a
-  // fresh idempotency key, while still staying mounted after it closes (so its
-  // exit animation plays).
   const [sendAttempt, setSendAttempt] = useState(0)
 
   const openSendModal = () => {
@@ -77,8 +74,6 @@ export function StarsSettingsSection() {
     return <LoadingState />
   }
 
-  // The wallet is the one thing the whole tab needs; without it there's nothing
-  // meaningful to show, so this is a hard error state with a retry.
   if (configQuery.isError || walletQuery.isError) {
     return (
       <EmptyState

@@ -16,8 +16,6 @@ import { mapTransferError } from './starsErrors'
 import { formatStars, newIdempotencyKey } from './starsFormat'
 import { useTransferStarsMutation } from './starsQueries'
 
-// Above this, sending asks for an explicit confirmation - either an absolute
-// amount that's meaningful on its own, or a big slice of what the user holds.
 const CONFIRM_ABSOLUTE_THRESHOLD = 100
 const CONFIRM_BALANCE_FRACTION = 0.5
 
@@ -71,8 +69,6 @@ function RecipientPicker({ friends, isLoading, isError, query, selectedId, onSel
       {friends.map((user) => {
         const name = friendName(user) || t('common.unknownUser')
         return (
-          // Native radios: arrow-key navigation, Space activation and the
-          // selected-state announcement all come for free.
           <label
             key={user.Id}
             className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 transition-colors duration-150 hover:bg-fg-default/5 has-[:checked]:bg-brand-bg has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand"
@@ -97,11 +93,6 @@ function RecipientPicker({ friends, isLoading, isError, query, selectedId, onSel
   )
 }
 
-/**
- * Note for callers: the parent gives this a fresh `key` every time it opens the
- * modal, so each attempt starts from a clean form (and a brand-new idempotency
- * key) without needing a reset-on-open effect.
- */
 export function SendStarsModal({ open, onOpenChange, balance = 0 }) {
   const { t } = useTranslation()
   const { user: currentUser } = useAuth()
@@ -122,10 +113,6 @@ export function SendStarsModal({ open, onOpenChange, balance = 0 }) {
   const [formError, setFormError] = useState('')
   const [confirming, setConfirming] = useState(false)
 
-  // One key per attempt: kept across retries of the same send (so a failed
-  // request the user retries can't double-spend), regenerated after a
-  // successful send and - via the remount the parent's `key` forces - whenever
-  // the modal is reopened.
   const idempotencyKeyRef = useRef(newIdempotencyKey())
 
   const friends = useMemo(() => {
@@ -176,12 +163,9 @@ export function SendStarsModal({ open, onOpenChange, balance = 0 }) {
           name: friendName(recipient) || t('common.unknownUser'),
         }),
       })
-      // Attempt finished for good - the next send is a brand-new attempt.
       idempotencyKeyRef.current = newIdempotencyKey()
       onOpenChange(false)
     } catch (sendError) {
-      // Same key stays in place so an immediate retry of *this* send is treated
-      // as the same attempt by the server.
       setConfirming(false)
       setFormError(mapTransferError(t, sendError))
     }

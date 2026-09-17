@@ -1,6 +1,5 @@
 namespace Concord.Domain.Entities;
 
-/// <summary>Mirrors <see cref="Concord.Domain.Entities.MessageReaction"/> (M-01) for DM messages.</summary>
 public class DirectMessageReaction : BaseEntity
 {
     public Guid Id { get; set; }

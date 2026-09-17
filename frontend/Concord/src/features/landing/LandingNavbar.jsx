@@ -25,9 +25,6 @@ export function LandingNavbar() {
           <span className="text-lg font-semibold text-fg-heading">Concord</span>
         </a>
 
-        {/* Tighter gaps at `md` (where the logo, four links, language, theme toggle and both
-          * auth buttons are all on one row) so the bar still fits at the largest text size;
-          * the roomier spacing comes back from `lg` up. */}
         <nav aria-label="Primary" className="hidden items-center gap-5 md:flex lg:gap-8">
           {NAV_LINKS.map((link) => (
             <a
@@ -53,8 +50,6 @@ export function LandingNavbar() {
           </div>
         </div>
 
-        {/* On mobile the two appearance controls stay outside the collapsible
-          * menu - they're one-tap preferences, not navigation. */}
         <div className="flex items-center gap-1 md:hidden">
           <LandingLanguageSwitcher />
           <ThemeToggle />

@@ -102,11 +102,6 @@ public class ChannelsService(ApplicationDbContext context, ServersService server
         return result;
     }
 
-    /// <summary>
-    /// Reorders every channel of one <see cref="ChannelType"/> group within a server (P3). Mirrors
-    /// <see cref="RolesService.ReorderRolesAsync"/>'s shape - the caller must submit the complete,
-    /// deduplicated set of channel ids for that group, position is then assigned by list index.
-    /// </summary>
     public async Task ReorderChannelsAsync(Guid currentUserId, Guid serverId, ReorderChannelsRequest request)
     {
         await _serversService.AssertPermissionAsync(currentUserId, serverId, ServerPermission.ManageChannels);
@@ -129,8 +124,6 @@ public class ChannelsService(ApplicationDbContext context, ServersService server
         var totalChannelsOfType = await _context.Channels
             .CountAsync(channel => channel.ServerId == serverId && channel.Type == type);
 
-        // Every channel in the group must be present - a partial list would leave the omitted
-        // channels' relative order undefined against the ones that did move.
         if (totalChannelsOfType != request.ChannelIds.Count)
             throw new ParameterValidationException(nameof(request.ChannelIds));
 
@@ -167,21 +160,11 @@ public class ChannelsService(ApplicationDbContext context, ServersService server
         return channel;
     }
 
-    /// <summary>
-    /// The read gate for everything inside a channel. Membership alone is no longer enough - a
-    /// member whose roles do not grant <see cref="ServerPermission.ViewChannels"/> cannot see the
-    /// channel or its history.
-    /// </summary>
     public async Task<Channel> AssertChannelMemberAsync(Guid currentUserId, Guid channelId)
     {
         return await AssertChannelPermissionAsync(currentUserId, channelId, ServerPermission.ViewChannels);
     }
 
-    /// <summary>
-    /// Channel-scoped capability check: resolves the parent server, then requires
-    /// <see cref="ServerPermission.ViewChannels"/> plus <paramref name="required"/>. Callers that
-    /// only need read access should use <see cref="AssertChannelMemberAsync"/>.
-    /// </summary>
     public async Task<Channel> AssertChannelPermissionAsync(Guid currentUserId, Guid channelId, ServerPermission required)
     {
         var channel = await _context.Channels

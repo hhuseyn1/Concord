@@ -56,7 +56,7 @@ public class UsersController(UsersService usersService, PushTokensService pushTo
     }
 
     [HttpGet("Search")]
-    public async Task<List<PublicProfileResponse>> SearchByUsernameAsync([FromQuery] string query)
+    public async Task<List<PublicProfileResponse>> SearchByUsernameAsync(string query)
     {
         return await _usersService.SearchByUsernameAsync(GetUserId(), query);
     }

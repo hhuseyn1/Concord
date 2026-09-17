@@ -6,16 +6,6 @@ import '../../providers/font_scale_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../theme/theme.dart';
 
-/// Theme (Light/Dark/Match device) and text-size pickers, living in the
-/// "My Account" tab right next to the existing language/notification
-/// preferences - the same place the web app put its own Appearance block,
-/// rather than a near-empty top-level tab.
-///
-/// Both pickers use the language picker's bottom-sheet-with-checkmark pattern
-/// instead of a `SegmentedButton`. Segmented controls put every option's label
-/// on one row, which is exactly what stops fitting at 320pt with the Extra
-/// large text size (and in Azerbaijani, where "Cihaza uyğun" is far wider than
-/// "System"); a sheet gives each option a full-width row that can wrap.
 class AppearanceSection extends ConsumerWidget {
   const AppearanceSection({super.key});
 
@@ -46,9 +36,6 @@ class AppearanceSection extends ConsumerWidget {
           onTap: () => _pickFontSize(context, ref),
         ),
         const SizedBox(height: ConcordSpacing.sm),
-        // Live preview: it re-renders with the new scale the instant a size is
-        // picked, which is the quickest way to answer "is this too big?"
-        // without leaving Settings.
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(ConcordSpacing.md),
@@ -119,10 +106,6 @@ class AppearanceSection extends ConsumerWidget {
   }
 }
 
-/// A settings row whose value opens a picker - same shape as the existing
-/// language row in `PreferencesSection`, but with the value allowed to shrink
-/// so a long translated value (or a big text size) can't push the chevron off
-/// the right edge at 320pt.
 class _PickerTile extends StatelessWidget {
   const _PickerTile({required this.label, required this.value, required this.onTap, this.subtitle});
 
@@ -142,9 +125,6 @@ class _PickerTile extends StatelessWidget {
       subtitle: subtitle == null
           ? null
           : Text(subtitle!, style: textTheme.bodySmall?.copyWith(color: colors.fgMuted)),
-      // `Flexible` + ellipsis rather than a bare Row: `ListTile` hands its
-      // trailing widget an unbounded-ish slot, so an unconstrained value Text
-      // overflows instead of truncating once the text scale grows.
       trailing: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.4),
         child: Row(
@@ -168,13 +148,6 @@ class _PickerTile extends StatelessWidget {
   }
 }
 
-/// Shared single-select bottom sheet (label + checkmark on the current value),
-/// matching the language picker's UX.
-///
-/// Scrollable and height-capped on purpose: four options at the Extra large
-/// text size on a 320x568 device is already taller than the comfortable
-/// half-sheet, and a sheet that silently clips its last option would hide
-/// functionality.
 Future<T?> showOptionSheet<T>(
   BuildContext context, {
   required List<(T value, String label, IconData? icon)> options,

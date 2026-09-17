@@ -30,9 +30,6 @@ class ConcordIconButton extends StatelessWidget {
     ConcordButtonSize.lg => 44,
   };
 
-  /// Material's minimum recommended tap target. `sm`/`md` keep their smaller
-  /// visual size but get their hit-test region expanded up to this; `lg` is
-  /// already 44 so this is a no-op for it.
   double get _tapDimension => math.max(_dimension, 44);
 
   double get _iconSize => switch (size) {

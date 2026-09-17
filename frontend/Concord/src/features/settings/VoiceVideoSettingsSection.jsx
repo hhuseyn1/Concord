@@ -59,7 +59,6 @@ export function VoiceVideoSettingsSection() {
 
   useEffect(() => {
     requestPermission()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

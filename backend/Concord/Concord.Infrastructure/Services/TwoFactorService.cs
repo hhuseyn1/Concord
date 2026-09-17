@@ -13,43 +13,23 @@ using QRCoder;
 
 namespace Concord.Infrastructure.Services;
 
-/// <summary>
-/// TOTP second factor (P2, RFC 6238) plus single-use recovery codes.
-///
-/// Enrolment is two-phase on purpose: <see cref="StartSetupAsync"/> writes a secret but leaves
-/// <c>TwoFactorEnabled</c> false, and only <see cref="EnableAsync"/> - which requires a code the
-/// authenticator actually produced - flips it on. Someone who never finishes scanning is therefore
-/// never locked out by a half-finished setup.
-/// </summary>
 public class TwoFactorService(
     ApplicationDbContext context,
     IDataProtectionProvider dataProtectionProvider,
     ILogger<TwoFactorService> logger)
 {
-    /// <summary>
-    /// Purpose string scopes the protector so this key can never be reused to decrypt data protected
-    /// under a different purpose elsewhere in the app, even though they'd share the same key ring.
-    /// </summary>
     private const string ProtectorPurpose = "TwoFactorSecret";
 
-    /// <summary>Secret size recommended by RFC 4226 for HMAC-SHA1.</summary>
     private const int SecretBytes = 20;
 
     private const int RecoveryCodeCount = 10;
 
-    /// <summary>Bytes per recovery code; 5 bytes render as 8 base32 characters.</summary>
     private const int RecoveryCodeBytes = 5;
 
-    /// <summary>
-    /// Accepts the previous and next step as well as the current one, tolerating roughly +/-30s of
-    /// clock drift between the phone and this server. Wider would meaningfully extend the window in
-    /// which an observed code still works.
-    /// </summary>
     private const int VerificationWindowSteps = 1;
 
     private const int TotpStepSeconds = 30;
 
-    /// <summary>Base32 without padding, per the otpauth URI convention.</summary>
     private const string Base32Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
     private readonly ApplicationDbContext _context = context;
@@ -80,13 +60,9 @@ public class TwoFactorService(
         if (user.TwoFactorEnabled)
             throw new TwoFactorAlreadyEnabledException();
 
-        // A fresh secret every time setup is started: restarting after an abandoned attempt must
-        // invalidate whatever the previous QR encoded, not resurrect it.
         var secretBytes = RandomNumberGenerator.GetBytes(SecretBytes);
         var secret = Base32Encoding.ToString(secretBytes).TrimEnd('=');
 
-        // Encrypted at rest: only this protector (see ProtectorPurpose) can turn it back into the
-        // base32 secret, and only TryConsumeTotp ever needs to.
         user.TwoFactorSecret = _protector.Protect(secret);
 
         await _context.SaveChangesAsync();
@@ -133,8 +109,6 @@ public class TwoFactorService(
         if (!user.TwoFactorEnabled)
             throw new TwoFactorNotEnabledException();
 
-        // Password *and* a second factor: turning the second factor off is exactly the action an
-        // attacker on a hijacked session would want, so it is gated at least as hard as using it.
         if (string.IsNullOrWhiteSpace(request.Password) ||
             string.IsNullOrWhiteSpace(user.Password) ||
             !PasswordHasher.VerifyHashedPassword(user.Password, request.Password))
@@ -177,11 +151,6 @@ public class TwoFactorService(
         return new RecoveryCodesResponse { Codes = codes };
     }
 
-    /// <summary>
-    /// Validates a login's second factor: a current TOTP code, or an unused recovery code. Called by
-    /// <see cref="AuthenticationService"/> after the password step, and by
-    /// <see cref="DisableAsync"/>. Persists on success, since both paths consume something.
-    /// </summary>
     public async Task<bool> VerifyForLoginAsync(User user, string? code)
     {
         var verified = await VerifyCodeOrRecoveryAsync(user, code);
@@ -199,19 +168,12 @@ public class TwoFactorService(
 
         var normalized = code.Replace(" ", string.Empty).Replace("-", string.Empty).Trim();
 
-        // Six digits is a TOTP code; anything else can only be a recovery code. Trying TOTP first
-        // keeps the common path to zero database reads beyond the user row already in hand.
         if (normalized.Length == 6 && normalized.All(char.IsDigit) && TryConsumeTotp(user, normalized))
             return true;
 
         return await TryConsumeRecoveryCodeAsync(user.Id, normalized);
     }
 
-    /// <summary>
-    /// Verifies a TOTP code and burns its time step. Returns false for a code from a step at or
-    /// before the last one this account used, which is what stops the same six digits being replayed
-    /// inside their validity window.
-    /// </summary>
     private bool TryConsumeTotp(User user, string? code)
     {
         if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(user.TwoFactorSecret))
@@ -226,10 +188,6 @@ public class TwoFactorService(
         }
         catch (Exception ex)
         {
-            // Also hit by a secret written before this column carried encrypted data - it cannot be
-            // unprotected by this (or any) key, so that account's existing enrolment is effectively
-            // dead and needs to be redone. No migration path exists for it - see the P2 remediation
-            // notes.
             _logger.LogError(ex, "Stored TOTP secret for user {UserId} could not be decrypted/decoded", user.Id);
             return false;
         }
@@ -261,8 +219,6 @@ public class TwoFactorService(
             .Where(entry => entry.UserId == userId && entry.UsedAt == null)
             .ToListAsync();
 
-        // Salted per row, so there is no lookup key - every unused code has to be compared. Ten of
-        // them is a fixed, tiny cost, and it keeps the codes as unguessable as a password hash.
         var match = candidates.FirstOrDefault(entry =>
             !string.IsNullOrWhiteSpace(entry.CodeHash) &&
             PasswordHasher.VerifyHashedPassword(entry.CodeHash, code));
@@ -277,7 +233,6 @@ public class TwoFactorService(
         return true;
     }
 
-    /// <summary>Replaces every existing code, spent or not - regenerating must invalidate the old sheet.</summary>
     private async Task<List<string>> ReplaceRecoveryCodesAsync(Guid userId)
     {
         var existing = await _context.TwoFactorRecoveryCodes.Where(entry => entry.UserId == userId).ToListAsync();
@@ -305,7 +260,6 @@ public class TwoFactorService(
         var bytes = RandomNumberGenerator.GetBytes(RecoveryCodeBytes);
         var builder = new StringBuilder(9);
 
-        // 5 bytes -> 8 base32 chars, hyphenated in the middle purely so they are easier to read back.
         var value = 0L;
         foreach (var b in bytes)
             value = (value << 8) | b;
@@ -321,8 +275,6 @@ public class TwoFactorService(
 
     private string BuildOtpAuthUri(User user, string secret)
     {
-        // The issuer appears as the account's heading in the authenticator app, so it should read as
-        // the product name rather than a hostname.
         const string issuer = "Concord";
 
         var account = string.IsNullOrWhiteSpace(user.Email) ? user.Username ?? user.Id.ToString() : user.Email;
@@ -331,10 +283,6 @@ public class TwoFactorService(
         return $"otpauth://totp/{label}?secret={secret}&issuer={Uri.EscapeDataString(issuer)}&algorithm=SHA1&digits=6&period={TotpStepSeconds}";
     }
 
-    /// <summary>
-    /// Renders the URI as an SVG data URI. Done server-side so the web client needs no QR library,
-    /// and so the same endpoint can serve any future client unchanged.
-    /// </summary>
     private static string BuildQrCodeSvgDataUri(string otpAuthUri)
     {
         using var generator = new QRCodeGenerator();
@@ -345,7 +293,6 @@ public class TwoFactorService(
         return $"data:image/svg+xml;base64,{Convert.ToBase64String(Encoding.UTF8.GetBytes(svg))}";
     }
 
-    /// <summary>Groups the secret into fours so it can be typed accurately when a QR cannot be scanned.</summary>
     private static string FormatSecretForDisplay(string secret)
     {
         return string.Join(' ', Enumerable

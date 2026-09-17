@@ -1,11 +1,5 @@
 import 'json_utils.dart';
 
-/// `GET Stars/Wallet` - balance plus the two Premium flags.
-///
-/// [premiumTrialActive] is specifically "the Stars-funded trial is unexpired",
-/// while [hasActivePremium] is "Premium from *any* source" (an Active/PastDue
-/// Stripe subscription or the trial). The trial card needs both to tell
-/// "already trialling" apart from "already a paying subscriber".
 class StarWalletResponse {
   const StarWalletResponse({
     required this.balance,

@@ -142,9 +142,6 @@ class _NotificationRow extends StatelessWidget {
                   )
                 : CircleAvatar(
                     radius: 20,
-                    // Same reasoning as ConcordAvatar's fallback fill: a
-                    // translucent neutral stays visible on every surface,
-                    // including light mode where rail == sidebar.
                     backgroundColor: colors.fgDefault.withValues(alpha: 0.16),
                     child: Icon(_icon, size: 18, color: colors.fgMuted),
                   ),

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 
-/** Fires once, the first time the element scrolls into view - not re-armed on scroll-out. */
 export function useRevealOnScroll() {
   const ref = useRef(null)
   const [isVisible, setIsVisible] = useState(() => typeof IntersectionObserver === 'undefined')

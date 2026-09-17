@@ -13,7 +13,7 @@ public class NotificationsController(NotificationsService notificationsService) 
     private readonly NotificationsService _notificationsService = notificationsService;
 
     [HttpGet]
-    public async Task<PagedResult<NotificationResponse>> GetMyNotificationsAsync([FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<NotificationResponse>> GetMyNotificationsAsync(int page, int pageSize)
     {
         return await _notificationsService.GetMyNotificationsAsync(GetUserId(), page, pageSize);
     }

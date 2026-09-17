@@ -2,9 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Concord.Application.Models;
 
-/// <summary>One row of the admin user table (P4) - deliberately not PublicProfileResponse, which is
-/// scoped to what any other user is allowed to see. An admin sees the account fields that matter for
-/// moderation instead: email, role, and account-status flags.</summary>
 public class AdminUserSummary
 {
     [JsonPropertyName("Id")]
@@ -28,8 +25,6 @@ public class AdminUserSummary
     [JsonPropertyName("AvatarUrl")]
     public string? AvatarUrl { get; set; }
 
-    /// <summary>"Admin" or "User" - the Domain-layer Roles enum can't appear here directly (Domain
-    /// references Application, not the reverse), so it's stringified at the mapping boundary.</summary>
     [JsonPropertyName("Role")]
     public string? Role { get; set; }
 

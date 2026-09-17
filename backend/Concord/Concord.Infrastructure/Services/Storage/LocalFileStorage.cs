@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Concord.Infrastructure.Services.Storage;
 
-/// <summary>Saves to <c>wwwroot/uploads/{purpose}/</c>, served back out by <c>app.UseStaticFiles</c>. Used outside Production.</summary>
 public class LocalFileStorage(IWebHostEnvironment environment) : IFileStorage
 {
     private const string UploadsUrlPrefix = "/uploads/";

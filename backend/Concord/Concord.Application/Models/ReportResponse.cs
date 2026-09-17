@@ -3,8 +3,6 @@ using Concord.Application.Enums;
 
 namespace Concord.Application.Models;
 
-/// <summary>One row of the moderator report queue. Denormalizes enough of the target to be readable
-/// without a second round-trip - see <see cref="TargetSnippet"/>.</summary>
 public class ReportResponse
 {
     [JsonPropertyName("Id")]
@@ -19,10 +17,6 @@ public class ReportResponse
     [JsonPropertyName("TargetId")]
     public Guid TargetId { get; set; }
 
-    /// <summary>A best-effort preview of the target - a message's content, or the reported user's
-    /// display name - so the queue is readable without a second round-trip. Null when the underlying
-    /// target can no longer be resolved (e.g. the message was hard-deleted since the report was
-    /// filed, or the user account no longer exists).</summary>
     [JsonPropertyName("TargetSnippet")]
     public string? TargetSnippet { get; set; }
 

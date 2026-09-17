@@ -61,11 +61,6 @@ public class PresenceHub(PresenceService presenceService) : Hub
         }
     }
 
-    /// <summary>
-    /// Called periodically by clients while connected, purely to keep the Redis connection-count
-    /// key (see <see cref="PresenceService.RenewConnectionAsync"/>) from expiring under a
-    /// long-lived, otherwise-idle connection. Not part of the visible presence status itself.
-    /// </summary>
     public async Task Heartbeat()
     {
         try

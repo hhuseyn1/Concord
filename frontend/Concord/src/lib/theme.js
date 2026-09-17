@@ -1,15 +1,3 @@
-/*
- * Theme preference (dark/light) - module-level state with a subscribe/notify
- * channel, mirroring `api/tokenStorage.js`, so every mounted consumer (the
- * landing navbar toggle, the Settings > Appearance toggle, ...) stays in sync
- * within a session no matter where the change came from.
- *
- * STORAGE_KEY and the accepted values must stay identical to the anti-FOUC
- * inline script in index.html, which applies the attribute before React mounts.
- * This module never *needs* to paint on load - it just adopts whatever the
- * inline script already decided - but it re-applies defensively so the app is
- * still correct if that script is ever removed or fails.
- */
 
 const STORAGE_KEY = 'concord.theme'
 const ATTRIBUTE = 'data-theme'
@@ -39,8 +27,6 @@ function applyTheme(theme) {
   document.documentElement.setAttribute(ATTRIBUTE, theme)
 }
 
-// `null` until the user explicitly picks a theme; while it's null we keep
-// following the OS preference.
 let explicitTheme = readStoredTheme()
 let currentTheme = explicitTheme ?? systemTheme()
 
@@ -57,8 +43,6 @@ function setCurrentTheme(theme) {
   notifyListeners()
 }
 
-// Keep following the OS while the user hasn't made a choice of their own -
-// e.g. macOS/Windows auto-switching at sunset with Concord already open.
 window.matchMedia?.('(prefers-color-scheme: light)').addEventListener?.('change', () => {
   if (explicitTheme) return
   setCurrentTheme(systemTheme())
@@ -79,7 +63,6 @@ export function setTheme(theme) {
   try {
     localStorage.setItem(STORAGE_KEY, theme)
   } catch {
-    // Storage unavailable: the choice still applies for this session.
   }
   setCurrentTheme(theme)
 }

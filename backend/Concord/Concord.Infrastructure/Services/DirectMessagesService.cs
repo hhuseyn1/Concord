@@ -244,11 +244,6 @@ public class DirectMessagesService(
 
         await _context.SaveChangesAsync();
 
-        // Stars-earning is scoped to DMs only (the product spec is "earn Stars by chatting with
-        // friends"), never server channel messages - see MessagesService, which has no equivalent
-        // call. `sender` is already loaded above for the response mapping, so this reuses it rather
-        // than issuing another query - see TryGrantChatRewardAsync's remarks on why this stays a
-        // best-effort "grant" rather than a strictly-atomic debit-style operation.
         await _starsService.TryGrantChatRewardAsync(sender, request.Content);
 
         var mentionedUserIds = await ResolveAndStoreMentionsAsync(conversation, message, request.Content);
@@ -268,11 +263,6 @@ public class DirectMessagesService(
                 reason: null);
         }
 
-        // A DM is inherently "for" the other person - unlike a channel, there's no one else it could
-        // be meant for, so (unlike channel messages) it shouldn't need an explicit @mention to notify
-        // them. Skipped when they were already @mentioned above: ResolveAndStoreMentionsAsync in a
-        // DM can only ever resolve to this same otherUserId, so that path already persisted and
-        // pushed a notification for this exact message - a second one here would just be a duplicate.
         if (!mentionedUserIds.Contains(otherUserId))
         {
             await _notificationsService.NotifyDirectMessageReceivedAsync(otherUserId, currentUserId, conversationId, result.Id, result.Content);
@@ -546,19 +536,19 @@ public class DirectMessagesService(
             .FirstOrDefaultAsync();
     }
 
-    public async Task<PagedResult<DirectMessageResponse>> SearchMessagesAsync(Guid currentUserId, Guid conversationId, string query, int page, int pageSize)
+    public async Task<PagedResult<DirectMessageResponse>> SearchMessagesAsync(Guid currentUserId, Guid conversationId, SearchDirectMessagesRequest request)
     {
         await AssertConversationAccessAsync(currentUserId, conversationId);
 
-        if (string.IsNullOrWhiteSpace(query))
-            throw new ParameterValidationException(nameof(query));
+        if (string.IsNullOrWhiteSpace(request.Query))
+            throw new ParameterValidationException(nameof(request.Query));
 
-        page = Math.Max(page, 1);
-        pageSize = Math.Clamp(pageSize, 1, GlobalConstants.MaxPageSize);
+        var page = Math.Max(request.Page, 1);
+        var pageSize = Math.Clamp(request.PageSize, 1, GlobalConstants.MaxPageSize);
 
         var messagesQuery = _context.DirectMessages
             .Where(message => message.ConversationId == conversationId)
-            .Where(message => message.Content != null && EF.Functions.ILike(message.Content, $"%{query}%"))
+            .Where(message => message.Content != null && EF.Functions.ILike(message.Content, $"%{request.Query}%"))
             .Where(message => !_context.DirectMessageHiddenForUsers
                 .Any(hidden => hidden.DirectMessageId == message.Id && hidden.UserId == currentUserId));
 

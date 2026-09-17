@@ -1,7 +1,6 @@
 import { cn } from '../../lib/cn'
 import { useRevealOnScroll } from './useRevealOnScroll'
 
-/** Fades + slides a section into place the first time it scrolls into view. */
 export function Reveal({ as: Tag = 'div', delay = 0, className, children }) {
   const [ref, isVisible] = useRevealOnScroll()
 

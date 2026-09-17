@@ -2,10 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Concord.Application.Models;
 
-/// <summary>One row of the admin subscriptions table (P4) - an audit view of billing activity, so it
-/// intentionally includes every <see cref="Domain.Entities.Subscription"/> row (past/canceled included),
-/// not a deduplicated "who is currently subscribed" list. See <see cref="AdminUserSummary"/> for the
-/// per-user view instead.</summary>
 public class AdminSubscriptionSummary
 {
     [JsonPropertyName("Id")]

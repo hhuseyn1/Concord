@@ -1,4 +1,3 @@
-using Concord.Application.Enums;
 using Concord.Application.Models;
 using Concord.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,11 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Concord.API.Controllers;
 
 
-/// <summary>
-/// Site-wide admin surface (P4). Every endpoint requires <c>Roles.Admin</c> - the same global role
-/// already used for <see cref="AuthenticationController.ResetPasswordAsync"/>, unrelated to the
-/// server-scoped RBAC from P0.
-/// </summary>
 [Route("Api/V1.0/Admin")]
 [Authorize(Roles = "Admin")]
 public class AdminController(AdminService adminService) : BaseApiController
@@ -25,26 +19,21 @@ public class AdminController(AdminService adminService) : BaseApiController
     }
 
     [HttpGet("Overview/Charts")]
-    public async Task<AdminOverviewChartsResponse> GetOverviewChartsAsync([FromQuery] DateTime? fromUtc, [FromQuery] DateTime? toUtc)
+    public async Task<AdminOverviewChartsResponse> GetOverviewChartsAsync(DateTime? fromUtc, DateTime? toUtc)
     {
         return await _adminService.GetOverviewChartsAsync(fromUtc, toUtc);
     }
 
     [HttpGet("Overview/UserGrowth")]
-    public async Task<List<AdminUserGrowthPoint>> GetUserGrowthAsync([FromQuery] int? year)
+    public async Task<List<AdminUserGrowthPoint>> GetUserGrowthAsync(int? year)
     {
         return await _adminService.GetUserGrowthAsync(year);
     }
 
     [HttpGet("Users")]
-    public async Task<PagedResult<AdminUserSummary>> GetUsersAsync(
-        [FromQuery] int page,
-        [FromQuery] int pageSize,
-        [FromQuery] string? search,
-        [FromQuery] string? sortBy,
-        [FromQuery] string? sortDirection)
+    public async Task<PagedResult<AdminUserSummary>> GetUsersAsync([FromQuery] GetAdminUsersRequest request)
     {
-        return await _adminService.GetUsersAsync(page, pageSize, search, sortBy, sortDirection);
+        return await _adminService.GetUsersAsync(request);
     }
 
     [HttpPost("Users/{userId:guid}/Disable")]
@@ -66,29 +55,14 @@ public class AdminController(AdminService adminService) : BaseApiController
     }
 
     [HttpGet("Subscriptions")]
-    public async Task<PagedResult<AdminSubscriptionSummary>> GetSubscriptionsAsync(
-        [FromQuery] int page,
-        [FromQuery] int pageSize,
-        [FromQuery] SubscriptionStatus? status,
-        [FromQuery] string? search,
-        [FromQuery] string? sortBy,
-        [FromQuery] string? sortDirection,
-        [FromQuery] DateTime? fromUtc,
-        [FromQuery] DateTime? toUtc)
+    public async Task<PagedResult<AdminSubscriptionSummary>> GetSubscriptionsAsync([FromQuery] GetAdminSubscriptionsRequest request)
     {
-        return await _adminService.GetSubscriptionsAsync(page, pageSize, status, search, sortBy, sortDirection, fromUtc, toUtc);
+        return await _adminService.GetSubscriptionsAsync(request);
     }
 
     [HttpGet("AuditLog")]
-    public async Task<PagedResult<AuditLogResponse>> GetAuditLogAsync(
-        [FromQuery] int page,
-        [FromQuery] int pageSize,
-        [FromQuery] string? actorEmail,
-        [FromQuery] string? action,
-        [FromQuery] DateTime? fromUtc,
-        [FromQuery] DateTime? toUtc,
-        [FromQuery] string? sortDirection)
+    public async Task<PagedResult<AuditLogResponse>> GetAuditLogAsync([FromQuery] GetAuditLogRequest request)
     {
-        return await _adminService.GetAuditLogAsync(page, pageSize, actorEmail, action, fromUtc, toUtc, sortDirection);
+        return await _adminService.GetAuditLogAsync(request);
     }
 }

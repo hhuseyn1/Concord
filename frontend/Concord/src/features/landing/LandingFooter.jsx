@@ -56,9 +56,13 @@ export function LandingFooter() {
             <p className="text-xs font-semibold tracking-wide text-fg-muted uppercase">{t('landing.footer.mobile')}</p>
             <ul className="mt-3 flex flex-col gap-2">
               <li>
-                <span className="text-sm text-fg-muted" title={t('landing.mobileApp.comingSoonTitle')}>
+                <a
+                  href="#mobile-app"
+                  className="text-sm text-fg-muted hover:text-fg-default"
+                  title={t('landing.mobileApp.comingSoonTitle')}
+                >
                   {t('landing.footer.androidComingSoon')}
-                </span>
+                </a>
               </li>
             </ul>
           </div>

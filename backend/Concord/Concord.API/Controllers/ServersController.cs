@@ -63,7 +63,7 @@ public class ServersController(ServersService serversService) : BaseApiControlle
     }
 
     [HttpGet("{serverId:guid}/Members")]
-    public async Task<PagedResult<ServerMemberSummary>> GetMembersAsync(Guid serverId, [FromQuery] int page, [FromQuery] int pageSize)
+    public async Task<PagedResult<ServerMemberSummary>> GetMembersAsync(Guid serverId, int page, int pageSize)
     {
         return await _serversService.GetMembersAsync(GetUserId(), serverId, page, pageSize);
     }

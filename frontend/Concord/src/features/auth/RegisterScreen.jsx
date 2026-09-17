@@ -15,9 +15,6 @@ import { mapRegisterError } from './authErrors'
 const USERNAME_PATTERN = /^[a-zA-Z0-9_]{1,32}$/
 const USERNAME_CHECK_DEBOUNCE_MS = 350
 
-// Mirrors PasswordInput's mechanical shape: a relatively-positioned wrapper around `Input` with
-// an absolutely-positioned status slot on the right, swapped here for a spinner/check/cross icon
-// instead of the show/hide-password toggle.
 const UsernameInput = forwardRef(function UsernameInput({ className, status, ...props }, ref) {
   return (
     <div className="relative">
@@ -62,7 +59,7 @@ export function RegisterScreen() {
 
   const username = watch('username')
   const [debouncedUsername, setDebouncedUsername] = useState('')
-  const [usernameAvailability, setUsernameAvailability] = useState('idle') // idle | checking | available | taken
+  const [usernameAvailability, setUsernameAvailability] = useState('idle')
   const lastSubmittedUsernameRef = useRef('')
 
   useEffect(() => {

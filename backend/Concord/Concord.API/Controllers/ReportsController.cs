@@ -1,4 +1,3 @@
-using Concord.Application.Enums;
 using Concord.Application.Models;
 using Concord.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,12 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Concord.API.Controllers;
 
 
-/// <summary>
-/// The report/flag system and moderator queue. <c>POST Reports</c> is open to any authenticated user;
-/// the <c>Admin/Reports</c> routes mirror <see cref="AdminController"/>'s exact gate
-/// (<c>[Authorize(Roles = "Admin")]</c> against the global site-admin role, unrelated to server-scoped
-/// RBAC).
-/// </summary>
 [Route("Api/V1.0")]
 [Authorize]
 public class ReportsController(ReportsService reportsService) : BaseApiController
@@ -27,15 +20,9 @@ public class ReportsController(ReportsService reportsService) : BaseApiControlle
 
     [HttpGet("Admin/Reports")]
     [Authorize(Roles = "Admin")]
-    public async Task<PagedResult<ReportResponse>> GetReportsAsync(
-        [FromQuery] int page,
-        [FromQuery] int pageSize,
-        [FromQuery] ReportStatus? status,
-        [FromQuery] string? search,
-        [FromQuery] string? sortBy,
-        [FromQuery] string? sortDirection)
+    public async Task<PagedResult<ReportResponse>> GetReportsAsync([FromQuery] GetReportsRequest request)
     {
-        return await _reportsService.GetReportsAsync(page, pageSize, status, search, sortBy, sortDirection);
+        return await _reportsService.GetReportsAsync(request);
     }
 
     [HttpPost("Admin/Reports/{reportId:guid}:Resolve")]

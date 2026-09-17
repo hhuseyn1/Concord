@@ -5,20 +5,13 @@ import { reportReconnected, reportReconnecting, reportSettled } from './connecti
 
 let connectionCounter = 0;
 
-// withAutomaticReconnect only covers reconnection after a connection has
-// succeeded at least once. A transient failure on the very first handshake
-// (cold start, brief network hiccup, token not yet available) is otherwise
-// fatal, so the initial start() is retried here with bounded exponential
-// backoff + jitter. This does NOT duplicate withAutomaticReconnect: once a
-// connection succeeds, all reconnection after that is handled by SignalR
-// itself, untouched by this wrapper.
 const START_MAX_ATTEMPTS = 5;
 const START_BASE_DELAY_MS = 1000;
 const START_MAX_DELAY_MS = 8000;
 
 function startRetryDelayMs(attempt) {
   const exponential = Math.min(START_BASE_DELAY_MS * 2 ** attempt, START_MAX_DELAY_MS);
-  return Math.round(exponential * (0.75 + Math.random() * 0.5)); // +/-25% jitter
+  return Math.round(exponential * (0.75 + Math.random() * 0.5));
 }
 
 export function createHubConnection(hubPath) {
@@ -62,9 +55,6 @@ export function createHubConnection(hubPath) {
     }
   };
 
-  // Guard against overlapping start() calls (e.g. a caller invoking start()
-  // again before the previous attempt/retry chain has settled) by handing
-  // back the same in-flight promise instead of racing a second originalStart().
   connection.start = () => {
     if (inFlightStart) return inFlightStart;
     cancelled = false;

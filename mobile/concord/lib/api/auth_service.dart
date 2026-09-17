@@ -47,10 +47,6 @@ class AuthService {
     return tokens;
   }
 
-  /// Registration no longer returns a usable session - the backend requires the email to be
-  /// confirmed before the account can log in, so it responds with `EmailConfirmationRequired`
-  /// and null tokens instead of a `TokenResponse`. There is nothing to store here; the caller
-  /// just needs to know the request succeeded so it can prompt the user to check their email.
   Future<void> register({
     required String name,
     required String surname,

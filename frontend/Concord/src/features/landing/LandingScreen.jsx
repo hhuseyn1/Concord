@@ -10,8 +10,6 @@ import { LandingNavbar } from './LandingNavbar'
 import { MobileAppSection } from './MobileAppSection'
 
 export function LandingScreen() {
-  // Smooth-scrolls the in-page nav/footer anchors (#features, #faq, ...) without opting the whole
-  // app into smooth scrolling - reset on unmount so it doesn't leak into other routes.
   useEffect(() => {
     const root = document.documentElement
     const previous = root.style.scrollBehavior

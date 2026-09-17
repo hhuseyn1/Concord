@@ -32,13 +32,6 @@ public class MessagesHub(ChannelsService channelsService) : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"Channel:{channelId}");
     }
 
-    /// <summary>
-    /// Ephemeral typing signal (M-03) - no persistence. The recipient side also expires the indicator
-    /// locally after a short timeout since the last event, as a safety net for a sender's client
-    /// closing mid-type without ever calling <see cref="StopTyping"/>. Only reaches whoever is already
-    /// in the group (i.e. already joined via <see cref="JoinChannel"/>), so no separate membership
-    /// check here.
-    /// </summary>
     public async Task Typing(Guid channelId)
     {
         var claimedUserId = Context.User?.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value;
@@ -48,7 +41,6 @@ public class MessagesHub(ChannelsService channelsService) : Hub
         await Clients.OthersInGroup($"Channel:{channelId}").SendAsync("UserTyping", new { channelId, userId });
     }
 
-    /// <summary>Explicit "I stopped typing" (P1.3) - sent on successful message send or on leaving the channel, so the indicator clears immediately instead of waiting out the client-side timeout.</summary>
     public async Task StopTyping(Guid channelId)
     {
         var claimedUserId = Context.User?.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value;

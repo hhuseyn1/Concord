@@ -19,11 +19,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  // No background message handler is registered: the backend only ever sends a plain
-  // `notification` payload (no `data`), which FCM's Android SDK renders as a system-tray
-  // notification itself once the OS delivers it - that happens without invoking any Dart code, so
-  // there's nothing for a background handler to do here (it's only needed to run custom logic on a
-  // data-only or mixed payload).
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const ProviderScope(child: ConcordApp()));
 }
@@ -35,9 +30,6 @@ class ConcordApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(localeControllerProvider);
-    // Both of these are persisted user preferences (Settings > My Account >
-    // Appearance). Watching them here is what makes a change repaint the whole
-    // app immediately, no restart and no per-screen plumbing.
     final themeMode = ref.watch(themeModeControllerProvider);
     final fontScale = ref.watch(fontScaleControllerProvider);
 

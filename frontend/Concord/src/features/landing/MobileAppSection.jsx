@@ -2,16 +2,13 @@ import { Bell, MessageCircle, Smartphone, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Reveal } from './Reveal'
 
-// Unset (the default) keeps the existing disabled "Coming soon" state - set this once a build
-// is actually ready to hand out, pointed at wherever it's hosted (a static file under `public/`,
-// a GitHub release, a CDN, whatever's easiest to update independently of a frontend deploy).
 const ANDROID_APK_URL = import.meta.env.VITE_ANDROID_APK_URL
 
 export function MobileAppSection() {
   const { t } = useTranslation()
   const apkUrl = ANDROID_APK_URL
   return (
-    <section className="bg-surface-sidebar py-24">
+    <section id="mobile-app" className="bg-surface-sidebar py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         <Reveal className="order-2 lg:order-1">
           <h2 className="text-3xl font-bold text-fg-heading sm:text-4xl">{t('landing.mobileApp.title')}</h2>

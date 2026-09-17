@@ -3,15 +3,10 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Locale codes the app ships translations for. Keep in sync with
-/// `AppLocalizations.supportedLocales` (generated from `lib/l10n/*.arb`).
 const supportedLocaleCodes = ['en', 'az'];
 
 const _prefsKey = 'concord.locale';
 
-/// Persists the user's chosen app locale (English/Azerbaijani) across
-/// restarts via [SharedPreferences], defaulting to the device locale when
-/// it's one we support and falling back to English otherwise.
 class LocaleController extends StateNotifier<Locale?> {
   LocaleController() : super(null) {
     _load();

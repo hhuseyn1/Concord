@@ -14,21 +14,12 @@ public class AuthenticationController(
     private readonly AuthenticationService _authenticationService = authenticationService;
     private readonly TwoFactorService _twoFactorService = twoFactorService;
 
-    /// <summary>
-    /// Password step. When the account has a second factor the response carries
-    /// <c>TwoFactorRequired</c> and a short-lived <c>TwoFactorToken</c> instead of a session - finish
-    /// at <c>Login/TwoFactor</c>.
-    /// </summary>
     [HttpPost("Login")]
     public async Task<TokenResponse> LoginAsync(LoginRequest request)
     {
         return await _authenticationService.LoginAsync(request);
     }
 
-    /// <summary>
-    /// Second-factor step. Accepts a TOTP code or an unused recovery code. Shares the login rate
-    /// limit, since it is the same credential-guessing surface.
-    /// </summary>
     [HttpPost("Login/TwoFactor")]
     public async Task<TokenResponse> CompleteTwoFactorLoginAsync(TwoFactorLoginRequest request)
     {
@@ -41,11 +32,8 @@ public class AuthenticationController(
         return await _authenticationService.RegisterAsync(request);
     }
 
-    /// <summary>Unauthenticated live-availability check for the registration form; no
-    /// <c>[Authorize]</c>/<c>[AllowAnonymous]</c> needed since this controller has no class-level
-    /// gate and inherits whatever global rate limiting already applies.</summary>
     [HttpGet("Register/Username-available")]
-    public async Task<UsernameAvailabilityResponse> CheckUsernameAvailableAsync([FromQuery] string username)
+    public async Task<UsernameAvailabilityResponse> CheckUsernameAvailableAsync(string username)
     {
         return await _authenticationService.CheckUsernameAvailableAsync(username);
     }
@@ -106,10 +94,6 @@ public class AuthenticationController(
         return await _twoFactorService.GetStatusAsync(GetUserId());
     }
 
-    /// <summary>
-    /// Begins enrolment: mints a secret and returns it as a QR plus a typeable key. Two-factor is not
-    /// yet active - the secret stays inert until confirmed at <c>Me/TwoFactor/Enable</c>.
-    /// </summary>
     [HttpPost("Me/TwoFactor/Setup")]
     [Authorize]
     public async Task<TwoFactorSetupResponse> StartTwoFactorSetupAsync()
@@ -117,10 +101,6 @@ public class AuthenticationController(
         return await _twoFactorService.StartSetupAsync(GetUserId());
     }
 
-    /// <summary>
-    /// Confirms enrolment with a code from the authenticator and returns the recovery codes. Those
-    /// codes are shown exactly once - only their hashes are kept.
-    /// </summary>
     [HttpPost("Me/TwoFactor/Enable")]
     [Authorize]
     public async Task<RecoveryCodesResponse> EnableTwoFactorAsync([FromBody] TwoFactorCodeRequest request)

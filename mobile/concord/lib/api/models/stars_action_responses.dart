@@ -1,7 +1,6 @@
 import 'enums.dart';
 import 'json_utils.dart';
 
-/// `POST Stars/Transfer` - the sender's balance after the transfer.
 class TransferStarsResponse {
   const TransferStarsResponse({required this.balance});
 
@@ -12,7 +11,6 @@ class TransferStarsResponse {
   final int balance;
 }
 
-/// `POST Stars/PremiumTrial/Activate`.
 class ActivatePremiumTrialResponse {
   const ActivatePremiumTrialResponse({required this.balance, required this.premiumTrialExpiresAt});
 
@@ -27,11 +25,6 @@ class ActivatePremiumTrialResponse {
   final DateTime premiumTrialExpiresAt;
 }
 
-/// `POST Stars/Purchases/CheckoutSession`. Unlike the shared (subscription)
-/// `CheckoutSessionResponse`, this carries the purchase id back too, so a
-/// native client - which never receives the web success-redirect the backend
-/// otherwise hands the id out through - can poll
-/// `GET Stars/Purchases/{purchaseId}/Status` directly.
 class CreateStarsCheckoutSessionResponse {
   const CreateStarsCheckoutSessionResponse({required this.url, required this.purchaseId});
 
@@ -46,7 +39,6 @@ class CreateStarsCheckoutSessionResponse {
   final String purchaseId;
 }
 
-/// `GET Stars/Purchases/{purchaseId}/Status`.
 class StarPurchaseStatusResponse {
   const StarPurchaseStatusResponse({required this.status});
 

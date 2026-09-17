@@ -3,16 +3,6 @@ import { ThemeToggle } from '../../components/ui/ThemeToggle'
 import { useTheme } from '../../hooks/useAppearance'
 import { FontSizeControl } from './FontSizeControl'
 
-/**
- * Appearance preferences (theme + text size). Lives inside the existing
- * "My Account" tab next to Preferences rather than as a sixth top-level tab -
- * two controls don't justify a whole tab, and they read naturally alongside the
- * other per-device preferences.
- *
- * Both controls are backed by the module-level stores in `lib/theme.js` /
- * `lib/fontSize.js`, i.e. the exact same state the landing-page navbar toggle
- * writes to.
- */
 export function AppearanceSection() {
   const { t } = useTranslation()
   const theme = useTheme()

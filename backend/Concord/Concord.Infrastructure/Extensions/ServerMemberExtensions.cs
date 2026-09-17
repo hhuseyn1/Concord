@@ -10,7 +10,6 @@ public static class ServerMemberExtensions
         User = user.MapToPublicModel(presence),
         JoinedAt = member.Created,
         IsMuted = member.IsMuted,
-        // Lapsed timeouts read as "not timed out" everywhere; see ModerationExtensions.
         TimedOutUntil = member.TimedOutUntil is { } until && until > DateTime.UtcNow ? until : null
     };
 }

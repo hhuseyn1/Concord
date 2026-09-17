@@ -17,7 +17,6 @@ public class StarTransactionResponse
     [JsonPropertyName("BalanceAfter")]
     public int BalanceAfter { get; set; }
 
-    /// <summary>Resolved server-side - null unless this row is a TransferSent/TransferReceived.</summary>
     [JsonPropertyName("CounterpartyUsername")]
     public string? CounterpartyUsername { get; set; }
 

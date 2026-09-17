@@ -22,9 +22,6 @@ export default defineConfig([
     },
   },
   {
-    // Radix-based primitives re-export several compound-component bindings
-    // (Root/Trigger/Content/...) per file alongside styled wrappers, which
-    // react-refresh's single-component-per-file heuristic can't model.
     files: ['src/components/ui/**/*.{js,jsx}'],
     rules: {
       'react-refresh/only-export-components': 'off',
