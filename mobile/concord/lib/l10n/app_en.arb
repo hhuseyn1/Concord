@@ -839,5 +839,157 @@
   "deleteAccountConfirmButton": "Delete My Account",
   "deleteAccountIncorrectPasswordError": "Incorrect password.",
   "deleteAccountFailedError": "Could not delete your account.",
-  "deleteAccountSuccessSnackbar": "Your account has been deleted. Log back in within 30 days to cancel the deletion."
+  "deleteAccountSuccessSnackbar": "Your account has been deleted. Log back in within 30 days to cancel the deletion.",
+  "appearanceTitle": "Appearance",
+  "appearanceDescription": "Theme and text size are saved on this device.",
+  "appearanceThemeLabel": "Theme",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "Match device",
+  "appearanceFontSizeLabel": "Text size",
+  "appearanceFontSizeHint": "Makes text across Concord bigger or smaller. Spacing and layout stay the same.",
+  "fontSizeSmall": "Small ({px}px)",
+  "@fontSizeSmall": {
+    "placeholders": {"px": {"type": "int"}}
+  },
+  "fontSizeDefault": "Default ({px}px)",
+  "@fontSizeDefault": {
+    "placeholders": {"px": {"type": "int"}}
+  },
+  "fontSizeLarge": "Large ({px}px)",
+  "@fontSizeLarge": {
+    "placeholders": {"px": {"type": "int"}}
+  },
+  "fontSizeExtraLarge": "Extra large ({px}px)",
+  "@fontSizeExtraLarge": {
+    "placeholders": {"px": {"type": "int"}}
+  },
+  "appearanceFontSizePreview": "This is how your messages will look.",
+  "appearanceFontSizePreviewMeta": "And this is how timestamps and other small details will look.",
+
+  "starsTabLabel": "Stars",
+  "starsUnit": "Stars",
+  "starsBalanceLabel": "Your balance",
+  "starsEarnHint": "Earn {amount} Stars for every message you send, up to {cap} Stars a day, with a {seconds}s wait between rewards.",
+  "@starsEarnHint": {
+    "placeholders": {"amount": {"type": "int"}, "cap": {"type": "int"}, "seconds": {"type": "int"}}
+  },
+  "starsSendButton": "Send Stars",
+  "starsLoadErrorTitle": "Couldn't load your Stars",
+  "starsLoadErrorDescription": "Something went wrong reaching your wallet. Please try again.",
+  "starsIndicatorTooltip": "{amount} Stars — open your Stars settings",
+  "@starsIndicatorTooltip": {
+    "placeholders": {"amount": {"type": "int"}}
+  },
+
+  "starsSendTitle": "Send Stars",
+  "starsSendDescription": "Send Stars from your balance to a friend. Transfers are instant and can't be undone.",
+  "starsSendRecipientLabel": "Send to",
+  "starsSendSearchHint": "Search friends",
+  "starsSendNoFriends": "No friends yet",
+  "starsSendNoFriendsDescription": "Stars can only be sent to friends — add someone first.",
+  "starsSendNoMatches": "No friends match “{query}”.",
+  "@starsSendNoMatches": {
+    "placeholders": {"query": {"type": "String"}}
+  },
+  "starsSendFriendsErrorTitle": "Couldn't load your friends",
+  "starsSendAmountLabel": "Amount",
+  "starsSendAmountHint": "You have {balance} Stars available.",
+  "@starsSendAmountHint": {
+    "placeholders": {"balance": {"type": "int"}}
+  },
+  "starsSendNoBalance": "You'll need to earn or buy Stars before you can send any.",
+  "starsSendSubmitButton": "Send",
+  "starsSendErrorNoRecipient": "Choose a friend to send Stars to.",
+  "starsSendErrorAmountRequired": "Enter how many Stars you want to send.",
+  "starsSendErrorAmountPositive": "Enter a whole number of Stars greater than zero.",
+  "starsSendErrorAmountTooLarge": "You only have {balance} Stars.",
+  "@starsSendErrorAmountTooLarge": {
+    "placeholders": {"balance": {"type": "int"}}
+  },
+  "starsSendErrorSelf": "You can't send Stars to yourself.",
+  "starsSendConfirmTitle": "Confirm this transfer",
+  "starsSendConfirmDescription": "You're about to send {amount} Stars to {name}. This can't be undone. Your balance afterwards: {balance} Stars.",
+  "@starsSendConfirmDescription": {
+    "placeholders": {"amount": {"type": "int"}, "name": {"type": "String"}, "balance": {"type": "int"}}
+  },
+  "starsSendConfirmAction": "Send {amount} Stars",
+  "@starsSendConfirmAction": {
+    "placeholders": {"amount": {"type": "int"}}
+  },
+  "starsSendSuccessSnackbar": "{amount} Stars are on their way to {name}.",
+  "@starsSendSuccessSnackbar": {
+    "placeholders": {"amount": {"type": "int"}, "name": {"type": "String"}}
+  },
+
+  "starsTrialSectionTitle": "Premium trial",
+  "starsTrialTitle": "Try Premium with Stars",
+  "starsTrialDescription": "Spend {cost} Stars to unlock Concord Premium for {days} days.",
+  "@starsTrialDescription": {
+    "placeholders": {"cost": {"type": "int"}, "days": {"type": "int"}}
+  },
+  "starsTrialAction": "Try Premium",
+  "starsTrialActiveBadge": "Trial active",
+  "starsTrialExpiresOn": "Your Premium trial runs until {date}.",
+  "@starsTrialExpiresOn": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "starsTrialAlreadyPremium": "You already have Premium, so there's no need to spend Stars on a trial.",
+  "starsTrialInsufficient": "You need {missing} more Stars to start the trial.",
+  "@starsTrialInsufficient": {
+    "placeholders": {"missing": {"type": "int"}}
+  },
+  "starsTrialConfirmTitle": "Start your Premium trial?",
+  "starsTrialConfirmDescription": "{cost} Stars will be deducted right away and you'll get {days} days of Premium. Your balance afterwards: {balance} Stars.",
+  "@starsTrialConfirmDescription": {
+    "placeholders": {"cost": {"type": "int"}, "days": {"type": "int"}, "balance": {"type": "int"}}
+  },
+  "starsTrialConfirmAction": "Spend {cost} Stars",
+  "@starsTrialConfirmAction": {
+    "placeholders": {"cost": {"type": "int"}}
+  },
+  "starsTrialSuccessSnackbar": "Premium trial started. You have Premium until {date}.",
+  "@starsTrialSuccessSnackbar": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+
+  "starsPackagesTitle": "Buy Stars",
+  "starsPackagesDescription": "Top up your balance through Stripe's secure checkout.",
+  "starsPackagesEmpty": "No Stars packages are available right now.",
+  "starsPackageAmount": "{stars} Stars",
+  "@starsPackageAmount": {
+    "placeholders": {"stars": {"type": "int"}}
+  },
+  "starsPackageBuyButton": "Buy",
+  "starsPurchaseLaunchFailedError": "Couldn't open the checkout page. Make sure you have a browser installed and try again.",
+  "starsPurchasePendingNotice": "Finishing your purchase in the browser? Your Stars will appear here as soon as the payment is confirmed.",
+
+  "starsHistoryTitle": "Recent activity",
+  "starsHistoryEmpty": "No Stars activity yet",
+  "starsHistoryEmptyDescription": "Send messages to start earning Stars.",
+  "starsHistoryErrorTitle": "Couldn't load your Stars history",
+  "starsHistoryBalanceAfter": "Balance: {balance}",
+  "@starsHistoryBalanceAfter": {
+    "placeholders": {"balance": {"type": "int"}}
+  },
+  "starsHistoryChatReward": "Chat reward",
+  "starsHistoryReceivedFrom": "Received from {name}",
+  "@starsHistoryReceivedFrom": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "starsHistorySentTo": "Sent to {name}",
+  "@starsHistorySentTo": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "starsHistoryPremiumTrial": "Premium trial",
+  "starsHistoryPackagePurchase": "Stars purchase",
+  "starsHistoryUnknown": "Stars adjustment",
+  "starsUnknownUser": "Someone",
+
+  "starsErrorNotFriends": "You can only send Stars to your friends.",
+  "starsErrorRecipientNotFound": "We couldn't find that person — they may have deleted their account.",
+  "starsErrorInsufficientBalance": "You don't have enough Stars for that.",
+  "starsErrorTransferInvalid": "Check the amount and who you're sending to, then try again.",
+  "starsErrorTrialAlreadyActive": "Your Premium trial is already active.",
+  "starsErrorPackageNotFound": "That Stars package isn't available any more."
 }

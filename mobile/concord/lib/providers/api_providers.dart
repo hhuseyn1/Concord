@@ -85,3 +85,7 @@ final qrLoginServiceProvider = Provider<QrLoginService>((ref) {
 final billingServiceProvider = Provider<BillingService>((ref) {
   return BillingService(ref.watch(apiClientProvider));
 });
+
+final starsServiceProvider = Provider<StarsService>((ref) {
+  return StarsService(ref.watch(apiClientProvider));
+});

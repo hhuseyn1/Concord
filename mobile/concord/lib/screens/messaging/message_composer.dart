@@ -284,6 +284,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final overLimit = _controller.text.length > _maxContentLength;
     final mentionCandidates = _mentionCandidates();
@@ -324,7 +325,7 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                       maxLines: 6,
                       enabled: !_isSending,
                       textInputAction: TextInputAction.newline,
-                      style: TextStyle(fontSize: 15, color: colors.fgDefault),
+                      style: TextStyle(fontSize: type.size(15), color: colors.fgDefault),
                       decoration: InputDecoration(
                         hintText: widget.hintText ?? l10n.messageChannelHint,
                         hintStyle: TextStyle(color: colors.fgMuted),
@@ -359,21 +360,21 @@ class _MessageComposerState extends ConsumerState<MessageComposer> {
                   child: _rateLimited
                       ? Text(
                           l10n.rateLimitedMessage,
-                          style: TextStyle(fontSize: 12, color: colors.warning),
+                          style: TextStyle(fontSize: type.size(12), color: colors.warning),
                         )
                       : (_sendError != null
-                          ? Text(_sendError!, style: TextStyle(fontSize: 12, color: colors.danger))
+                          ? Text(_sendError!, style: TextStyle(fontSize: type.size(12), color: colors.danger))
                           : (overLimit
                               ? Text(
                                   l10n.messageTooLong(_maxContentLength),
-                                  style: TextStyle(fontSize: 12, color: colors.danger),
+                                  style: TextStyle(fontSize: type.size(12), color: colors.danger),
                                 )
                               : const SizedBox.shrink())),
                 ),
                 if (_controller.text.length > _warnThreshold)
                   Text(
                     '${_controller.text.length}/$_maxContentLength',
-                    style: TextStyle(fontSize: 12, color: overLimit ? colors.danger : colors.fgMuted),
+                    style: TextStyle(fontSize: type.size(12), color: overLimit ? colors.danger : colors.fgMuted),
                   ),
               ],
             ),
@@ -393,6 +394,7 @@ class _ReplyBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final senderName = displayNameFor(message.sender);
 
@@ -411,7 +413,7 @@ class _ReplyBanner extends StatelessWidget {
           Expanded(
             child: Text.rich(
               TextSpan(
-                style: TextStyle(fontSize: 13, color: colors.fgMuted),
+                style: TextStyle(fontSize: type.size(13), color: colors.fgMuted),
                 children: [
                   TextSpan(text: l10n.replyingToPrefix),
                   TextSpan(text: senderName, style: TextStyle(color: colors.fgDefault, fontWeight: FontWeight.w500)),
@@ -441,6 +443,7 @@ class _AttachmentChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final uploading = attachment.status == _AttachmentStatus.uploading;
 
@@ -467,12 +470,12 @@ class _AttachmentChip extends StatelessWidget {
             child: Text(
               attachment.filename,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 13, color: colors.fgDefault),
+              style: TextStyle(fontSize: type.size(13), color: colors.fgDefault),
             ),
           ),
           Text(
             uploading ? l10n.uploadingEllipsis : l10n.readyToSendLabel,
-            style: TextStyle(fontSize: 11, color: colors.fgMuted),
+            style: TextStyle(fontSize: type.size(11), color: colors.fgMuted),
           ),
           IconButton(
             icon: Icon(Icons.close, size: 16, color: colors.fgMuted),
@@ -495,6 +498,7 @@ class _MentionSuggestionsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: ConcordSpacing.sm),
@@ -523,12 +527,12 @@ class _MentionSuggestionsList extends StatelessWidget {
                     child: Text(
                       name,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 13, color: colors.fgDefault),
+                      style: TextStyle(fontSize: type.size(13), color: colors.fgDefault),
                     ),
                   ),
                   if (member.user.username != null) ...[
                     const SizedBox(width: ConcordSpacing.sm),
-                    Text('@${member.user.username}', style: TextStyle(fontSize: 11, color: colors.fgMuted)),
+                    Text('@${member.user.username}', style: TextStyle(fontSize: type.size(11), color: colors.fgMuted)),
                   ],
                 ],
               ),

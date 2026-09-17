@@ -18,7 +18,7 @@ class PagedListState<T> {
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
-  final String? loadError;
+  final ApiException? loadError;
   final int page;
 
   PagedListState<T> copyWith({
@@ -26,7 +26,7 @@ class PagedListState<T> {
     bool? isLoading,
     bool? isLoadingMore,
     bool? hasMore,
-    String? loadError,
+    ApiException? loadError,
     bool clearLoadError = false,
     int? page,
   }) {
@@ -64,7 +64,7 @@ class PagedListController<T> extends StateNotifier<PagedListState<T>> {
       state = state.copyWith(items: result.items, isLoading: false, hasMore: result.hasNextPage, page: 1);
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoading: false, loadError: e.message);
+      state = state.copyWith(isLoading: false, loadError: e);
     }
   }
 

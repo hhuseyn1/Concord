@@ -21,6 +21,7 @@ export 'roles_service.dart';
 export 'search_service.dart';
 export 'servers_service.dart';
 export 'sessions_service.dart';
+export 'stars_service.dart';
 export 'token_storage.dart';
 export 'users_service.dart';
 export 'voice_service.dart';

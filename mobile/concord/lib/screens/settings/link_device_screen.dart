@@ -283,6 +283,7 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
   }
 
   Widget _buildRequestReview(ConcordColors colors, TextTheme textTheme, AppLocalizations l10n) {
+    final type = ConcordTypography.of(context);
     final request = _request!;
     final deviceLabel = request.deviceLabel?.isNotEmpty == true ? request.deviceLabel! : l10n.unknownDeviceLabel;
     final browserOs = [request.browser, request.os].where((p) => p != null && p.isNotEmpty).join(' · ');
@@ -328,7 +329,7 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
           ),
           child: Text(
             l10n.approveDeviceWarning,
-            style: TextStyle(color: colors.warning, fontSize: 13),
+            style: TextStyle(color: colors.warning, fontSize: type.size(13)),
           ),
         ),
         if (_error != null) ...[

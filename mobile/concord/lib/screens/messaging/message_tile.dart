@@ -318,6 +318,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final message = widget.message;
     final sender = message.sender;
@@ -344,7 +345,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
                       padding: const EdgeInsets.only(top: 3),
                       child: Text(
                         formatShortTime(l10n, message.created),
-                        style: TextStyle(fontSize: 10, color: colors.fgMuted),
+                        style: TextStyle(fontSize: type.size(10), color: colors.fgMuted),
                       ),
                     ),
             ),
@@ -362,14 +363,14 @@ class _MessageTileState extends ConsumerState<MessageTile> {
                         children: [
                           Text(
                             senderName,
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colors.fgDefault),
+                            style: TextStyle(fontSize: type.size(14), fontWeight: FontWeight.w600, color: colors.fgDefault),
                           ),
                           const SizedBox(width: ConcordSpacing.sm),
                           Tooltip(
                             message: formatAbsoluteTimestamp(message.created),
                             child: Text(
                               formatGroupTimestamp(l10n, message.created),
-                              style: TextStyle(fontSize: 11, color: colors.fgMuted),
+                              style: TextStyle(fontSize: type.size(11), color: colors.fgMuted),
                             ),
                           ),
                         ],
@@ -390,17 +391,18 @@ class _MessageTileState extends ConsumerState<MessageTile> {
   }
 
   Widget _buildContent(ConcordColors colors) {
+    final type = ConcordTypography.of(context);
     final content = widget.message.content;
     if (content == null || content.isEmpty) return const SizedBox.shrink();
     return RichText(
       text: TextSpan(
-        style: TextStyle(fontSize: 14, color: colors.fgDefault, height: 1.35),
+        style: TextStyle(fontSize: type.size(14), color: colors.fgDefault, height: 1.35),
         children: [
           ..._buildContentSpans(content, colors),
           if (widget.message.editedAtUtc != null)
             TextSpan(
               text: AppLocalizations.of(context).editedSuffix,
-              style: TextStyle(fontSize: 10, color: colors.fgMuted),
+              style: TextStyle(fontSize: type.size(10), color: colors.fgMuted),
             ),
         ],
       ),
@@ -452,6 +454,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
   }
 
   Widget _buildEditor(ConcordColors colors) {
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -464,11 +467,13 @@ class _MessageTileState extends ConsumerState<MessageTile> {
             minLines: 1,
             maxLines: 6,
             enabled: !_isSavingEdit,
-            style: TextStyle(fontSize: 14, color: colors.fgDefault),
+            style: TextStyle(fontSize: type.size(14), color: colors.fgDefault),
             decoration: InputDecoration(
               isDense: true,
               filled: true,
-              fillColor: colors.surfaceSidebar,
+              // The inline message-edit box is an input, so it uses the
+              // dedicated input surface like every themed field does.
+              fillColor: colors.surfaceInput,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(ConcordRadii.sm),
                 borderSide: BorderSide(color: _editError != null ? colors.danger : colors.borderDefault),
@@ -479,7 +484,7 @@ class _MessageTileState extends ConsumerState<MessageTile> {
           if (_editError != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(_editError!, style: TextStyle(fontSize: 11, color: colors.danger)),
+              child: Text(_editError!, style: TextStyle(fontSize: type.size(11), color: colors.danger)),
             ),
           Padding(
             padding: const EdgeInsets.only(top: 4),
@@ -537,6 +542,7 @@ class _ReactionPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
       child: InkWell(
@@ -553,12 +559,12 @@ class _ReactionPill extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(emoji, style: const TextStyle(fontSize: 13)),
+                Text(emoji, style: TextStyle(fontSize: type.size(13))),
                 const SizedBox(width: 4),
                 Text(
                   '$count',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: type.size(12),
                     fontWeight: FontWeight.w500,
                     color: reactedByMe ? colors.brand : colors.fgMuted,
                   ),
@@ -580,6 +586,7 @@ class _ReplyQuote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     if (replyTo == null) {
       return Padding(
@@ -588,7 +595,10 @@ class _ReplyQuote extends StatelessWidget {
           children: [
             Icon(Icons.subdirectory_arrow_right, size: 14, color: colors.fgMuted),
             const SizedBox(width: 4),
-            Text(l10n.originalMessageLabel, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: colors.fgMuted)),
+            Text(
+              l10n.originalMessageLabel,
+              style: TextStyle(fontSize: type.size(12), fontStyle: FontStyle.italic, color: colors.fgMuted),
+            ),
           ],
         ),
       );
@@ -605,13 +615,13 @@ class _ReplyQuote extends StatelessWidget {
         children: [
           Icon(Icons.subdirectory_arrow_right, size: 14, color: colors.fgMuted),
           const SizedBox(width: 4),
-          Text(senderName, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: colors.fgMuted)),
+          Text(senderName, style: TextStyle(fontSize: type.size(12), fontWeight: FontWeight.w500, color: colors.fgMuted)),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
               preview,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12, color: colors.fgMuted),
+              style: TextStyle(fontSize: type.size(12), color: colors.fgMuted),
             ),
           ),
         ],
@@ -628,6 +638,7 @@ class _ForwardedFromLine extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final profileAsync = ref.watch(userProfileProvider(userId));
     final name = profileAsync.maybeWhen(data: (profile) => displayNameFor(profile), orElse: () => l10n.someoneFallbackLower);
@@ -638,7 +649,7 @@ class _ForwardedFromLine extends ConsumerWidget {
         children: [
           Icon(Icons.forward, size: 12, color: colors.fgMuted),
           const SizedBox(width: 4),
-          Text(l10n.forwardedFromLabel(name), style: TextStyle(fontSize: 11, color: colors.fgMuted)),
+          Text(l10n.forwardedFromLabel(name), style: TextStyle(fontSize: type.size(11), color: colors.fgMuted)),
         ],
       ),
     );

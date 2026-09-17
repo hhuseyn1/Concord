@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/settings_providers.dart';
 import '../../theme/theme.dart';
+import '../../utils/api_error_message.dart';
 import '../../utils/message_time_format.dart';
 import '../../widgets/widgets.dart';
 
@@ -29,7 +30,7 @@ class ActiveSessionsSection extends ConsumerWidget {
     final error = await ref.read(sessionsControllerProvider.notifier).revoke(sessionId);
     if (error != null && context.mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.errorSignOutDeviceFailed(error))));
+          .showSnackBar(SnackBar(content: Text(l10n.errorSignOutDeviceFailed(apiErrorMessage(l10n, error)))));
     }
   }
 
@@ -50,7 +51,7 @@ class ActiveSessionsSection extends ConsumerWidget {
     final error = await ref.read(sessionsControllerProvider.notifier).revokeAllOthers();
     if (error != null && context.mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.errorSignOutOthersFailed(error))));
+          .showSnackBar(SnackBar(content: Text(l10n.errorSignOutOthersFailed(apiErrorMessage(l10n, error)))));
     }
   }
 
@@ -86,7 +87,7 @@ class ActiveSessionsSection extends ConsumerWidget {
           ConcordEmptyState(
             icon: Icons.error_outline,
             title: l10n.couldNotLoadSessionsTitle,
-            subtitle: state.loadError,
+            subtitle: apiErrorMessage(l10n, state.loadError!),
             compact: true,
             action: ConcordButton(
               label: l10n.tryAgainButton,

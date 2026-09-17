@@ -3385,6 +3385,486 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your account has been deleted. Log back in within 30 days to cancel the deletion.'**
   String get deleteAccountSuccessSnackbar;
+
+  /// No description provided for @appearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearanceTitle;
+
+  /// No description provided for @appearanceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme and text size are saved on this device.'**
+  String get appearanceDescription;
+
+  /// No description provided for @appearanceThemeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get appearanceThemeLabel;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Match device'**
+  String get themeSystem;
+
+  /// No description provided for @appearanceFontSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Text size'**
+  String get appearanceFontSizeLabel;
+
+  /// No description provided for @appearanceFontSizeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Makes text across Concord bigger or smaller. Spacing and layout stay the same.'**
+  String get appearanceFontSizeHint;
+
+  /// No description provided for @fontSizeSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small ({px}px)'**
+  String fontSizeSmall(int px);
+
+  /// No description provided for @fontSizeDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default ({px}px)'**
+  String fontSizeDefault(int px);
+
+  /// No description provided for @fontSizeLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large ({px}px)'**
+  String fontSizeLarge(int px);
+
+  /// No description provided for @fontSizeExtraLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra large ({px}px)'**
+  String fontSizeExtraLarge(int px);
+
+  /// No description provided for @appearanceFontSizePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'This is how your messages will look.'**
+  String get appearanceFontSizePreview;
+
+  /// No description provided for @appearanceFontSizePreviewMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'And this is how timestamps and other small details will look.'**
+  String get appearanceFontSizePreviewMeta;
+
+  /// No description provided for @starsTabLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars'**
+  String get starsTabLabel;
+
+  /// No description provided for @starsUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars'**
+  String get starsUnit;
+
+  /// No description provided for @starsBalanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your balance'**
+  String get starsBalanceLabel;
+
+  /// No description provided for @starsEarnHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Earn {amount} Stars for every message you send, up to {cap} Stars a day, with a {seconds}s wait between rewards.'**
+  String starsEarnHint(int amount, int cap, int seconds);
+
+  /// No description provided for @starsSendButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Stars'**
+  String get starsSendButton;
+
+  /// No description provided for @starsLoadErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your Stars'**
+  String get starsLoadErrorTitle;
+
+  /// No description provided for @starsLoadErrorDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong reaching your wallet. Please try again.'**
+  String get starsLoadErrorDescription;
+
+  /// No description provided for @starsIndicatorTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} Stars — open your Stars settings'**
+  String starsIndicatorTooltip(int amount);
+
+  /// No description provided for @starsSendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Stars'**
+  String get starsSendTitle;
+
+  /// No description provided for @starsSendDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Stars from your balance to a friend. Transfers are instant and can\'t be undone.'**
+  String get starsSendDescription;
+
+  /// No description provided for @starsSendRecipientLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to'**
+  String get starsSendRecipientLabel;
+
+  /// No description provided for @starsSendSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search friends'**
+  String get starsSendSearchHint;
+
+  /// No description provided for @starsSendNoFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends yet'**
+  String get starsSendNoFriends;
+
+  /// No description provided for @starsSendNoFriendsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars can only be sent to friends — add someone first.'**
+  String get starsSendNoFriendsDescription;
+
+  /// No description provided for @starsSendNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends match “{query}”.'**
+  String starsSendNoMatches(String query);
+
+  /// No description provided for @starsSendFriendsErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your friends'**
+  String get starsSendFriendsErrorTitle;
+
+  /// No description provided for @starsSendAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get starsSendAmountLabel;
+
+  /// No description provided for @starsSendAmountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {balance} Stars available.'**
+  String starsSendAmountHint(int balance);
+
+  /// No description provided for @starsSendNoBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll need to earn or buy Stars before you can send any.'**
+  String get starsSendNoBalance;
+
+  /// No description provided for @starsSendSubmitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get starsSendSubmitButton;
+
+  /// No description provided for @starsSendErrorNoRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a friend to send Stars to.'**
+  String get starsSendErrorNoRecipient;
+
+  /// No description provided for @starsSendErrorAmountRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter how many Stars you want to send.'**
+  String get starsSendErrorAmountRequired;
+
+  /// No description provided for @starsSendErrorAmountPositive.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number of Stars greater than zero.'**
+  String get starsSendErrorAmountPositive;
+
+  /// No description provided for @starsSendErrorAmountTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'You only have {balance} Stars.'**
+  String starsSendErrorAmountTooLarge(int balance);
+
+  /// No description provided for @starsSendErrorSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t send Stars to yourself.'**
+  String get starsSendErrorSelf;
+
+  /// No description provided for @starsSendConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm this transfer'**
+  String get starsSendConfirmTitle;
+
+  /// No description provided for @starsSendConfirmDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re about to send {amount} Stars to {name}. This can\'t be undone. Your balance afterwards: {balance} Stars.'**
+  String starsSendConfirmDescription(int amount, String name, int balance);
+
+  /// No description provided for @starsSendConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Send {amount} Stars'**
+  String starsSendConfirmAction(int amount);
+
+  /// No description provided for @starsSendSuccessSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} Stars are on their way to {name}.'**
+  String starsSendSuccessSnackbar(int amount, String name);
+
+  /// No description provided for @starsTrialSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium trial'**
+  String get starsTrialSectionTitle;
+
+  /// No description provided for @starsTrialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Premium with Stars'**
+  String get starsTrialTitle;
+
+  /// No description provided for @starsTrialDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Spend {cost} Stars to unlock Concord Premium for {days} days.'**
+  String starsTrialDescription(int cost, int days);
+
+  /// No description provided for @starsTrialAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Premium'**
+  String get starsTrialAction;
+
+  /// No description provided for @starsTrialActiveBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial active'**
+  String get starsTrialActiveBadge;
+
+  /// No description provided for @starsTrialExpiresOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Premium trial runs until {date}.'**
+  String starsTrialExpiresOn(String date);
+
+  /// No description provided for @starsTrialAlreadyPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have Premium, so there\'s no need to spend Stars on a trial.'**
+  String get starsTrialAlreadyPremium;
+
+  /// No description provided for @starsTrialInsufficient.
+  ///
+  /// In en, this message translates to:
+  /// **'You need {missing} more Stars to start the trial.'**
+  String starsTrialInsufficient(int missing);
+
+  /// No description provided for @starsTrialConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start your Premium trial?'**
+  String get starsTrialConfirmTitle;
+
+  /// No description provided for @starsTrialConfirmDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'{cost} Stars will be deducted right away and you\'ll get {days} days of Premium. Your balance afterwards: {balance} Stars.'**
+  String starsTrialConfirmDescription(int cost, int days, int balance);
+
+  /// No description provided for @starsTrialConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Spend {cost} Stars'**
+  String starsTrialConfirmAction(int cost);
+
+  /// No description provided for @starsTrialSuccessSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium trial started. You have Premium until {date}.'**
+  String starsTrialSuccessSnackbar(String date);
+
+  /// No description provided for @starsPackagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Stars'**
+  String get starsPackagesTitle;
+
+  /// No description provided for @starsPackagesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up your balance through Stripe\'s secure checkout.'**
+  String get starsPackagesDescription;
+
+  /// No description provided for @starsPackagesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No Stars packages are available right now.'**
+  String get starsPackagesEmpty;
+
+  /// No description provided for @starsPackageAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'{stars} Stars'**
+  String starsPackageAmount(int stars);
+
+  /// No description provided for @starsPackageBuyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get starsPackageBuyButton;
+
+  /// No description provided for @starsPurchaseLaunchFailedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the checkout page. Make sure you have a browser installed and try again.'**
+  String get starsPurchaseLaunchFailedError;
+
+  /// No description provided for @starsPurchasePendingNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Finishing your purchase in the browser? Your Stars will appear here as soon as the payment is confirmed.'**
+  String get starsPurchasePendingNotice;
+
+  /// No description provided for @starsHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent activity'**
+  String get starsHistoryTitle;
+
+  /// No description provided for @starsHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No Stars activity yet'**
+  String get starsHistoryEmpty;
+
+  /// No description provided for @starsHistoryEmptyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Send messages to start earning Stars.'**
+  String get starsHistoryEmptyDescription;
+
+  /// No description provided for @starsHistoryErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your Stars history'**
+  String get starsHistoryErrorTitle;
+
+  /// No description provided for @starsHistoryBalanceAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance: {balance}'**
+  String starsHistoryBalanceAfter(int balance);
+
+  /// No description provided for @starsHistoryChatReward.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat reward'**
+  String get starsHistoryChatReward;
+
+  /// No description provided for @starsHistoryReceivedFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Received from {name}'**
+  String starsHistoryReceivedFrom(String name);
+
+  /// No description provided for @starsHistorySentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to {name}'**
+  String starsHistorySentTo(String name);
+
+  /// No description provided for @starsHistoryPremiumTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium trial'**
+  String get starsHistoryPremiumTrial;
+
+  /// No description provided for @starsHistoryPackagePurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars purchase'**
+  String get starsHistoryPackagePurchase;
+
+  /// No description provided for @starsHistoryUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars adjustment'**
+  String get starsHistoryUnknown;
+
+  /// No description provided for @starsUnknownUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone'**
+  String get starsUnknownUser;
+
+  /// No description provided for @starsErrorNotFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only send Stars to your friends.'**
+  String get starsErrorNotFriends;
+
+  /// No description provided for @starsErrorRecipientNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t find that person — they may have deleted their account.'**
+  String get starsErrorRecipientNotFound;
+
+  /// No description provided for @starsErrorInsufficientBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have enough Stars for that.'**
+  String get starsErrorInsufficientBalance;
+
+  /// No description provided for @starsErrorTransferInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the amount and who you\'re sending to, then try again.'**
+  String get starsErrorTransferInvalid;
+
+  /// No description provided for @starsErrorTrialAlreadyActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Premium trial is already active.'**
+  String get starsErrorTrialAlreadyActive;
+
+  /// No description provided for @starsErrorPackageNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'That Stars package isn\'t available any more.'**
+  String get starsErrorPackageNotFound;
 }
 
 class _AppLocalizationsDelegate

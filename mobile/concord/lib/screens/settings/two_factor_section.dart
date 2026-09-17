@@ -259,6 +259,7 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
   }
 
   Widget _buildSetupPanel(ConcordColors colors, TextTheme textTheme, AppLocalizations l10n) {
+    final type = ConcordTypography.of(context);
     Uint8List? svgBytes;
     final qrCodeSvg = _setup!.qrCodeSvg;
     if (qrCodeSvg != null) {
@@ -297,7 +298,7 @@ class _TwoFactorSectionState extends ConsumerState<TwoFactorSection> {
           const SizedBox(height: 4),
           SelectableText(
             _setup!.secretKey ?? '',
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 14),
+            style: TextStyle(fontFamily: 'monospace', fontSize: type.size(14)),
           ),
           const SizedBox(height: ConcordSpacing.md),
           ConcordTextField(
@@ -363,6 +364,7 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
 
     return Container(
@@ -386,7 +388,7 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
             ),
             child: Text(
               l10n.recoveryCodesWarning,
-              style: TextStyle(color: colors.warning, fontSize: 13),
+              style: TextStyle(color: colors.warning, fontSize: type.size(13)),
             ),
           ),
           const SizedBox(height: ConcordSpacing.sm),
@@ -404,7 +406,7 @@ class _RecoveryCodesPanelState extends State<_RecoveryCodesPanel> {
                 for (final code in widget.codes)
                   SizedBox(
                     width: 130,
-                    child: Text(code, style: const TextStyle(fontFamily: 'monospace', fontSize: 13)),
+                    child: Text(code, style: TextStyle(fontFamily: 'monospace', fontSize: type.size(13))),
                   ),
               ],
             ),

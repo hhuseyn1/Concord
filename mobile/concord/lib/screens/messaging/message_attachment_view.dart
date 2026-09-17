@@ -81,6 +81,7 @@ class _FileChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final type = ConcordTypography.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md, vertical: ConcordSpacing.sm),
       decoration: BoxDecoration(
@@ -97,7 +98,7 @@ class _FileChip extends StatelessWidget {
             child: Text(
               filename,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 13, color: colors.fgDefault),
+              style: TextStyle(fontSize: type.size(13), color: colors.fgDefault),
             ),
           ),
         ],

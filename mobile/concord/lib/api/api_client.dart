@@ -101,7 +101,7 @@ class ApiClient {
     } on TimeoutException {
       throw const ApiException(ApiException.timeoutStatusCode, 'The request timed out.');
     } catch (e) {
-      throw ApiException(ApiException.networkErrorStatusCode, 'Network error: $e');
+      throw const ApiException(ApiException.networkErrorStatusCode, 'A network error occurred.');
     }
 
     if (response.statusCode == 401 && !isRetry) {
@@ -169,7 +169,7 @@ class ApiClient {
     } on ArgumentError {
       rethrow;
     } catch (e) {
-      throw ApiException(ApiException.networkErrorStatusCode, 'Network error: $e');
+      throw const ApiException(ApiException.networkErrorStatusCode, 'A network error occurred.');
     }
 
     if (response.statusCode == 401 && auth && !isRetry) {
@@ -212,7 +212,7 @@ class ApiClient {
     } on TimeoutException {
       throw const ApiException(ApiException.timeoutStatusCode, 'The request timed out during refresh.');
     } catch (e) {
-      throw ApiException(ApiException.networkErrorStatusCode, 'Network error during refresh: $e');
+      throw const ApiException(ApiException.networkErrorStatusCode, 'A network error occurred during refresh.');
     }
 
     if (response.statusCode >= 200 && response.statusCode < 300) {

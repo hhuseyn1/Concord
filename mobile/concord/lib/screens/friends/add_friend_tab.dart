@@ -170,6 +170,7 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final enabled = _query.length >= _minQueryLength;
 
@@ -185,7 +186,7 @@ class _AddFriendTabState extends ConsumerState<AddFriendTab> {
         if (_query.isNotEmpty && !enabled)
           Text(
             l10n.keepTypingMessage(_minQueryLength),
-            style: TextStyle(fontSize: 13, color: colors.fgMuted),
+            style: TextStyle(fontSize: type.size(13), color: colors.fgMuted),
           ),
         if (_query.isEmpty)
           ConcordEmptyState(

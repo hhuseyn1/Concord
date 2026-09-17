@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/paged_list_controller.dart';
 import '../../providers/server_member_list_providers.dart';
 import '../../theme/theme.dart';
+import '../../utils/api_error_message.dart';
 import '../../widgets/widgets.dart';
 import 'server_member_row.dart';
 
@@ -41,7 +42,7 @@ class ServerMemberListScreen extends ConsumerWidget {
         child: ConcordEmptyState(
           icon: Icons.error_outline,
           title: l10n.couldNotLoadMembersTitle,
-          subtitle: state.loadError,
+          subtitle: apiErrorMessage(l10n, state.loadError!),
           action: ConcordButton(
             label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
@@ -63,6 +64,7 @@ class ServerMemberListScreen extends ConsumerWidget {
     }
 
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final groups = _groupByPresence(l10n, state.items);
 
     return ListView(
@@ -73,7 +75,7 @@ class ServerMemberListScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(ConcordSpacing.md, ConcordSpacing.md, ConcordSpacing.md, ConcordSpacing.xs),
             child: Text(
               l10n.memberGroupHeader(group.label.toUpperCase(), group.members.length),
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
+              style: TextStyle(fontSize: type.size(12), fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
             ),
           ),
           for (final member in group.members) ServerMemberRow(serverId: serverId, member: member),
@@ -96,7 +98,7 @@ class ServerMemberListScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md, vertical: ConcordSpacing.xs),
           child: Text(
             l10n.memberCountLabel(state.items.length),
-            style: TextStyle(fontSize: 12, color: colors.fgMuted),
+            style: TextStyle(fontSize: type.size(12), color: colors.fgMuted),
           ),
         ),
       ],

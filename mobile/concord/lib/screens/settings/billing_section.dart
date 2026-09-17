@@ -7,6 +7,7 @@ import '../../api/api.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/billing_providers.dart';
 import '../../theme/theme.dart';
+import '../../utils/api_error_message.dart';
 import '../../utils/message_time_format.dart';
 import '../../widgets/widgets.dart';
 
@@ -72,7 +73,7 @@ class _BillingSectionState extends ConsumerState<BillingSection> with WidgetsBin
         child: ConcordEmptyState(
           icon: Icons.error_outline,
           title: l10n.billingLoadErrorTitle,
-          subtitle: billingState.loadError,
+          subtitle: apiErrorMessage(l10n, billingState.loadError!),
           action: ConcordButton(
             label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
@@ -104,13 +105,10 @@ class _BillingSectionState extends ConsumerState<BillingSection> with WidgetsBin
   }
 }
 
-/// Maps an `ApiException` to display copy the same way `reset_password_screen.dart` does for its
-/// form errors, so Billing's action errors read consistently with the rest of the app.
+/// Maps an `ApiException` to display copy - see `apiErrorMessage` for the shared logic (this
+/// wrapper only exists so call sites in this file keep reading `_actionErrorMessage`).
 String _actionErrorMessage(AppLocalizations l10n, ApiException e) {
-  if (e.isConnectivityError) return l10n.errorCouldNotReachServer;
-  if (e.message.isNotEmpty) return e.message;
-  if (e.isServerError) return l10n.errorServerTrouble;
-  return l10n.errorSomethingWentWrong;
+  return apiErrorMessage(l10n, e);
 }
 
 class _ActionError extends StatelessWidget {
@@ -121,6 +119,7 @@ class _ActionError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: ConcordSpacing.md),
@@ -130,7 +129,7 @@ class _ActionError extends StatelessWidget {
         borderRadius: BorderRadius.circular(ConcordRadii.md),
         border: Border.all(color: colors.danger.withValues(alpha: 0.4)),
       ),
-      child: Text(message, style: TextStyle(color: colors.danger, fontSize: 13)),
+      child: Text(message, style: TextStyle(color: colors.danger, fontSize: type.size(13))),
     );
   }
 }

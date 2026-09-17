@@ -29,6 +29,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(searchControllerProvider);
     final notifier = ref.read(searchControllerProvider.notifier);
@@ -97,7 +98,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       color: colors.fgMuted,
                     ),
                     const SizedBox(width: ConcordSpacing.xs),
-                    Text(formatAbsoluteTimestamp(result.created), style: TextStyle(color: colors.fgMuted, fontSize: 11)),
+                    Text(formatAbsoluteTimestamp(result.created), style: TextStyle(color: colors.fgMuted, fontSize: type.size(11))),
                   ],
                 ),
                 subtitle: Text(

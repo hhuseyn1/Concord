@@ -1901,4 +1901,308 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteAccountSuccessSnackbar =>
       'Your account has been deleted. Log back in within 30 days to cancel the deletion.';
+
+  @override
+  String get appearanceTitle => 'Appearance';
+
+  @override
+  String get appearanceDescription =>
+      'Theme and text size are saved on this device.';
+
+  @override
+  String get appearanceThemeLabel => 'Theme';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeSystem => 'Match device';
+
+  @override
+  String get appearanceFontSizeLabel => 'Text size';
+
+  @override
+  String get appearanceFontSizeHint =>
+      'Makes text across Concord bigger or smaller. Spacing and layout stay the same.';
+
+  @override
+  String fontSizeSmall(int px) {
+    return 'Small (${px}px)';
+  }
+
+  @override
+  String fontSizeDefault(int px) {
+    return 'Default (${px}px)';
+  }
+
+  @override
+  String fontSizeLarge(int px) {
+    return 'Large (${px}px)';
+  }
+
+  @override
+  String fontSizeExtraLarge(int px) {
+    return 'Extra large (${px}px)';
+  }
+
+  @override
+  String get appearanceFontSizePreview =>
+      'This is how your messages will look.';
+
+  @override
+  String get appearanceFontSizePreviewMeta =>
+      'And this is how timestamps and other small details will look.';
+
+  @override
+  String get starsTabLabel => 'Stars';
+
+  @override
+  String get starsUnit => 'Stars';
+
+  @override
+  String get starsBalanceLabel => 'Your balance';
+
+  @override
+  String starsEarnHint(int amount, int cap, int seconds) {
+    return 'Earn $amount Stars for every message you send, up to $cap Stars a day, with a ${seconds}s wait between rewards.';
+  }
+
+  @override
+  String get starsSendButton => 'Send Stars';
+
+  @override
+  String get starsLoadErrorTitle => 'Couldn\'t load your Stars';
+
+  @override
+  String get starsLoadErrorDescription =>
+      'Something went wrong reaching your wallet. Please try again.';
+
+  @override
+  String starsIndicatorTooltip(int amount) {
+    return '$amount Stars — open your Stars settings';
+  }
+
+  @override
+  String get starsSendTitle => 'Send Stars';
+
+  @override
+  String get starsSendDescription =>
+      'Send Stars from your balance to a friend. Transfers are instant and can\'t be undone.';
+
+  @override
+  String get starsSendRecipientLabel => 'Send to';
+
+  @override
+  String get starsSendSearchHint => 'Search friends';
+
+  @override
+  String get starsSendNoFriends => 'No friends yet';
+
+  @override
+  String get starsSendNoFriendsDescription =>
+      'Stars can only be sent to friends — add someone first.';
+
+  @override
+  String starsSendNoMatches(String query) {
+    return 'No friends match “$query”.';
+  }
+
+  @override
+  String get starsSendFriendsErrorTitle => 'Couldn\'t load your friends';
+
+  @override
+  String get starsSendAmountLabel => 'Amount';
+
+  @override
+  String starsSendAmountHint(int balance) {
+    return 'You have $balance Stars available.';
+  }
+
+  @override
+  String get starsSendNoBalance =>
+      'You\'ll need to earn or buy Stars before you can send any.';
+
+  @override
+  String get starsSendSubmitButton => 'Send';
+
+  @override
+  String get starsSendErrorNoRecipient => 'Choose a friend to send Stars to.';
+
+  @override
+  String get starsSendErrorAmountRequired =>
+      'Enter how many Stars you want to send.';
+
+  @override
+  String get starsSendErrorAmountPositive =>
+      'Enter a whole number of Stars greater than zero.';
+
+  @override
+  String starsSendErrorAmountTooLarge(int balance) {
+    return 'You only have $balance Stars.';
+  }
+
+  @override
+  String get starsSendErrorSelf => 'You can\'t send Stars to yourself.';
+
+  @override
+  String get starsSendConfirmTitle => 'Confirm this transfer';
+
+  @override
+  String starsSendConfirmDescription(int amount, String name, int balance) {
+    return 'You\'re about to send $amount Stars to $name. This can\'t be undone. Your balance afterwards: $balance Stars.';
+  }
+
+  @override
+  String starsSendConfirmAction(int amount) {
+    return 'Send $amount Stars';
+  }
+
+  @override
+  String starsSendSuccessSnackbar(int amount, String name) {
+    return '$amount Stars are on their way to $name.';
+  }
+
+  @override
+  String get starsTrialSectionTitle => 'Premium trial';
+
+  @override
+  String get starsTrialTitle => 'Try Premium with Stars';
+
+  @override
+  String starsTrialDescription(int cost, int days) {
+    return 'Spend $cost Stars to unlock Concord Premium for $days days.';
+  }
+
+  @override
+  String get starsTrialAction => 'Try Premium';
+
+  @override
+  String get starsTrialActiveBadge => 'Trial active';
+
+  @override
+  String starsTrialExpiresOn(String date) {
+    return 'Your Premium trial runs until $date.';
+  }
+
+  @override
+  String get starsTrialAlreadyPremium =>
+      'You already have Premium, so there\'s no need to spend Stars on a trial.';
+
+  @override
+  String starsTrialInsufficient(int missing) {
+    return 'You need $missing more Stars to start the trial.';
+  }
+
+  @override
+  String get starsTrialConfirmTitle => 'Start your Premium trial?';
+
+  @override
+  String starsTrialConfirmDescription(int cost, int days, int balance) {
+    return '$cost Stars will be deducted right away and you\'ll get $days days of Premium. Your balance afterwards: $balance Stars.';
+  }
+
+  @override
+  String starsTrialConfirmAction(int cost) {
+    return 'Spend $cost Stars';
+  }
+
+  @override
+  String starsTrialSuccessSnackbar(String date) {
+    return 'Premium trial started. You have Premium until $date.';
+  }
+
+  @override
+  String get starsPackagesTitle => 'Buy Stars';
+
+  @override
+  String get starsPackagesDescription =>
+      'Top up your balance through Stripe\'s secure checkout.';
+
+  @override
+  String get starsPackagesEmpty => 'No Stars packages are available right now.';
+
+  @override
+  String starsPackageAmount(int stars) {
+    return '$stars Stars';
+  }
+
+  @override
+  String get starsPackageBuyButton => 'Buy';
+
+  @override
+  String get starsPurchaseLaunchFailedError =>
+      'Couldn\'t open the checkout page. Make sure you have a browser installed and try again.';
+
+  @override
+  String get starsPurchasePendingNotice =>
+      'Finishing your purchase in the browser? Your Stars will appear here as soon as the payment is confirmed.';
+
+  @override
+  String get starsHistoryTitle => 'Recent activity';
+
+  @override
+  String get starsHistoryEmpty => 'No Stars activity yet';
+
+  @override
+  String get starsHistoryEmptyDescription =>
+      'Send messages to start earning Stars.';
+
+  @override
+  String get starsHistoryErrorTitle => 'Couldn\'t load your Stars history';
+
+  @override
+  String starsHistoryBalanceAfter(int balance) {
+    return 'Balance: $balance';
+  }
+
+  @override
+  String get starsHistoryChatReward => 'Chat reward';
+
+  @override
+  String starsHistoryReceivedFrom(String name) {
+    return 'Received from $name';
+  }
+
+  @override
+  String starsHistorySentTo(String name) {
+    return 'Sent to $name';
+  }
+
+  @override
+  String get starsHistoryPremiumTrial => 'Premium trial';
+
+  @override
+  String get starsHistoryPackagePurchase => 'Stars purchase';
+
+  @override
+  String get starsHistoryUnknown => 'Stars adjustment';
+
+  @override
+  String get starsUnknownUser => 'Someone';
+
+  @override
+  String get starsErrorNotFriends => 'You can only send Stars to your friends.';
+
+  @override
+  String get starsErrorRecipientNotFound =>
+      'We couldn\'t find that person — they may have deleted their account.';
+
+  @override
+  String get starsErrorInsufficientBalance =>
+      'You don\'t have enough Stars for that.';
+
+  @override
+  String get starsErrorTransferInvalid =>
+      'Check the amount and who you\'re sending to, then try again.';
+
+  @override
+  String get starsErrorTrialAlreadyActive =>
+      'Your Premium trial is already active.';
+
+  @override
+  String get starsErrorPackageNotFound =>
+      'That Stars package isn\'t available any more.';
 }

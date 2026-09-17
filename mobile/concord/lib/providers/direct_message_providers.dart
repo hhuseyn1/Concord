@@ -23,8 +23,8 @@ class DirectMessagesState {
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
-  final String? loadError;
-  final String? loadMoreError;
+  final ApiException? loadError;
+  final ApiException? loadMoreError;
   final Set<String> typingUserIds;
   final int page;
 
@@ -35,9 +35,9 @@ class DirectMessagesState {
     bool? isLoading,
     bool? isLoadingMore,
     bool? hasMore,
-    String? loadError,
+    ApiException? loadError,
     bool clearLoadError = false,
-    String? loadMoreError,
+    ApiException? loadMoreError,
     bool clearLoadMoreError = false,
     Set<String>? typingUserIds,
     int? page,
@@ -93,7 +93,7 @@ class DirectMessagesController extends StateNotifier<DirectMessagesState> implem
       );
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoading: false, loadError: e.message);
+      state = state.copyWith(isLoading: false, loadError: e);
     }
   }
 
@@ -116,7 +116,7 @@ class DirectMessagesController extends StateNotifier<DirectMessagesState> implem
       );
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoadingMore: false, loadMoreError: e.message);
+      state = state.copyWith(isLoadingMore: false, loadMoreError: e);
     }
   }
 

@@ -186,6 +186,7 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
 
     return Column(
@@ -252,7 +253,7 @@ class _CreateFormState extends ConsumerState<_CreateForm> {
               borderRadius: BorderRadius.circular(ConcordRadii.md),
               border: Border.all(color: colors.danger.withValues(alpha: 0.4)),
             ),
-            child: Text(_formError!, style: TextStyle(color: colors.danger, fontSize: 13)),
+            child: Text(_formError!, style: TextStyle(color: colors.danger, fontSize: type.size(13))),
           ),
         ],
         const SizedBox(height: ConcordSpacing.lg),

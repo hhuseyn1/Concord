@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/notifications_controller.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
+import '../../utils/api_error_message.dart';
 import '../../utils/message_time_format.dart';
 import '../../widgets/widgets.dart';
 
@@ -52,7 +53,7 @@ class _NotificationsBody extends StatelessWidget {
         child: ConcordEmptyState(
           icon: Icons.error_outline,
           title: l10n.couldNotLoadNotificationsTitle,
-          subtitle: state.loadError,
+          subtitle: apiErrorMessage(l10n, state.loadError!),
           action: ConcordButton(
             label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
@@ -141,7 +142,10 @@ class _NotificationRow extends StatelessWidget {
                   )
                 : CircleAvatar(
                     radius: 20,
-                    backgroundColor: colors.surfaceRail,
+                    // Same reasoning as ConcordAvatar's fallback fill: a
+                    // translucent neutral stays visible on every surface,
+                    // including light mode where rail == sidebar.
+                    backgroundColor: colors.fgDefault.withValues(alpha: 0.16),
                     child: Icon(_icon, size: 18, color: colors.fgMuted),
                   ),
             const SizedBox(width: ConcordSpacing.md),

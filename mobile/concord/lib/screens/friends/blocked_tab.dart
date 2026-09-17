@@ -7,6 +7,7 @@ import '../../providers/api_providers.dart';
 import '../../providers/friends_providers.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
+import '../../utils/api_error_message.dart';
 import '../../widgets/widgets.dart';
 import 'friend_row.dart';
 
@@ -40,7 +41,8 @@ class _BlockedTabState extends ConsumerState<BlockedTab> {
           .showSnackBar(SnackBar(content: Text(l10n.unblockedSnackbar(displayNameFor(user)))));
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorUnblockFailed(e.message))));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.errorUnblockFailed(apiErrorMessage(l10n, e)))));
     } finally {
       if (mounted) setState(() => _unblockingUserId = null);
     }
@@ -49,6 +51,7 @@ class _BlockedTabState extends ConsumerState<BlockedTab> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(blockedListControllerProvider);
     final controller = ref.read(blockedListControllerProvider.notifier);
@@ -62,7 +65,7 @@ class _BlockedTabState extends ConsumerState<BlockedTab> {
         child: ConcordEmptyState(
           icon: Icons.error_outline,
           title: l10n.couldNotLoadBlockedTitle,
-          subtitle: state.loadError,
+          subtitle: apiErrorMessage(l10n, state.loadError!),
           action: ConcordButton(
             label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
@@ -90,7 +93,7 @@ class _BlockedTabState extends ConsumerState<BlockedTab> {
           padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md),
           child: Text(
             '${l10n.blockedHeader}${l10n.sectionCountSuffix(state.items.length)}',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
+            style: TextStyle(fontSize: type.size(12), fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
           ),
         ),
         const SizedBox(height: ConcordSpacing.xs),

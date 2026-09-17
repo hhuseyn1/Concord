@@ -2,14 +2,24 @@ import 'package:flutter/material.dart';
 
 import 'concord_colors.dart';
 import 'concord_tokens.dart';
+import 'concord_typography.dart';
 
 abstract final class ConcordTheme {
-  static ThemeData dark() => _build(ConcordColors.dark, Brightness.dark);
+  /// [fontScale] multiplies every font size in [_textTheme] and nothing else -
+  /// spacing, padding, icon sizes and button heights stay put (mirroring the
+  /// web app's `--font-scale`, which is deliberately not a root `font-size`
+  /// change for exactly this reason). Rows and buttons still grow vertically
+  /// where their height is text + fixed padding, but the layout grid doesn't
+  /// rescale under them. Defaults to 1.0 so callers that don't care (tests,
+  /// previews) can keep calling `ConcordTheme.dark()`.
+  static ThemeData dark({double fontScale = 1.0}) =>
+      _build(ConcordColors.dark, Brightness.dark, fontScale);
 
-  static ThemeData light() => _build(ConcordColors.light, Brightness.light);
+  static ThemeData light({double fontScale = 1.0}) =>
+      _build(ConcordColors.light, Brightness.light, fontScale);
 
-  static ThemeData _build(ConcordColors colors, Brightness brightness) {
-    final textTheme = _textTheme(colors);
+  static ThemeData _build(ConcordColors colors, Brightness brightness, double fontScale) {
+    final textTheme = _textTheme(colors, fontScale);
 
     // `secondary` is a distinct neutral tone (not the brand color) so that
     // Material widgets that fall back to theme defaults (no explicit
@@ -38,7 +48,7 @@ abstract final class ConcordTheme {
       dividerColor: colors.borderDefault,
       splashFactory: InkSparkle.splashFactory,
       textTheme: textTheme,
-      extensions: [colors],
+      extensions: [colors, ConcordTypography(fontScale: fontScale)],
       appBarTheme: AppBarTheme(
         backgroundColor: colors.surfaceBase,
         foregroundColor: colors.fgHeading,
@@ -123,7 +133,7 @@ abstract final class ConcordTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: colors.surfaceSidebar,
+        fillColor: colors.surfaceInput,
         hintStyle: textTheme.bodyMedium?.copyWith(color: colors.fgMuted),
         labelStyle: textTheme.bodyMedium?.copyWith(color: colors.fgDefault),
         contentPadding: const EdgeInsets.symmetric(
@@ -181,36 +191,42 @@ abstract final class ConcordTheme {
     );
   }
 
-  static TextTheme _textTheme(ConcordColors colors) {
+  /// The type ramp. Sizes are this app's own (slightly different from web's,
+  /// which is fine - only the *relative* scale steps are shared), each
+  /// multiplied by [fontScale]. `height` is a unitless multiplier, so
+  /// line-heights scale with the font size for free.
+  static TextTheme _textTheme(ConcordColors colors, double fontScale) {
+    double size(double base) => base * fontScale;
+
     return TextTheme(
       headlineSmall: TextStyle(
-        fontSize: 24,
+        fontSize: size(24),
         height: 32 / 24,
         fontWeight: FontWeight.w700,
         color: colors.fgHeading,
       ),
       titleLarge: TextStyle(
-        fontSize: 20,
+        fontSize: size(20),
         height: 28 / 20,
         fontWeight: FontWeight.w600,
         color: colors.fgHeading,
       ),
       titleMedium: TextStyle(
-        fontSize: 17,
+        fontSize: size(17),
         height: 24 / 17,
         fontWeight: FontWeight.w600,
         color: colors.fgHeading,
       ),
-      bodyLarge: TextStyle(fontSize: 15, height: 22 / 15, color: colors.fgDefault),
-      bodyMedium: TextStyle(fontSize: 13, height: 18 / 13, color: colors.fgDefault),
-      bodySmall: TextStyle(fontSize: 12, height: 16 / 12, color: colors.fgMuted),
+      bodyLarge: TextStyle(fontSize: size(15), height: 22 / 15, color: colors.fgDefault),
+      bodyMedium: TextStyle(fontSize: size(13), height: 18 / 13, color: colors.fgDefault),
+      bodySmall: TextStyle(fontSize: size(12), height: 16 / 12, color: colors.fgMuted),
       labelLarge: TextStyle(
-        fontSize: 13,
+        fontSize: size(13),
         height: 18 / 13,
         fontWeight: FontWeight.w500,
         color: colors.fgDefault,
       ),
-      labelSmall: TextStyle(fontSize: 11, height: 14 / 11, color: colors.fgMuted),
+      labelSmall: TextStyle(fontSize: size(11), height: 14 / 11, color: colors.fgMuted),
     );
   }
 }

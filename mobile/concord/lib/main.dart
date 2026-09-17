@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/font_scale_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/theme_mode_provider.dart';
 import 'router/app_router.dart';
 import 'screens/app_session_overlay.dart';
 import 'screens/voice/voice_call_overlay.dart';
@@ -33,13 +35,18 @@ class ConcordApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(localeControllerProvider);
+    // Both of these are persisted user preferences (Settings > My Account >
+    // Appearance). Watching them here is what makes a change repaint the whole
+    // app immediately, no restart and no per-screen plumbing.
+    final themeMode = ref.watch(themeModeControllerProvider);
+    final fontScale = ref.watch(fontScaleControllerProvider);
 
     return MaterialApp.router(
       title: 'Concord',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark,
-      theme: ConcordTheme.light(),
-      darkTheme: ConcordTheme.dark(),
+      themeMode: themeMode,
+      theme: ConcordTheme.light(fontScale: fontScale),
+      darkTheme: ConcordTheme.dark(fontScale: fontScale),
       locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

@@ -19,7 +19,7 @@ class BillingState {
 
   final SubscriptionResponse? subscription;
   final bool isLoading;
-  final String? loadError;
+  final ApiException? loadError;
 
   /// True while a Subscribe/Manage-subscription request (or the subsequent external-browser
   /// launch) is in flight - separate from [isLoading], which only covers the initial/retry load,
@@ -43,7 +43,7 @@ class BillingState {
   BillingState copyWith({
     SubscriptionResponse? subscription,
     bool? isLoading,
-    String? loadError,
+    ApiException? loadError,
     bool clearLoadError = false,
     bool? actionInFlight,
     ApiException? actionException,
@@ -119,7 +119,7 @@ class BillingController extends StateNotifier<BillingState> {
       state = state.copyWith(subscription: subscription, isLoading: false);
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoading: false, loadError: e.message);
+      state = state.copyWith(isLoading: false, loadError: e);
     }
   }
 

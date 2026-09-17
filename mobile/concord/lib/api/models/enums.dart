@@ -300,3 +300,58 @@ enum FriendRelationshipStatus {
     return FriendRelationshipStatus.none;
   }
 }
+
+/// Ledger row kinds from `Stars/Transactions` ("ChatReward"/"TransferSent"/...). The backend
+/// serializes enums by name (Newtonsoft `StringEnumConverter`), but `fromWire` tolerates an
+/// ordinal like every other enum here. Declaration order matches the backend's
+/// `StarTransactionType`, so the ordinal fallback stays correct.
+enum StarTransactionType {
+  chatReward,
+  transferSent,
+  transferReceived,
+  premiumTrialPurchase,
+  packagePurchase,
+
+  /// Not a backend value: what an unrecognized/future wire value maps to, so one new server-side
+  /// transaction kind can't break the whole history list.
+  unknown;
+
+  static StarTransactionType fromWire(dynamic value) {
+    if (value is int && value >= 0 && value < StarTransactionType.unknown.index) {
+      return StarTransactionType.values[value];
+    }
+    if (value is String) {
+      return StarTransactionType.values.firstWhere(
+        (e) => e.name.toLowerCase() == value.toLowerCase(),
+        orElse: () => StarTransactionType.unknown,
+      );
+    }
+    return StarTransactionType.unknown;
+  }
+
+  /// True for the kinds that always move Stars *out* of the wallet - used to render a sign when
+  /// the server sends a bare magnitude instead of a negative `Amount`.
+  bool get isDebit =>
+      this == StarTransactionType.transferSent || this == StarTransactionType.premiumTrialPurchase;
+}
+
+/// Lifecycle of a real-money Stars package purchase (`Stars/Purchases/{id}/Status`).
+enum StarPurchaseStatus {
+  pending,
+  completed,
+  failed,
+  canceled;
+
+  static StarPurchaseStatus fromWire(dynamic value) {
+    if (value is int && value >= 0 && value < StarPurchaseStatus.values.length) {
+      return StarPurchaseStatus.values[value];
+    }
+    if (value is String) {
+      return StarPurchaseStatus.values.firstWhere(
+        (e) => e.name.toLowerCase() == value.toLowerCase(),
+        orElse: () => StarPurchaseStatus.pending,
+      );
+    }
+    return StarPurchaseStatus.pending;
+  }
+}

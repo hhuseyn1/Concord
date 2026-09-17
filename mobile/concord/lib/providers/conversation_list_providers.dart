@@ -22,7 +22,7 @@ class ConversationsState {
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
-  final String? loadError;
+  final ApiException? loadError;
   final int page;
 
   ConversationsState copyWith({
@@ -30,7 +30,7 @@ class ConversationsState {
     bool? isLoading,
     bool? isLoadingMore,
     bool? hasMore,
-    String? loadError,
+    ApiException? loadError,
     bool clearLoadError = false,
     int? page,
   }) {
@@ -73,7 +73,7 @@ class ConversationsController extends StateNotifier<ConversationsState> {
       state = state.copyWith(items: result.items, isLoading: false, hasMore: result.hasNextPage, page: 1);
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoading: false, loadError: e.message);
+      state = state.copyWith(isLoading: false, loadError: e);
     }
   }
 

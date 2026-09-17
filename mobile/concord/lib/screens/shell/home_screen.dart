@@ -133,6 +133,7 @@ class _ActiveCallBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final call = state.activeCall!;
     final label = call.kind == ActiveCallKind.channel ? l10n.voiceConnectedLabel : l10n.callConnectedLabel;
@@ -154,7 +155,7 @@ class _ActiveCallBanner extends ConsumerWidget {
               Icon(Icons.call, size: 16, color: colors.brand),
               const SizedBox(width: ConcordSpacing.sm),
               Expanded(child: Text(label, style: TextStyle(color: colors.brand, fontWeight: FontWeight.w500))),
-              Text(l10n.tapToReturnLabel, style: TextStyle(color: colors.fgMuted, fontSize: 12)),
+              Text(l10n.tapToReturnLabel, style: TextStyle(color: colors.fgMuted, fontSize: type.size(12))),
             ],
           ),
         ),

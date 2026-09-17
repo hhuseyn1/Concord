@@ -37,8 +37,8 @@ class MessagesState {
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
-  final String? loadError;
-  final String? loadMoreError;
+  final ApiException? loadError;
+  final ApiException? loadMoreError;
   final Set<String> typingUserIds;
   final int page;
 
@@ -47,9 +47,9 @@ class MessagesState {
     bool? isLoading,
     bool? isLoadingMore,
     bool? hasMore,
-    String? loadError,
+    ApiException? loadError,
     bool clearLoadError = false,
-    String? loadMoreError,
+    ApiException? loadMoreError,
     bool clearLoadMoreError = false,
     Set<String>? typingUserIds,
     int? page,
@@ -107,7 +107,7 @@ class MessagesController extends StateNotifier<MessagesState> implements Message
       );
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoading: false, loadError: e.message);
+      state = state.copyWith(isLoading: false, loadError: e);
     }
   }
 
@@ -130,7 +130,7 @@ class MessagesController extends StateNotifier<MessagesState> implements Message
       );
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoadingMore: false, loadMoreError: e.message);
+      state = state.copyWith(isLoadingMore: false, loadMoreError: e);
     }
   }
 

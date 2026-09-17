@@ -1912,4 +1912,307 @@ class AppLocalizationsAz extends AppLocalizations {
   @override
   String get deleteAccountSuccessSnackbar =>
       'Hesabınız silindi. Silinməni ləğv etmək üçün 30 gün ərzində yenidən daxil olun.';
+
+  @override
+  String get appearanceTitle => 'Görünüş';
+
+  @override
+  String get appearanceDescription =>
+      'Tema və mətn ölçüsü bu cihazda yadda saxlanılır.';
+
+  @override
+  String get appearanceThemeLabel => 'Tema';
+
+  @override
+  String get themeLight => 'İşıqlı';
+
+  @override
+  String get themeDark => 'Qaranlıq';
+
+  @override
+  String get themeSystem => 'Cihaza uyğun';
+
+  @override
+  String get appearanceFontSizeLabel => 'Mətn ölçüsü';
+
+  @override
+  String get appearanceFontSizeHint =>
+      'Concord-da mətni böyüdür və ya kiçildir. Boşluqlar və düzülüş dəyişmir.';
+
+  @override
+  String fontSizeSmall(int px) {
+    return 'Kiçik (${px}px)';
+  }
+
+  @override
+  String fontSizeDefault(int px) {
+    return 'Standart (${px}px)';
+  }
+
+  @override
+  String fontSizeLarge(int px) {
+    return 'Böyük (${px}px)';
+  }
+
+  @override
+  String fontSizeExtraLarge(int px) {
+    return 'Çox böyük (${px}px)';
+  }
+
+  @override
+  String get appearanceFontSizePreview => 'Mesajlarınız belə görünəcək.';
+
+  @override
+  String get appearanceFontSizePreviewMeta =>
+      'Vaxt damğaları və digər kiçik detallar isə belə görünəcək.';
+
+  @override
+  String get starsTabLabel => 'Stars';
+
+  @override
+  String get starsUnit => 'Stars';
+
+  @override
+  String get starsBalanceLabel => 'Balansınız';
+
+  @override
+  String starsEarnHint(int amount, int cap, int seconds) {
+    return 'Göndərdiyiniz hər mesaj üçün $amount Stars qazanın — gündə $cap Stars-a qədər, mükafatlar arasında $seconds saniyə gözləmə ilə.';
+  }
+
+  @override
+  String get starsSendButton => 'Stars göndər';
+
+  @override
+  String get starsLoadErrorTitle => 'Stars məlumatlarınız yüklənmədi';
+
+  @override
+  String get starsLoadErrorDescription =>
+      'Cüzdanınıza müraciət edərkən xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.';
+
+  @override
+  String starsIndicatorTooltip(int amount) {
+    return '$amount Stars — Stars ayarlarını aç';
+  }
+
+  @override
+  String get starsSendTitle => 'Stars göndər';
+
+  @override
+  String get starsSendDescription =>
+      'Balansınızdan dostunuza Stars göndərin. Köçürmələr dərhal baş verir və geri qaytarıla bilməz.';
+
+  @override
+  String get starsSendRecipientLabel => 'Kimə';
+
+  @override
+  String get starsSendSearchHint => 'Dostları axtar';
+
+  @override
+  String get starsSendNoFriends => 'Hələ dostunuz yoxdur';
+
+  @override
+  String get starsSendNoFriendsDescription =>
+      'Stars yalnız dostlara göndərilə bilər — əvvəlcə kimisə əlavə edin.';
+
+  @override
+  String starsSendNoMatches(String query) {
+    return '“$query” üzrə uyğun dost tapılmadı.';
+  }
+
+  @override
+  String get starsSendFriendsErrorTitle => 'Dostlarınız yüklənmədi';
+
+  @override
+  String get starsSendAmountLabel => 'Məbləğ';
+
+  @override
+  String starsSendAmountHint(int balance) {
+    return 'Sizdə $balance Stars var.';
+  }
+
+  @override
+  String get starsSendNoBalance =>
+      'Göndərmək üçün əvvəlcə Stars qazanmalı və ya almalısınız.';
+
+  @override
+  String get starsSendSubmitButton => 'Göndər';
+
+  @override
+  String get starsSendErrorNoRecipient => 'Stars göndərmək üçün dost seçin.';
+
+  @override
+  String get starsSendErrorAmountRequired =>
+      'Neçə Stars göndərmək istədiyinizi yazın.';
+
+  @override
+  String get starsSendErrorAmountPositive =>
+      'Sıfırdan böyük tam ədəd daxil edin.';
+
+  @override
+  String starsSendErrorAmountTooLarge(int balance) {
+    return 'Sizdə cəmi $balance Stars var.';
+  }
+
+  @override
+  String get starsSendErrorSelf => 'Özünüzə Stars göndərə bilməzsiniz.';
+
+  @override
+  String get starsSendConfirmTitle => 'Bu köçürməni təsdiqləyin';
+
+  @override
+  String starsSendConfirmDescription(int amount, String name, int balance) {
+    return '$name istifadəçisinə $amount Stars göndərmək üzrəsiniz. Bu əməliyyat geri qaytarıla bilməz. Sonrakı balansınız: $balance Stars.';
+  }
+
+  @override
+  String starsSendConfirmAction(int amount) {
+    return '$amount Stars göndər';
+  }
+
+  @override
+  String starsSendSuccessSnackbar(int amount, String name) {
+    return '$amount Stars $name istifadəçisinə yollandı.';
+  }
+
+  @override
+  String get starsTrialSectionTitle => 'Premium sınaq müddəti';
+
+  @override
+  String get starsTrialTitle => 'Stars ilə Premium-u sınayın';
+
+  @override
+  String starsTrialDescription(int cost, int days) {
+    return '$days gün Concord Premium üçün $cost Stars xərcləyin.';
+  }
+
+  @override
+  String get starsTrialAction => 'Premium-u sına';
+
+  @override
+  String get starsTrialActiveBadge => 'Sınaq aktivdir';
+
+  @override
+  String starsTrialExpiresOn(String date) {
+    return 'Premium sınağınız $date tarixinə qədər davam edir.';
+  }
+
+  @override
+  String get starsTrialAlreadyPremium =>
+      'Artıq Premium-unuz var, sınaq üçün Stars xərcləməyə ehtiyac yoxdur.';
+
+  @override
+  String starsTrialInsufficient(int missing) {
+    return 'Sınağa başlamaq üçün daha $missing Stars lazımdır.';
+  }
+
+  @override
+  String get starsTrialConfirmTitle => 'Premium sınağına başlayaq?';
+
+  @override
+  String starsTrialConfirmDescription(int cost, int days, int balance) {
+    return '$cost Stars dərhal balansınızdan silinəcək və $days gün Premium əldə edəcəksiniz. Sonrakı balansınız: $balance Stars.';
+  }
+
+  @override
+  String starsTrialConfirmAction(int cost) {
+    return '$cost Stars xərclə';
+  }
+
+  @override
+  String starsTrialSuccessSnackbar(String date) {
+    return 'Premium sınağı başladı. $date tarixinə qədər Premium-unuz var.';
+  }
+
+  @override
+  String get starsPackagesTitle => 'Stars al';
+
+  @override
+  String get starsPackagesDescription =>
+      'Stripe-ın təhlükəsiz ödəniş səhifəsi ilə balansınızı artırın.';
+
+  @override
+  String get starsPackagesEmpty => 'Hazırda əlçatan Stars paketi yoxdur.';
+
+  @override
+  String starsPackageAmount(int stars) {
+    return '$stars Stars';
+  }
+
+  @override
+  String get starsPackageBuyButton => 'Al';
+
+  @override
+  String get starsPurchaseLaunchFailedError =>
+      'Ödəniş səhifəsini açmaq mümkün olmadı. Brauzerinizin quraşdırıldığından əmin olub yenidən cəhd edin.';
+
+  @override
+  String get starsPurchasePendingNotice =>
+      'Alışı brauzerdə tamamlayırsınız? Ödəniş təsdiqlənən kimi Stars-larınız burada görünəcək.';
+
+  @override
+  String get starsHistoryTitle => 'Son əməliyyatlar';
+
+  @override
+  String get starsHistoryEmpty => 'Hələ Stars əməliyyatı yoxdur';
+
+  @override
+  String get starsHistoryEmptyDescription =>
+      'Stars qazanmaq üçün mesaj göndərin.';
+
+  @override
+  String get starsHistoryErrorTitle => 'Stars tarixçəniz yüklənmədi';
+
+  @override
+  String starsHistoryBalanceAfter(int balance) {
+    return 'Balans: $balance';
+  }
+
+  @override
+  String get starsHistoryChatReward => 'Söhbət mükafatı';
+
+  @override
+  String starsHistoryReceivedFrom(String name) {
+    return '$name istifadəçisindən alındı';
+  }
+
+  @override
+  String starsHistorySentTo(String name) {
+    return '$name istifadəçisinə göndərildi';
+  }
+
+  @override
+  String get starsHistoryPremiumTrial => 'Premium sınağı';
+
+  @override
+  String get starsHistoryPackagePurchase => 'Stars alışı';
+
+  @override
+  String get starsHistoryUnknown => 'Stars düzəlişi';
+
+  @override
+  String get starsUnknownUser => 'Kimsə';
+
+  @override
+  String get starsErrorNotFriends =>
+      'Stars yalnız dostlarınıza göndərilə bilər.';
+
+  @override
+  String get starsErrorRecipientNotFound =>
+      'Bu istifadəçini tapa bilmədik — hesabını silmiş ola bilər.';
+
+  @override
+  String get starsErrorInsufficientBalance =>
+      'Bunun üçün kifayət qədər Stars-ınız yoxdur.';
+
+  @override
+  String get starsErrorTransferInvalid =>
+      'Məbləği və göndərdiyiniz şəxsi yoxlayıb yenidən cəhd edin.';
+
+  @override
+  String get starsErrorTrialAlreadyActive =>
+      'Premium sınağınız artıq aktivdir.';
+
+  @override
+  String get starsErrorPackageNotFound => 'Bu Stars paketi artıq mövcud deyil.';
 }

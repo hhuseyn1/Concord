@@ -68,7 +68,7 @@ void main() {
 
       final state = container.read(billingControllerProvider);
       expect(state.isLoading, isFalse);
-      expect(state.loadError, 'boom');
+      expect(state.loadError?.message, 'boom');
       expect(state.subscription, isNull);
     });
 

@@ -225,6 +225,7 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
       itemCount: invites.length,
       separatorBuilder: (context, index) => const SizedBox(height: ConcordSpacing.sm),
       itemBuilder: (context, index) {
+        final type = ConcordTypography.of(context);
         final invite = invites[index];
         final isExpired = invite.expiresAtUtc != null && invite.expiresAtUtc!.isBefore(DateTime.now().toUtc());
         final isExhausted = invite.maxUses != null && invite.useCount >= invite.maxUses!;
@@ -251,7 +252,7 @@ class _InviteSheetState extends ConsumerState<_InviteSheet> {
                       const SizedBox(height: 2),
                       Text(
                         '${_describeUses(l10n, invite)} · ${_describeExpiry(l10n, invite, isExpired)}',
-                        style: TextStyle(fontSize: 12, color: colors.fgMuted),
+                        style: TextStyle(fontSize: type.size(12), color: colors.fgMuted),
                       ),
                     ],
                   ),

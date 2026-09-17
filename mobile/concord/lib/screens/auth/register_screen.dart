@@ -119,6 +119,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
 
     if (_registered) {
@@ -139,7 +140,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         children: [
           if (_resendMessage != null) ...[
-            Text(_resendMessage!, style: TextStyle(color: colors.fgMuted, fontSize: 13)),
+            Text(_resendMessage!, style: TextStyle(color: colors.fgMuted, fontSize: type.size(13))),
             const SizedBox(height: ConcordSpacing.md),
           ],
           ConcordButton(
@@ -233,7 +234,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         if (_passwordError == null) ...[
           const SizedBox(height: 4),
-          Text(l10n.passwordMinCharactersHint, style: TextStyle(fontSize: 12, color: colors.fgMuted)),
+          Text(l10n.passwordMinCharactersHint, style: TextStyle(fontSize: type.size(12), color: colors.fgMuted)),
         ],
         if (_formError != null) ...[
           const SizedBox(height: ConcordSpacing.lg),
@@ -245,7 +246,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               borderRadius: BorderRadius.circular(ConcordRadii.md),
               border: Border.all(color: colors.danger.withValues(alpha: 0.4)),
             ),
-            child: Text(_formError!, style: TextStyle(color: colors.danger, fontSize: 13)),
+            child: Text(_formError!, style: TextStyle(color: colors.danger, fontSize: type.size(13))),
           ),
         ],
         const SizedBox(height: ConcordSpacing.xl - 4),

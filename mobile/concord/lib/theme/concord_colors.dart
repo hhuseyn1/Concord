@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+/// Concord's color tokens, mirroring the web app's `src/styles/tokens.css`
+/// (Discord-inspired blurple palette). Token *names* and values are kept
+/// deliberately in lockstep with that file so a person can switch between web
+/// and mobile without the product looking like two different apps - when a
+/// value here looks surprising (light-mode elevation flipping direction,
+/// `fgLink` not being the raw brand color, ...), the reasoning lives in the
+/// comments below and in `tokens.css`.
 @immutable
 class ConcordColors extends ThemeExtension<ConcordColors> {
   const ConcordColors({
@@ -7,10 +14,12 @@ class ConcordColors extends ThemeExtension<ConcordColors> {
     required this.surfaceSidebar,
     required this.surfaceBase,
     required this.surfaceFloating,
+    required this.surfaceInput,
     required this.borderDefault,
     required this.borderSubtle,
     required this.fgDefault,
     required this.fgMuted,
+    required this.fgFaint,
     required this.fgLink,
     required this.fgHeading,
     required this.fgOnBrand,
@@ -36,16 +45,29 @@ class ConcordColors extends ThemeExtension<ConcordColors> {
     required this.presenceOffline,
   });
 
+  /// Elevation tiers. In DARK the rail is the darkest strip, the sidebar one
+  /// step lighter, the base (message area) lighter still, and floating
+  /// surfaces (dialogs, bottom sheets, menus) go *darker* again so they pop
+  /// off the page. In LIGHT the elevation direction flips and floating
+  /// surfaces go lighter, toward white - intentional, not a mistake.
   final Color surfaceRail;
   final Color surfaceSidebar;
   final Color surfaceBase;
   final Color surfaceFloating;
 
+  /// Inputs read as recessed "wells" rather than as another panel, so they get
+  /// their own surface instead of borrowing the sidebar's. Wired up through
+  /// `InputDecorationTheme.fillColor` in [ConcordTheme].
+  final Color surfaceInput;
+
   final Color borderDefault;
   final Color borderSubtle;
 
+  /// Text tiers: [fgDefault] (primary copy), [fgMuted] (secondary),
+  /// [fgFaint] (timestamps and least-important metadata).
   final Color fgDefault;
   final Color fgMuted;
+  final Color fgFaint;
   final Color fgLink;
   final Color fgHeading;
   final Color fgOnBrand;
@@ -76,71 +98,98 @@ class ConcordColors extends ThemeExtension<ConcordColors> {
   final Color presenceDnd;
   final Color presenceOffline;
 
+  /// Translucent tints (`brandBg`, `dangerBg`, ...) mirror `tokens.css`'s
+  /// `rgb(r g b / 18%)`-style values: dark uses 18%/15% alpha (0x2E/0x26),
+  /// light uses 10% (0x1A), because a tint needs more presence on a dark
+  /// surface than on a light one to read at the same strength.
   static const dark = ConcordColors(
-    surfaceRail: Color(0xFF17131F),
-    surfaceSidebar: Color(0xFF1E1929),
-    surfaceBase: Color(0xFF262032),
-    surfaceFloating: Color(0xFF120E19),
-    borderDefault: Color(0xFF33303E),
-    borderSubtle: Color(0xFF262330),
-    fgDefault: Color(0xFFDCDBE3),
-    fgMuted: Color(0xFF948F9E),
-    fgLink: Color(0xFFC084FC),
-    fgHeading: Color(0xFFF5F3F9),
-    fgOnBrand: Color(0xFF1A1625),
+    surfaceRail: Color(0xFF1E1F22),
+    surfaceSidebar: Color(0xFF2B2D31),
+    surfaceBase: Color(0xFF313338),
+    surfaceFloating: Color(0xFF1E1F22),
+    surfaceInput: Color(0xFF1E1F22),
+    borderDefault: Color(0xFF3F4147),
+    // Blended from borderDefault toward surfaceSidebar: still separates rows
+    // without drawing the eye.
+    borderSubtle: Color(0xFF35373C),
+    fgDefault: Color(0xFFF2F3F5),
+    fgMuted: Color(0xFFB5BAC1),
+    fgFaint: Color(0xFF949BA4),
+    // NOT the raw brand: #5865F2 is only 2.74:1 on surfaceBase, well under
+    // WCAG AA. Lightened along the same hue to 5.03:1 (6.56:1 on
+    // surfaceFloating) while still reading as unmistakably blurple.
+    fgLink: Color(0xFF949CF7),
+    fgHeading: Color(0xFFFFFFFF),
+    // White on the blurple brand fill is 4.61:1 and works in BOTH themes,
+    // unlike the old light-violet brand which needed dark text.
+    fgOnBrand: Color(0xFFFFFFFF),
     fgOnDanger: Color(0xFFFFFFFF),
-    brand: Color(0xFFC084FC),
-    brandHover: Color(0xFFD1A3FD),
-    brandPressed: Color(0xFFA855F7),
-    brandBg: Color(0x26C084FC),
-    danger: Color(0xFFF87171),
-    dangerBg: Color(0x26F87171),
-    dangerSolid: Color(0xFFDC2626),
-    dangerSolidHover: Color(0xFFB91C1C),
-    dangerSolidPressed: Color(0xFF991B1B),
-    success: Color(0xFF4ADE80),
-    successBg: Color(0x264ADE80),
-    warning: Color(0xFFFBBF24),
-    warningBg: Color(0x26FBBF24),
+    brand: Color(0xFF5865F2),
+    brandHover: Color(0xFF4752C4),
+    brandPressed: Color(0xFF3C45A5),
+    brandBg: Color(0x2E5865F2),
+    danger: Color(0xFFF23F42),
+    dangerBg: Color(0x26F23F42),
+    // The `-solid` red family is theme-invariant (identical in light).
+    dangerSolid: Color(0xFFDA373C),
+    dangerSolidHover: Color(0xFFA12828),
+    dangerSolidPressed: Color(0xFF8B1D1D),
+    success: Color(0xFF23A559),
+    successBg: Color(0x2623A559),
+    warning: Color(0xFFF0B232),
+    warningBg: Color(0x26F0B232),
     info: Color(0xFF60A5FA),
     infoBg: Color(0x2660A5FA),
-    presenceOnline: Color(0xFF3BA55D),
+    presenceOnline: Color(0xFF23A559),
     presenceIdle: Color(0xFFF0B232),
-    presenceDnd: Color(0xFFED4245),
+    presenceDnd: Color(0xFFF23F42),
     presenceOffline: Color(0xFF80848E),
   );
 
+  /// Hand-tuned per token, NOT a mechanical inversion of [dark].
   static const light = ConcordColors(
-    surfaceRail: Color(0xFFE3DDEC),
-    surfaceSidebar: Color(0xFFEEE9F5),
-    surfaceBase: Color(0xFFFFFFFF),
-    surfaceFloating: Color(0xFFFBFAFF),
-    borderDefault: Color(0xFFE5E4E7),
-    borderSubtle: Color(0xFFEFEEF2),
-    fgDefault: Color(0xFF4A4453),
-    fgMuted: Color(0xFF6B6375),
-    fgLink: Color(0xFFAA3BFF),
-    fgHeading: Color(0xFF08060D),
+    // Rail and sidebar deliberately share one value here (web's designer
+    // flagged the same flattening): anything that relied on rail-vs-sidebar
+    // contrast alone needs its own separation - see `ConcordAvatar`'s fallback
+    // fill and `ServerRailDrawer`'s tiles, which use other tokens because of it.
+    surfaceRail: Color(0xFFE3E5E8),
+    surfaceSidebar: Color(0xFFE3E5E8),
+    surfaceBase: Color(0xFFF2F3F5),
+    // Elevation flips in light mode: elevated surfaces go lighter, toward white.
+    surfaceFloating: Color(0xFFFFFFFF),
+    surfaceInput: Color(0xFFEBEDEF),
+    borderDefault: Color(0xFFD4D7DC),
+    borderSubtle: Color(0xFFE3E5E8),
+    fgDefault: Color(0xFF1E1F22),
+    fgMuted: Color(0xFF4E5058),
+    fgFaint: Color(0xFF747F8D),
+    // Raw brand (#5865F2) is only 4.15:1 on surfaceBase - under AA. brandHover
+    // is the same hue at 5.78:1 on surfaceBase / 6.42:1 on surfaceFloating.
+    fgLink: Color(0xFF4752C4),
+    fgHeading: Color(0xFF060607),
     fgOnBrand: Color(0xFFFFFFFF),
     fgOnDanger: Color(0xFFFFFFFF),
-    brand: Color(0xFFAA3BFF),
-    brandHover: Color(0xFF9526E8),
-    brandPressed: Color(0xFF7F1FC7),
-    brandBg: Color(0x1AAA3BFF),
-    dangerSolid: Color(0xFFDC2626),
-    dangerSolidHover: Color(0xFFB91C1C),
-    dangerSolidPressed: Color(0xFF991B1B),
-    danger: Color(0xFFDC2626),
-    dangerBg: Color(0x1ADC2626),
-    success: Color(0xFF16A34A),
-    successBg: Color(0x1A16A34A),
-    warning: Color(0xFFB45309),
-    warningBg: Color(0x1AB45309),
+    // Brand identity is deliberately identical across themes.
+    brand: Color(0xFF5865F2),
+    brandHover: Color(0xFF4752C4),
+    brandPressed: Color(0xFF3C45A5),
+    brandBg: Color(0x1A5865F2),
+    danger: Color(0xFFD83C3E),
+    dangerBg: Color(0x1AD83C3E),
+    dangerSolid: Color(0xFFDA373C),
+    dangerSolidHover: Color(0xFFA12828),
+    dangerSolidPressed: Color(0xFF8B1D1D),
+    success: Color(0xFF248046),
+    successBg: Color(0x1A248046),
+    // Amber-gold; reserved for icons, badge fills and borders rather than long
+    // runs of body copy (2.96:1 on surfaceBase).
+    warning: Color(0xFFC47F00),
+    warningBg: Color(0x1AC47F00),
     info: Color(0xFF2563EB),
     infoBg: Color(0x1A2563EB),
-    presenceOnline: Color(0xFF3BA55D),
+    presenceOnline: Color(0xFF23A559),
     presenceIdle: Color(0xFFF0B232),
-    presenceDnd: Color(0xFFED4245),
+    presenceDnd: Color(0xFFF23F42),
     presenceOffline: Color(0xFF80848E),
   );
 
@@ -150,10 +199,12 @@ class ConcordColors extends ThemeExtension<ConcordColors> {
     Color? surfaceSidebar,
     Color? surfaceBase,
     Color? surfaceFloating,
+    Color? surfaceInput,
     Color? borderDefault,
     Color? borderSubtle,
     Color? fgDefault,
     Color? fgMuted,
+    Color? fgFaint,
     Color? fgLink,
     Color? fgHeading,
     Color? fgOnBrand,
@@ -183,10 +234,12 @@ class ConcordColors extends ThemeExtension<ConcordColors> {
       surfaceSidebar: surfaceSidebar ?? this.surfaceSidebar,
       surfaceBase: surfaceBase ?? this.surfaceBase,
       surfaceFloating: surfaceFloating ?? this.surfaceFloating,
+      surfaceInput: surfaceInput ?? this.surfaceInput,
       borderDefault: borderDefault ?? this.borderDefault,
       borderSubtle: borderSubtle ?? this.borderSubtle,
       fgDefault: fgDefault ?? this.fgDefault,
       fgMuted: fgMuted ?? this.fgMuted,
+      fgFaint: fgFaint ?? this.fgFaint,
       fgLink: fgLink ?? this.fgLink,
       fgHeading: fgHeading ?? this.fgHeading,
       fgOnBrand: fgOnBrand ?? this.fgOnBrand,
@@ -222,10 +275,12 @@ class ConcordColors extends ThemeExtension<ConcordColors> {
       surfaceSidebar: c(surfaceSidebar, other.surfaceSidebar),
       surfaceBase: c(surfaceBase, other.surfaceBase),
       surfaceFloating: c(surfaceFloating, other.surfaceFloating),
+      surfaceInput: c(surfaceInput, other.surfaceInput),
       borderDefault: c(borderDefault, other.borderDefault),
       borderSubtle: c(borderSubtle, other.borderSubtle),
       fgDefault: c(fgDefault, other.fgDefault),
       fgMuted: c(fgMuted, other.fgMuted),
+      fgFaint: c(fgFaint, other.fgFaint),
       fgLink: c(fgLink, other.fgLink),
       fgHeading: c(fgHeading, other.fgHeading),
       fgOnBrand: c(fgOnBrand, other.fgOnBrand),

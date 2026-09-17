@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../../providers/conversation_list_providers.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
+import '../../utils/api_error_message.dart';
 import '../../widgets/widgets.dart';
 import 'direct_message_screen.dart';
 
@@ -28,7 +29,7 @@ class ConversationListScreen extends ConsumerWidget {
         child: ConcordEmptyState(
           icon: Icons.error_outline,
           title: l10n.couldNotLoadConversationsTitle,
-          subtitle: state.loadError,
+          subtitle: apiErrorMessage(l10n, state.loadError!),
           action: ConcordButton(
             label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,

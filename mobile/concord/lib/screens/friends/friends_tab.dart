@@ -9,6 +9,7 @@ import '../../providers/conversation_list_providers.dart';
 import '../../providers/friends_providers.dart';
 import '../../providers/user_providers.dart';
 import '../../theme/theme.dart';
+import '../../utils/api_error_message.dart';
 import '../../widgets/widgets.dart';
 import '../direct_messages/direct_message_screen.dart';
 import 'friend_row.dart';
@@ -38,7 +39,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
     } on ApiException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.errorStartConversationFailed(e.message))));
+          .showSnackBar(SnackBar(content: Text(l10n.errorStartConversationFailed(apiErrorMessage(l10n, e)))));
     } finally {
       if (mounted) setState(() => _startingDmForUserId = null);
     }
@@ -68,7 +69,8 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.blockedSnackbar(displayName))));
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorBlockUserFailed(e.message))));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.errorBlockUserFailed(apiErrorMessage(l10n, e)))));
     } finally {
       if (mounted) setState(() => _blocking = false);
     }
@@ -77,6 +79,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(friendsListControllerProvider);
     final controller = ref.read(friendsListControllerProvider.notifier);
@@ -90,7 +93,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
         child: ConcordEmptyState(
           icon: Icons.error_outline,
           title: l10n.couldNotLoadFriendsTitle,
-          subtitle: state.loadError,
+          subtitle: apiErrorMessage(l10n, state.loadError!),
           action: ConcordButton(
             label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
@@ -121,7 +124,7 @@ class _FriendsTabState extends ConsumerState<FriendsTab> {
           padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.md),
           child: Text(
             '${l10n.allFriendsHeader}${l10n.sectionCountSuffix(friends.length)}',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
+            style: TextStyle(fontSize: type.size(12), fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
           ),
         ),
         const SizedBox(height: ConcordSpacing.xs),

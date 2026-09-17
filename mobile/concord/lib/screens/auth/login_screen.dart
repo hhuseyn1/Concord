@@ -73,6 +73,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
 
     return ConcordAuthLayout(
@@ -124,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               borderRadius: BorderRadius.circular(ConcordRadii.md),
               border: Border.all(color: colors.danger.withValues(alpha: 0.4)),
             ),
-            child: Text(_formError!, style: TextStyle(color: colors.danger, fontSize: 13)),
+            child: Text(_formError!, style: TextStyle(color: colors.danger, fontSize: type.size(13))),
           ),
         ],
         const SizedBox(height: ConcordSpacing.xl - 4),

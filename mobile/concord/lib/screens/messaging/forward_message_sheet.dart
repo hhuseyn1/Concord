@@ -90,6 +90,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final query = _searchController.text.trim().toLowerCase();
     final serversAsync = ref.watch(myServersProvider);
@@ -127,7 +128,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
             ),
             const SizedBox(height: ConcordSpacing.sm),
             if (_error != null) ...[
-              Text(_error!, style: TextStyle(color: colors.danger, fontSize: 12)),
+              Text(_error!, style: TextStyle(color: colors.danger, fontSize: type.size(12))),
               const SizedBox(height: ConcordSpacing.sm),
             ],
             Flexible(
@@ -143,7 +144,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                         child: Text(
                           l10n.channelsSectionHeader,
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: type.size(11),
                             fontWeight: FontWeight.w600,
                             color: colors.fgMuted,
                             letterSpacing: 0.5,
@@ -160,7 +161,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                               padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
                               child: Text(
                                 servers.isEmpty ? l10n.notInAnyServersText : l10n.noMatchingServersText,
-                                style: TextStyle(fontSize: 13, color: colors.fgMuted),
+                                style: TextStyle(fontSize: type.size(13), color: colors.fgMuted),
                               ),
                             );
                           }
@@ -182,7 +183,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                         ),
                         error: (error, stackTrace) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
-                          child: Text(l10n.couldNotLoadYourServersText, style: TextStyle(fontSize: 13, color: colors.danger)),
+                          child: Text(l10n.couldNotLoadYourServersText, style: TextStyle(fontSize: type.size(13), color: colors.danger)),
                         ),
                       ),
                       const SizedBox(height: ConcordSpacing.md),
@@ -191,7 +192,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                         child: Text(
                           l10n.directMessagesSectionHeader,
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: type.size(11),
                             fontWeight: FontWeight.w600,
                             color: colors.fgMuted,
                             letterSpacing: 0.5,
@@ -201,7 +202,7 @@ class _ForwardMessageSheetState extends ConsumerState<_ForwardMessageSheet> {
                       if (filteredConversations.isEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
-                          child: Text(l10n.noMatchingConversationsText, style: TextStyle(fontSize: 13, color: colors.fgMuted)),
+                          child: Text(l10n.noMatchingConversationsText, style: TextStyle(fontSize: type.size(13), color: colors.fgMuted)),
                         )
                       else
                         for (final conversation in filteredConversations)
@@ -244,6 +245,7 @@ class _ServerChannelsExpansion extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -251,7 +253,7 @@ class _ServerChannelsExpansion extends ConsumerWidget {
         tilePadding: EdgeInsets.zero,
         childrenPadding: const EdgeInsets.only(left: ConcordSpacing.xl),
         leading: ConcordAvatar(imageUrl: server.iconUrl, name: server.name, size: ConcordAvatarSize.sm),
-        title: Text(server.name, style: TextStyle(fontSize: 14, color: colors.fgDefault)),
+        title: Text(server.name, style: TextStyle(fontSize: type.size(14), color: colors.fgDefault)),
         children: [
           Consumer(
             builder: (context, ref, _) {
@@ -265,7 +267,7 @@ class _ServerChannelsExpansion extends ConsumerWidget {
                   if (textChannels.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
-                      child: Text(l10n.noMatchingChannelsText, style: TextStyle(fontSize: 12, color: colors.fgMuted)),
+                      child: Text(l10n.noMatchingChannelsText, style: TextStyle(fontSize: type.size(12), color: colors.fgMuted)),
                     );
                   }
                   return Column(
@@ -275,7 +277,7 @@ class _ServerChannelsExpansion extends ConsumerWidget {
                           dense: true,
                           contentPadding: EdgeInsets.zero,
                           leading: Icon(Icons.tag, size: 16, color: colors.fgMuted),
-                          title: Text(channel.name, style: TextStyle(fontSize: 13, color: colors.fgDefault)),
+                          title: Text(channel.name, style: TextStyle(fontSize: type.size(13), color: colors.fgDefault)),
                           onTap: () => onPick(channel.id),
                         ),
                     ],
@@ -287,7 +289,7 @@ class _ServerChannelsExpansion extends ConsumerWidget {
                 ),
                 error: (error, stackTrace) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: ConcordSpacing.sm),
-                  child: Text(l10n.couldNotLoadChannelsPeriod, style: TextStyle(fontSize: 12, color: colors.danger)),
+                  child: Text(l10n.couldNotLoadChannelsPeriod, style: TextStyle(fontSize: type.size(12), color: colors.danger)),
                 ),
               );
             },

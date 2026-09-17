@@ -22,7 +22,7 @@ class NotificationsState {
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
-  final String? loadError;
+  final ApiException? loadError;
   final int page;
 
   int get unreadCount => items.where((n) => !n.isRead).length;
@@ -32,7 +32,7 @@ class NotificationsState {
     bool? isLoading,
     bool? isLoadingMore,
     bool? hasMore,
-    String? loadError,
+    ApiException? loadError,
     bool clearLoadError = false,
     int? page,
   }) {
@@ -83,7 +83,7 @@ class NotificationsController extends StateNotifier<NotificationsState> {
       state = state.copyWith(items: result.items, isLoading: false, hasMore: result.hasNextPage, page: 1);
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoading: false, loadError: e.message);
+      state = state.copyWith(isLoading: false, loadError: e);
     }
   }
 

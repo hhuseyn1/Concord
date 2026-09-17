@@ -88,6 +88,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     }
 
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
 
     return ConcordAuthLayout(
       title: l10n.resetPasswordTitle,
@@ -124,7 +125,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               borderRadius: BorderRadius.circular(ConcordRadii.md),
               border: Border.all(color: colors.danger.withValues(alpha: 0.4)),
             ),
-            child: Text(_formError!, style: TextStyle(color: colors.danger, fontSize: 13)),
+            child: Text(_formError!, style: TextStyle(color: colors.danger, fontSize: type.size(13))),
           ),
         ],
         const SizedBox(height: ConcordSpacing.xl - 4),

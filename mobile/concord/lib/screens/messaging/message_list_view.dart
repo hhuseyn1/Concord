@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../api/models/message_like.dart';
+import '../../api/api.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/message_thread_controller.dart';
 import '../../theme/theme.dart';
+import '../../utils/api_error_message.dart';
 import '../../widgets/widgets.dart';
 import 'message_tile.dart';
 
@@ -34,7 +35,7 @@ class MessageListView extends StatefulWidget {
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
-  final String? loadError;
+  final ApiException? loadError;
   final String? currentUserId;
   final ScrollController scrollController;
   final MessageThreadController controller;
@@ -155,6 +156,7 @@ class _MessageListViewState extends State<MessageListView> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final threadNoun = widget.threadNoun ?? l10n.channelThreadNoun;
 
@@ -167,7 +169,7 @@ class _MessageListViewState extends State<MessageListView> {
         child: ConcordEmptyState(
           icon: Icons.error_outline,
           title: l10n.couldNotLoadMessagesTitle,
-          subtitle: widget.loadError,
+          subtitle: apiErrorMessage(l10n, widget.loadError!),
           action: ConcordButton(
             label: l10n.tryAgainButton,
             variant: ConcordButtonVariant.secondary,
@@ -232,7 +234,7 @@ class _MessageListViewState extends State<MessageListView> {
                             ))
                       : Text(
                           l10n.reachedBeginningOfThread(threadNoun),
-                          style: TextStyle(fontSize: 12, color: colors.fgMuted),
+                          style: TextStyle(fontSize: type.size(12), color: colors.fgMuted),
                         ),
                 ),
               );
@@ -260,7 +262,7 @@ class _MessageListViewState extends State<MessageListView> {
                 if (showReadReceipt && group.last.id == lastOwnMessageId)
                   Padding(
                     padding: const EdgeInsets.only(left: 52, right: ConcordSpacing.lg, top: 2),
-                    child: Text(l10n.seenLabel, style: TextStyle(fontSize: 11, color: colors.fgMuted)),
+                    child: Text(l10n.seenLabel, style: TextStyle(fontSize: type.size(11), color: colors.fgMuted)),
                   ),
               ],
             );

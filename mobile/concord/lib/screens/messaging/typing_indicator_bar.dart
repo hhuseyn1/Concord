@@ -16,6 +16,7 @@ class TypingIndicatorBar extends ConsumerWidget {
     if (ids.isEmpty) return const SizedBox.shrink();
 
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
     final firstName = ids.isNotEmpty ? _watchName(ref, ids[0], l10n) : null;
     final secondName = ids.length > 1 ? _watchName(ref, ids[1], l10n) : null;
@@ -49,7 +50,7 @@ class TypingIndicatorBar extends ConsumerWidget {
             child: Text(
               text,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12, color: colors.fgMuted),
+              style: TextStyle(fontSize: type.size(12), color: colors.fgMuted),
             ),
           ),
         ],

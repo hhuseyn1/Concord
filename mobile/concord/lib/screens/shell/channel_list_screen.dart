@@ -232,6 +232,7 @@ class _ChannelGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).extension<ConcordColors>()!;
+    final type = ConcordTypography.of(context);
     final l10n = AppLocalizations.of(context);
 
     return Column(
@@ -244,7 +245,7 @@ class _ChannelGroup extends ConsumerWidget {
             children: [
               Text(
                 label.toUpperCase(),
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
+                style: TextStyle(fontSize: type.size(12), fontWeight: FontWeight.w600, color: colors.fgMuted, letterSpacing: 0.5),
               ),
               if (canManage)
                 ConcordIconButton(
@@ -262,7 +263,7 @@ class _ChannelGroup extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: ConcordSpacing.lg),
             child: Text(
               l10n.noChannelsOfTypeYet(label.toLowerCase()),
-              style: TextStyle(fontSize: 13, color: colors.fgMuted),
+              style: TextStyle(fontSize: type.size(13), color: colors.fgMuted),
             ),
           )
         else

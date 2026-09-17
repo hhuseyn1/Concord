@@ -10,14 +10,14 @@ class SessionsListState {
 
   final List<SessionResponse> items;
   final bool isLoading;
-  final String? loadError;
+  final ApiException? loadError;
 
   final String? revokingId;
 
   SessionsListState copyWith({
     List<SessionResponse>? items,
     bool? isLoading,
-    String? loadError,
+    ApiException? loadError,
     bool clearLoadError = false,
     String? revokingId,
     bool clearRevokingId = false,
@@ -51,11 +51,11 @@ class SessionsController extends StateNotifier<SessionsListState> {
       state = state.copyWith(items: sessions, isLoading: false);
     } on ApiException catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoading: false, loadError: e.message);
+      state = state.copyWith(isLoading: false, loadError: e);
     }
   }
 
-  Future<String?> revoke(String sessionId) async {
+  Future<ApiException?> revoke(String sessionId) async {
     state = state.copyWith(revokingId: sessionId);
     try {
       await _service.revokeSession(sessionId);
@@ -67,11 +67,11 @@ class SessionsController extends StateNotifier<SessionsListState> {
       return null;
     } on ApiException catch (e) {
       if (!_disposed) state = state.copyWith(clearRevokingId: true);
-      return e.message;
+      return e;
     }
   }
 
-  Future<String?> revokeAllOthers() async {
+  Future<ApiException?> revokeAllOthers() async {
     state = state.copyWith(revokingId: revokeAllOthersMarker);
     try {
       await _service.revokeOtherSessions();
@@ -83,7 +83,7 @@ class SessionsController extends StateNotifier<SessionsListState> {
       return null;
     } on ApiException catch (e) {
       if (!_disposed) state = state.copyWith(clearRevokingId: true);
-      return e.message;
+      return e;
     }
   }
 
