@@ -14,46 +14,22 @@ namespace Concord.Infrastructure.Services;
 public class BillingService(
     ApplicationDbContext context,
     StripeClient stripeClient,
-    IOptions<StripeSettings> stripeOptions)
+    IOptions<StripeSettings> stripeOptions,
+    StripeCustomerService stripeCustomerService,
+    StarsService starsService)
 {
     private readonly ApplicationDbContext _context = context;
     private readonly StripeClient _stripeClient = stripeClient;
     private readonly StripeSettings _stripeSettings = stripeOptions.Value;
+    private readonly StripeCustomerService _stripeCustomerService = stripeCustomerService;
+    private readonly StarsService _starsService = starsService;
 
     /// <summary>
-    /// Returns the Stripe Customer id for the given user, reusing the one from their most recent
-    /// local Subscription row (no Stripe API call needed) if one exists. Otherwise creates a new
-    /// Stripe Customer, tagged with metadata for reconciliation, and returns its id.
+    /// Returns the Stripe Customer id for the given user - thin delegation to
+    /// <see cref="StripeCustomerService"/>, kept here so existing call sites don't change.
     /// </summary>
-    public async Task<string> GetOrCreateStripeCustomerIdAsync(User user)
-    {
-        var existingSubscription = await _context.Subscriptions
-            .Where(subscription => subscription.UserId == user.Id)
-            .OrderByDescending(subscription => subscription.Created)
-            .FirstOrDefaultAsync();
-
-        if (existingSubscription is not null)
-            return existingSubscription.StripeCustomerId;
-
-        var options = new CustomerCreateOptions
-        {
-            Email = user.Email,
-            Metadata = new Dictionary<string, string>
-            {
-                ["ConcordUserId"] = user.Id.ToString()
-            }
-        };
-
-        var requestOptions = new RequestOptions
-        {
-            IdempotencyKey = $"customer-create-{user.Id}"
-        };
-
-        var service = new CustomerService(_stripeClient);
-        var customer = await service.CreateAsync(options, requestOptions);
-
-        return customer.Id;
-    }
+    public Task<string> GetOrCreateStripeCustomerIdAsync(User user) =>
+        _stripeCustomerService.GetOrCreateStripeCustomerIdAsync(user);
 
     /// <summary>
     /// Creates a Stripe Checkout Session for the user's premium subscription and returns the
@@ -233,6 +209,16 @@ public class BillingService(
     {
         if (stripeEvent.Data.Object is not Stripe.Checkout.Session session)
             return;
+
+        // Stars purchases (Mode = "payment", one-time) go through a completely different completion
+        // path than subscription checkouts - see StarsService.CompleteStarsPurchaseAsync. The
+        // "Type" metadata set at session-creation time is the authoritative discriminator; Mode is
+        // checked too as a defensive fallback in case metadata is ever missing.
+        if (session.Mode == "payment" || session.Metadata?.GetValueOrDefault("Type") == "StarsPurchase")
+        {
+            await _starsService.CompleteStarsPurchaseAsync(session);
+            return;
+        }
 
         var userId = Guid.Parse(session.ClientReferenceId);
         var stripeCustomerId = session.CustomerId;

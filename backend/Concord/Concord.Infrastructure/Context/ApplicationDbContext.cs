@@ -40,6 +40,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<AuditLog> AuditLogs { get; set; }
     public DbSet<PushToken> PushTokens { get; set; }
     public DbSet<Subscription> Subscriptions { get; set; }
+    public DbSet<StarTransaction> StarTransactions { get; set; }
+    public DbSet<StarPurchase> StarPurchases { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,6 +82,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         ConfigureAuditLog(modelBuilder.Entity<AuditLog>());
         ConfigurePushToken(modelBuilder.Entity<PushToken>());
         ConfigureSubscription(modelBuilder.Entity<Subscription>());
+        ConfigureStarTransaction(modelBuilder.Entity<StarTransaction>());
+        ConfigureStarPurchase(modelBuilder.Entity<StarPurchase>());
     }
     
     private static void ConfigureSession(EntityTypeBuilder<Session> builder)
@@ -231,6 +235,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         // Data Protection's IDataProtector.Protect - measured at ~176 base64 chars for a 32-char
         // input, so 64 silently truncated it. 512 leaves comfortable headroom.
         builder.Property(user => user.TwoFactorSecret).HasMaxLength(512);
+
+        builder.Property(user => user.StarsBalance).HasDefaultValue(0);
+        builder.Property(user => user.StarsEarnedToday).HasDefaultValue(0);
     }
 
     private static void ConfigureFriendRequest(EntityTypeBuilder<FriendRequest> builder)
@@ -712,6 +719,71 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(subscription => subscription.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    private static void ConfigureStarTransaction(EntityTypeBuilder<StarTransaction> builder)
+    {
+        builder.ToTable("StarTransaction");
+
+        builder.HasKey(transaction => transaction.Id);
+
+        builder.Property(transaction => transaction.Created).HasDefaultValueSql("now()");
+
+        builder.Property(transaction => transaction.IdempotencyKey).HasMaxLength(100);
+
+        // The ledger is read as "give me this user's history", newest first - a composite covering
+        // that default sort keeps it off a full scan.
+        builder.HasIndex(transaction => new { transaction.UserId, transaction.Created });
+
+        // Idempotency backstop against duplicate transfer/trial-activation requests (see
+        // StarsService) - scoped to rows that actually carry a key, since chat rewards and
+        // webhook-driven package purchases never set one.
+        builder.HasIndex(transaction => new { transaction.UserId, transaction.IdempotencyKey })
+            .IsUnique()
+            .HasFilter("\"IdempotencyKey\" IS NOT NULL");
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(transaction => transaction.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(transaction => transaction.CounterpartyUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<StarPurchase>()
+            .WithMany()
+            .HasForeignKey(transaction => transaction.RelatedPurchaseId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    private static void ConfigureStarPurchase(EntityTypeBuilder<StarPurchase> builder)
+    {
+        builder.ToTable("StarPurchase");
+
+        builder.HasKey(purchase => purchase.Id);
+
+        builder.Property(purchase => purchase.Created).HasDefaultValueSql("now()");
+
+        builder.Property(purchase => purchase.PackageId).IsRequired().HasMaxLength(64);
+        builder.Property(purchase => purchase.Currency).IsRequired().HasMaxLength(8);
+        builder.Property(purchase => purchase.PaymentProvider).IsRequired().HasMaxLength(32);
+        builder.Property(purchase => purchase.StripeCheckoutSessionId).HasMaxLength(255);
+        builder.Property(purchase => purchase.StripePaymentIntentId).HasMaxLength(255);
+
+        // decimal defaults to (18,2) precision under Npgsql, which is exactly right for a two-decimal
+        // currency amount - set explicitly so it's not left to the provider's own default-mapping
+        // convention.
+        builder.Property(purchase => purchase.PriceAmount).HasPrecision(18, 2);
+
+        builder.HasIndex(purchase => purchase.UserId);
+        builder.HasIndex(purchase => purchase.StripeCheckoutSessionId);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(purchase => purchase.UserId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

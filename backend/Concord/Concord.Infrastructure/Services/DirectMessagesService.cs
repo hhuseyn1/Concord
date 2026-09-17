@@ -15,6 +15,7 @@ public class DirectMessagesService(
     FriendsService friendsService,
     FilesService filesService,
     NotificationsService notificationsService,
+    StarsService starsService,
     IDirectMessagesRealtimeNotifier realtimeNotifier,
     INotificationsRealtimeNotifier notificationsRealtimeNotifier)
 {
@@ -25,6 +26,7 @@ public class DirectMessagesService(
     private readonly FriendsService _friendsService = friendsService;
     private readonly FilesService _filesService = filesService;
     private readonly NotificationsService _notificationsService = notificationsService;
+    private readonly StarsService _starsService = starsService;
     private readonly IDirectMessagesRealtimeNotifier _realtimeNotifier = realtimeNotifier;
     private readonly INotificationsRealtimeNotifier _notificationsRealtimeNotifier = notificationsRealtimeNotifier;
 
@@ -241,6 +243,13 @@ public class DirectMessagesService(
         conversation.LastMessageAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+
+        // Stars-earning is scoped to DMs only (the product spec is "earn Stars by chatting with
+        // friends"), never server channel messages - see MessagesService, which has no equivalent
+        // call. `sender` is already loaded above for the response mapping, so this reuses it rather
+        // than issuing another query - see TryGrantChatRewardAsync's remarks on why this stays a
+        // best-effort "grant" rather than a strictly-atomic debit-style operation.
+        await _starsService.TryGrantChatRewardAsync(sender, request.Content);
 
         var mentionedUserIds = await ResolveAndStoreMentionsAsync(conversation, message, request.Content);
 

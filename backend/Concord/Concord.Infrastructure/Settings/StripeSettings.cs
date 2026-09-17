@@ -8,4 +8,6 @@ public class StripeSettings
     public string SuccessUrl { get; set; } = null!;
     public string CancelUrl { get; set; } = null!;
     public string PortalReturnUrl { get; set; } = null!;
+    public string StarsSuccessUrl { get; set; } = null!;
+    public string StarsCancelUrl { get; set; } = null!;
 }

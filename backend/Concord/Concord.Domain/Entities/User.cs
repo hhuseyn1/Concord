@@ -123,5 +123,28 @@ public class User : BaseEntity
 
     public DateTime? LockoutEnd { get; set; }
 
+    /// <summary>Source of truth for the user's virtual-currency balance. Never written directly from a
+    /// client-supplied value - always mutated through <c>StarsService</c>, either via an atomic
+    /// conditional <c>ExecuteUpdateAsync</c> (debits) or a plain increment inside a tracked
+    /// SaveChanges (credits) - see <c>StarsService</c>'s remarks for why the two paths differ.</summary>
+    public int StarsBalance { get; set; }
+
+    /// <summary>Null if the user has never activated the Stars-funded Premium trial, or their most
+    /// recent trial has lapsed. An unexpired value here grants Premium access alongside (or instead
+    /// of) an active <see cref="Subscription"/> - see <c>StarsService.GetWalletAsync</c>.</summary>
+    public DateTime? PremiumTrialExpiresAt { get; set; }
+
+    /// <summary>Cooldown tracking for the DM chat-reward grant (see <c>StarsService</c> and
+    /// <c>StarsConstants.ChatRewardCooldownSeconds</c>). Null until the first reward is ever granted.</summary>
+    public DateTime? LastStarRewardAt { get; set; }
+
+    /// <summary>Daily-cap tracking for the DM chat-reward grant, paired with
+    /// <see cref="StarsEarnedTodayDate"/> - reset to 0 whenever that date no longer matches "today".</summary>
+    public int StarsEarnedToday { get; set; }
+
+    /// <summary>App-local calendar date (see <c>GlobalConstants.TimeZoneOffsetHours</c>) that
+    /// <see cref="StarsEarnedToday"/> was accumulated for. Null until the first reward is ever granted.</summary>
+    public DateOnly? StarsEarnedTodayDate { get; set; }
+
     public ICollection<Session> Sessions { get; set; }
 }
