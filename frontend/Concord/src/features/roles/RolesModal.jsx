@@ -138,7 +138,7 @@ export function RolesModal({ server, open, onOpenChange }) {
       description={t('roles.subtitle', { server: server?.Name || 'Server' })}
       size="xl"
     >
-      <div className="flex min-h-[22rem] flex-col gap-4 sm:flex-row">
+      <div className="flex h-full min-h-[22rem] flex-col gap-4 sm:flex-row">
         <div className="flex shrink-0 flex-col gap-2 border-b border-border-default pb-4 sm:w-52 sm:border-r sm:border-b-0 sm:pr-4 sm:pb-0">
           {canManage && !creating && (
             <Button variant="secondary" size="sm" onClick={() => setCreating(true)}>

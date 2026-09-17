@@ -22,21 +22,33 @@ export function ServerRail() {
         <NavLink
           to="/cabinet"
           end
-          className={({ isActive }) =>
-            cn(
-              'flex size-12 shrink-0 items-center justify-center rounded-2xl bg-surface-sidebar text-fg-default',
-              'transition-[border-radius,background-color] duration-150 [transition-timing-function:var(--ease-standard)]',
-              'hover:rounded-xl hover:bg-brand hover:text-fg-on-brand',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-rail',
-              isActive && 'rounded-xl bg-brand text-fg-on-brand',
-            )
-          }
+          // A plain string, never the `({ isActive }) => ...` function form NavLink also accepts.
+          // This is the direct child of Tooltip's Radix `asChild` trigger, whose Slot clones this
+          // element and merges its own className into ours via a plain string join *before*
+          // NavLink ever calls that function itself - handed a function instead of a string, that
+          // join silently stringifies it, so the DOM's actual class became the function's literal
+          // source text (see the identical fix + longer explanation on ServerIcon's NavLink). All
+          // the isActive-dependent styling below now lives on the inner span instead, via the
+          // children render-prop, which isn't subject to this Slot merge at all. focus-visible
+          // stays here because it must target the element that's actually focusable.
+          className="flex size-12 shrink-0 items-center justify-center rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-surface-rail"
         >
-          {/* Self-contained badge asset (own rounded-square + brand-blue fill baked in), not the
-            * plain icon mark - this tile's hover/active state fills its own background with
-            * `bg-brand`, and the plain mark's blue is too close to that to read against it. */}
-          <img src="/logo-app-icon.png" alt="" className="size-9 rounded-xl" aria-hidden="true" />
-          <span className="sr-only">Home (Friends)</span>
+          {({ isActive }) => (
+            <span
+              className={cn(
+                'flex size-full items-center justify-center rounded-2xl bg-surface-sidebar text-fg-default',
+                'transition-[border-radius,background-color] duration-150 [transition-timing-function:var(--ease-standard)]',
+                'hover:rounded-xl hover:bg-brand hover:text-fg-on-brand',
+                isActive && 'rounded-xl bg-brand text-fg-on-brand',
+              )}
+            >
+              {/* Self-contained badge asset (own rounded-square + brand-blue fill baked in), not the
+                * plain icon mark - this tile's hover/active state fills its own background with
+                * `bg-brand`, and the plain mark's blue is too close to that to read against it. */}
+              <img src="/logo-app-icon.png" alt="" className="size-9 rounded-xl" aria-hidden="true" />
+              <span className="sr-only">Home (Friends)</span>
+            </span>
+          )}
         </NavLink>
       </Tooltip>
 

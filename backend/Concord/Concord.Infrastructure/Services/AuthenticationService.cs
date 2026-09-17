@@ -616,6 +616,22 @@ public class AuthenticationService(
 
         var (userAgent, ipAddress, deviceLabel, browser, os) = ResolveClientInfo();
 
+        // A fresh login from the same browser/device (same UA + IP) supersedes whatever session
+        // that device already held - without this, a device that logs in repeatedly without ever
+        // hitting the explicit logout button (closing the tab, clearing storage, reinstalling the
+        // app) piles up one still-valid Session row per login, all shown as separate "active
+        // sessions" for what is really one device. Requiring both signals together (rather than UA
+        // alone) keeps this from misfiring across two genuinely different devices that merely share
+        // a common browser/OS string.
+        if (!string.IsNullOrWhiteSpace(userAgent) && !string.IsNullOrWhiteSpace(ipAddress))
+        {
+            await _context.Sessions
+                .Where(existing => existing.UserId == user.Id
+                    && existing.UserAgent == userAgent
+                    && existing.IpAddress == ipAddress)
+                .ExecuteDeleteAsync();
+        }
+
         var session = new Session
         {
             UserId = user.Id,

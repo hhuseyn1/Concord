@@ -31,13 +31,19 @@ export function Modal({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 motion-safe:data-[state=open]:animate-overlay-in motion-safe:data-[state=closed]:animate-overlay-out" />
         <Dialog.Content
           className={cn(
-            'fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-border-default bg-surface-floating p-6 shadow-lg outline-none',
+            // flex-col + max-h bounds the whole dialog to the viewport: without it, tall content
+            // (e.g. a long permission list) just grows the box past the viewport, and since this
+            // is centered via top-1/2/-translate-y-1/2 with no scroll container anywhere in the
+            // chain, the header/close button end up rendered off-screen above the fold with no way
+            // to scroll back to them. min-h-0 on the children wrapper below is what actually lets
+            // it shrink to the remaining space instead of growing with its content.
+            'fixed top-1/2 left-1/2 z-50 flex max-h-[85vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg border border-border-default bg-surface-floating p-6 shadow-lg outline-none',
             'motion-safe:data-[state=open]:animate-content-in motion-safe:data-[state=closed]:animate-content-out',
             SIZES[size],
             className,
           )}
         >
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex shrink-0 items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
               <Dialog.Title className="text-lg font-semibold text-fg-heading">{title}</Dialog.Title>
               {description && (
@@ -54,8 +60,8 @@ export function Modal({
               </button>
             </Dialog.Close>
           </div>
-          <div className="mt-4">{children}</div>
-          {footer && <div className="mt-6 flex justify-end gap-2">{footer}</div>}
+          <div className="mt-4 min-h-0 flex-1 overflow-y-auto">{children}</div>
+          {footer && <div className="mt-6 flex shrink-0 justify-end gap-2">{footer}</div>}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
