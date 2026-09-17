@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Local convenience copy for the landing page's "Download Android App" button
+# (see MobileAppSection.jsx / VITE_ANDROID_APK_URL) - a 70MB+ binary doesn't
+# belong in git; host real releases externally (GitHub Releases/CDN) instead.
+public/*.apk
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
