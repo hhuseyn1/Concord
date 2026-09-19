@@ -5,6 +5,7 @@
 .data
 
 .env.Production
+.env.Local
 
 .claude/settings.json
 .claude/settings.local.json
