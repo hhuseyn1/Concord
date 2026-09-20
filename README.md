@@ -1,193 +1,340 @@
 # Concord
 
-Concord is a Discord-like chat/voice platform made up of three apps that share one backend:
+<p align="center">
+  <br>
+  <img src="./frontend/Concord/public/logo.png" alt="Concord Logo" width="150">
+  <br>
+  <br>
+  <strong>Concord</strong>
+  <br>
+  <em>A real-time communication platform for communities.</em>
+  <br>
+</p>
 
-- **`backend/Concord`** - ASP.NET Core 10 Web API (REST + SignalR hubs), backed by PostgreSQL, Redis, Elasticsearch/Kibana, and LiveKit (voice).
-- **`frontend/Concord`** - React 19 + Vite web client.
-- **`mobile/concord`** - Flutter mobile client.
+<p align="center">
+  <a href="https://github.com/hhuseyn1/Concord">
+    <img src="https://img.shields.io/github/stars/hhuseyn1/Concord?style=flat-square&color=5865F2&v=4">  </a>
+  <a href="https://github.com/luxpeu1/Concord/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/luxpeu1/Concord/concord-api.yml?style=flat-square&label=build" alt="Build">
+  </a>
+  <a href="https://github.com/hhuseyn1/Concord">
+    <img src="https://img.shields.io/github/last-commit/hhuseyn1/Concord?style=flat-square" alt="Last Commit">
+  </a>
+  <a href="https://github.com/hhuseyn1/Concord">
+    <img src="https://img.shields.io/github/license/hhuseyn1/Concord?style=flat-square&v=2" alt="License">
+  </a>
+</p>
 
-Full endpoint/hub documentation lives in [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md) (human-readable) and [`docs/openapi.json`](docs/openapi.json) (machine-readable spec).
+<p align="center">
+  <a href="#about">About</a> •
+  <a href="#features">Features</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#deployment">Deployment</a> •
+  <a href="#license">License</a>
+</p>
+
+---
+
+## About
+
+**Concord** is a full-stack real-time communication platform built around communities, servers, channels and direct conversations.
+
+The project was created as a practical engineering project to explore the challenges behind building a modern real-time application, including real-time messaging, presence, voice and video communication, permissions, search, notifications and cloud deployment.
+
+Concord has both a web client and a Flutter mobile client sharing the same backend.
+
+---
+
+## Preview
+
+### Web Application
+
+<p align="center">
+  <img src="./frontend/Concord/public/web-preview.png" alt="Concord Web Application" width="900">
+</p>
+
+### Mobile Application
+
+<p align="center">
+  <img src="./frontend/Concord/public/mobile-preview.png" alt="Concord Demo" height="500">
+</p>
+
+
+## Features
+
+### Communication
+
+* Real-time messaging
+* Direct messages
+* Server-based communities
+* Text channels
+* Voice channels
+* Voice and video calls
+* Incoming call notifications
+* Call history
+
+### Real-Time Experience
+
+* Online/offline presence
+* Typing indicators
+* Message read receipts
+* Real-time notifications
+* Real-time call events
+* SignalR-based communication
+
+### Social Features
+
+* Friend requests
+* User blocking
+* Custom user status
+* User profiles
+* Mentions
+* Server invitations
+
+### Search & Discovery
+
+* User search
+* Message search
+* PostgreSQL full-text/trigram search support
+* Server and channel discovery
+
+### Security & Reliability
+
+* JWT-based authentication
+* Email verification
+* Role-based authorization
+* Server and channel permissions
+* Request rate limiting
+* Input validation
+* Protected API endpoints
+* Environment-based configuration
+* Secrets kept outside source control
+
+### Clients
+
+* Responsive web application
+* Flutter mobile application
+* Shared backend API
+* Mobile-friendly interface
+
+---
+
+# Architecture
+
+Concord follows a **modular monolith architecture**.
+
+Instead of splitting the application into many independently deployed microservices, the backend keeps clear boundaries between application domains while remaining a single deployable backend.
+
+```text
+                         ┌──────────────────────┐
+                         │      React Web        │
+                         │       Client         │
+                         └──────────┬───────────┘
+                                    │
+                              REST / SignalR
+                                    │
+                         ┌──────────▼───────────┐
+                         │    ASP.NET Core       │
+                         │        API            │
+                         │                       │
+                         │  Users                │
+                         │  Servers              │
+                         │  Channels             │
+                         │  Messaging            │
+                         │  Notifications        │
+                         │  Calls                │
+                         └──────┬───────┬────────┘
+                                │       │
+                         ┌──────▼───┐ ┌─▼────────┐
+                         │PostgreSQL│ │  Redis   │
+                         └──────────┘ └────┬─────┘
+                                           │
+                                      SignalR
+                                           │
+                              ┌────────────▼─────────┐
+                              │        Clients       │
+                              └──────────────────────┘
+
+                              ┌──────────────┐
+                              │   LiveKit    │
+                              │              │
+                              │ Voice / Video│
+                              └──────────────┘
+```
+---
+
+# Real-Time Architecture
+
+Real-time functionality is one of the core parts of Concord.
+
+**SignalR** is used for application-level real-time events such as:
+
+* New messages
+* Typing indicators
+* Presence updates
+* Read receipts
+* Notifications
+* Incoming call events
+
+**Redis** provides shared infrastructure for real-time communication when multiple backend instances are involved.
+
+Voice and video communication are handled separately through **LiveKit**, allowing the application backend to focus on authentication, permissions and call state while LiveKit handles the media communication layer.
+
+```text
+                     Client
+                       │
+                       │ SignalR
+                       ▼
+                ASP.NET Core API
+                       │
+             ┌─────────┼──────────┐
+             │         │          │
+             ▼         ▼          ▼
+        PostgreSQL   Redis      LiveKit
+             │         │          │
+             ▼         ▼          ▼
+          Storage   Real-time   Voice/Video
+                     events
+```
+
+---
+
+# Getting Started
 
 ## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) + Docker Compose v2 (the `docker compose` subcommand) - for the backend and its infrastructure.
-- [Node.js](https://nodejs.org/) 22+ and npm - for the frontend.
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (Dart ^3.12) - for the mobile app.
+Make sure you have the following installed:
+
+* [.NET 10 SDK](https://dotnet.microsoft.com/)
+* [Node.js](https://nodejs.org/)
+* [Flutter](https://flutter.dev/)
+* [Docker](https://www.docker.com/)
+* Git
+
+Depending on the selected development setup, PostgreSQL and Redis can be started through Docker Compose.
 
 ---
 
-## 1. Backend (Docker)
-
-All backend commands below are run from `backend/Concord/`.
+## Clone the Repository
 
 ```bash
-cd backend/Concord
+git clone https://github.com/hhuseyn1/Concord.git
+cd Concord
 ```
-
-### 1.1 Configure the environment
-
-There are no `.env.example` files in this repo - `.env` and `.env.Local` are the real files,
-and both are checked in directly:
-
-- **`.env`** is committed as a mostly-blank template (only ports and secrets are empty). Fill in
-  `APP_ENV` and the two data directories before starting anything:
-
-  ```dotenv
-  APP_ENV=Local
-  POSTGRES_DIRECTORY=./.data/postgres
-  ELASTICSEARCH_DIRECTORY=./.data/elasticsearch
-  ```
-
-  (`POSTGRES_DIRECTORY`/`ELASTICSEARCH_DIRECTORY` are host paths for the DB/ES data volumes - any writable local folder works.)
-
-- **`.env.Local`** is committed with working values already filled in (including a random
-  32+ character `AuthenticationSettings__SigningKey` and dummy LiveKit keys) - use it as-is for
-  local development, or edit it if you need different values.
-- **`.env.Production`** is git-ignored (it carries real production secrets: JWT signing key, DB
-  password, LiveKit API keys) and won't exist on a fresh clone. Create it yourself before
-  deploying - use `.env.Local`'s keys as a template and fill in real production values.
-
-Compose reads two layers of env files:
-
-- **`.env`** (this folder) - used by Compose itself to fill in `${...}` placeholders in `compose.yaml` (image tags, container names, port mappings, volume paths). It must have real values, not just be present.
-- **`.env.Local`** / **`.env.Production`** - loaded *into the containers* at runtime, selected by `.env`'s `APP_ENV` value (`env_file: .env.${APP_ENV}`).
-
-`Concord.API/appsettings.Development.json`'s `AuthenticationSettings:SigningKey` and
-`ApiSettings:PostgresConnectionString` password are intentionally blank in source control. If
-you run the API directly with `dotnet run` (outside Docker, where `.env.Local` doesn't apply),
-supply them via .NET user-secrets instead of editing the checked-in file:
-
-```bash
-cd Concord.API
-dotnet user-secrets set "AuthenticationSettings:SigningKey" "<your-local-signing-key>"
-dotnet user-secrets set "ApiSettings:PostgresConnectionString" "Host=localhost:5432;Database=Concord;Username=postgres;Password=<your-local-password>"
-```
-
-File uploads (avatars, server icons, message attachments) are stored on local disk everywhere
-except `ASPNETCORE_ENVIRONMENT=Production`, where `FileStorageConfig.AddFileStorage` (checked via
-`builder.Environment.IsProduction()`) switches to Azure Blob Storage instead - a container's
-filesystem doesn't survive a redeploy. Only needed in `.env.Production`, fill in real values for:
-
-```dotenv
-AzureBlobStorageSettings__ConnectionString=
-AzureBlobStorageSettings__ContainerName=
-```
-
-(the API throws on startup if either is blank while `ASPNETCORE_ENVIRONMENT=Production`).
-
-### 1.2 Build the shared base image
-
-`Concord.API`'s Dockerfile builds `FROM shared:${APP_ENV}`, an image that isn't built by Compose itself, so build it once first (rebuild whenever `Concord.Domain`/`Concord.Infrastructure`/`Concord.Application` change):
-
-```bash
-docker build -t shared:Local -f Dockerfile .
-```
-
-### 1.3 Start the stack
-
-```bash
-docker compose --profile db --profile backend up -d --build
-```
-
-This starts Postgres, Redis, and LiveKit (`db` profile) and the API (`backend` profile).
-Elasticsearch/Kibana are their own `logging` profile - split out deliberately, since they're
-~2GB+ of RAM and the API runs fine without them (Serilog's Elasticsearch sink is non-blocking,
-it just has nowhere to ship logs). Bring them up explicitly when you want them:
-
-```bash
-docker compose --profile logging up -d
-```
-
-`ASPNETCORE_ENVIRONMENT` is set per profile in the env files (`Development` in `.env.Local`,
-`Production` in `.env.Production`), not hardcoded. On startup the API always applies EF Core
-migrations; only when `ASPNETCORE_ENVIRONMENT=Development` (i.e. the `Local` profile) does it
-also seed an admin user - **`admin@gmail.com` / `admin`** - if the `Users` table is empty, and
-expose Swagger UI.
-
-Check status / logs:
-
-```bash
-docker compose ps
-docker compose logs -f api
-```
-
-### 1.4 Verify it's up
-
-With the default local ports (`API_HTTP_PORT=6001` etc. in `.env`):
-
-- API base URL: `http://localhost:6001/Api/V1.0`
-- Swagger UI: `http://localhost:6001/swagger` (only exposed when `ASPNETCORE_ENVIRONMENT=Development`, i.e. the `Local` profile)
-- Kibana: `http://localhost:5601` (only if you also brought up the `logging` profile)
-
-### 1.5 Stop / clean up
-
-```bash
-docker compose --profile db --profile backend --profile logging down      # stop and remove containers
-docker compose --profile db --profile backend --profile logging down -v    # also remove volumes (wipes DB/ES data)
-```
-
-(drop `--profile logging` if you never brought it up - Compose ignores profiles for services that aren't running.)
-
-> `.env.Local` contains real-looking secrets for local use only - don't reuse them anywhere outside your machine.
 
 ---
 
-## 2. Frontend (React + Vite)
+## Backend
 
-Run from `frontend/Concord/`. The service layer already reads its API base URL from `VITE_API_URL` (see `src/api/httpClient.js`).
-
-### Option A - Vite dev server (recommended while developing)
+Navigate to the backend directory:
 
 ```bash
-cd frontend/Concord
+cd backend
+```
+
+Configure the required environment variables according to the project's environment configuration.
+
+Then restore dependencies:
+
+```bash
+dotnet restore
+```
+
+Run the API:
+
+```bash
+dotnet run
+```
+
+---
+
+## Frontend
+
+Navigate to the frontend:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
 npm install
-echo "VITE_API_URL=http://localhost:6001" > .env.local
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-Open `http://localhost:5173`.
-
-### Option B - Docker (production-style build via the existing `Dockerfile`)
-
-```bash
-cd frontend/Concord
-docker build --build-arg VITE_API_URL=http://localhost:6001 -t concord-frontend .
-docker run --rm -p 5173:80 concord-frontend
-```
-
-Open `http://localhost:5173`.
-
 ---
 
-## 3. Mobile (Flutter)
+## Mobile
 
-Run from `mobile/concord/`. There's no Docker image for this app - Flutter targets a device/emulator/simulator, not a container. The API base URL is read via `--dart-define=API_BASE_URL=...` (see `lib/api/api_config.dart`), defaulting to `http://localhost:6001` if omitted.
+Navigate to the Flutter application:
 
 ```bash
-cd mobile/concord
+cd mobile
+```
+
+Install dependencies:
+
+```bash
 flutter pub get
-flutter run --dart-define=API_BASE_URL=http://localhost:6001
 ```
 
-> **Android emulator:** `localhost` refers to the emulator itself, not your host machine - use `--dart-define=API_BASE_URL=http://10.0.2.2:6001` instead.
+Run the application:
+
+```bash
+flutter run
+```
+---
+
+# Deployment
+
+Concord uses a containerized backend and a separately deployed frontend.
+
+```text
+                         GitHub
+                            │
+                            │ GitHub Actions
+                            ▼
+                    Build / Test / Deploy
+                            │
+                  ┌─────────┴─────────┐
+                  ▼                   ▼
+              Azure API             Vercel
+                  │                 Frontend
+          ┌───────┼────────┐
+          ▼       ▼        ▼
+      PostgreSQL Redis   LiveKit
+```
+
+The frontend is deployed through Vercel, while the backend infrastructure is hosted separately.
+
+The production configuration uses environment-specific secrets and configuration rather than storing credentials in source control.
 
 ---
 
-## Running everything together
+# Contact
 
-### Option A - backend in Docker, frontend/mobile run natively (recommended while developing)
+**Huseyn Hamidov**
 
-1. Start the backend (section 1) - wait until `docker compose ps` shows `api` healthy/running.
-2. Start the frontend (section 2, Option A) and/or the mobile app (section 3), pointed at the backend's URL.
-3. Log in with the seeded admin account (`admin@gmail.com` / `admin`, only seeded on the `Local` profile) or register a new user via `POST /Api/V1.0/Register`.
+* GitHub: [@hhuseyn1](https://github.com/hhuseyn1)
+* Project: [Concord](https://github.com/hhuseyn1/Concord)
+* Live Application: [concord-taupe-zeta.vercel.app](https://concord-taupe-zeta.vercel.app)
+* Email: [huseynhemi@gmail.com](mailto:huseynhemi@gmail.com)
 
-### Option B - everything in Docker, including the frontend
+For questions, feedback or a live demonstration, feel free to reach out.
 
-Compose also has a `frontend` profile (see `compose.yaml`) that builds and serves the React app
-alongside the backend, instead of running it with `npm run dev` as in section 2:
+---
 
-```bash
-cd backend/Concord
-docker build -t shared:Local -f Dockerfile .
-docker compose --env-file .env.Local --profile db --profile backend --profile frontend up -d --build
-```
+# License
+
+Concord is licensed under the **MIT License**.
+
+See the [LICENSE](./LICENSE) file for the full license text.
+
+Copyright (c) 2026 Huseyn Hamidov
